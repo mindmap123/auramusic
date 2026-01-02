@@ -34,6 +34,8 @@ export default function TracksContent() {
     const [audio] = useState(() => typeof window !== 'undefined' ? new Audio() : null);
     const [isDragging, setIsDragging] = useState(false);
 
+    const [uploadProgress, setUploadProgress] = useState(0);
+
     useEffect(() => {
         fetchStyles();
         return () => { if (audio) { audio.pause(); audio.src = ''; } };
@@ -52,21 +54,79 @@ export default function TracksContent() {
         if (!selectedStyleId || !file) return;
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("styleId", selectedStyleId);
+        setUploadProgress(0);
 
         try {
-            const res = await fetch("/api/admin/mixes", { method: "POST", body: formData });
-            if (res.ok) {
-                setShowUpload(false);
-                setFile(null);
-                fetchStyles();
-            } else {
-                alert((await res.json()).error || "Erreur");
+            // 1. Get signature from our API
+            const sigRes = await fetch("/api/admin/upload-signature", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ folder: "music-streaming/mixes" })
+            });
+            
+            if (!sigRes.ok) {
+                const err = await sigRes.json();
+                throw new Error(err.error || "Failed to get upload signature");
             }
-        } catch (err: any) { alert("Erreur : " + err.message); }
-        finally { setUploading(false); }
+            
+            const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
+
+            // 2. Upload directly to Cloudinary
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("signature", signature);
+            formData.append("timestamp", timestamp.toString());
+            formData.append("api_key", apiKey);
+            formData.append("folder", folder);
+            formData.append("resource_type", "video");
+
+            const xhr = new XMLHttpRequest();
+            
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    setUploadProgress(percent);
+                }
+            };
+
+            const uploadPromise = new Promise<any>((resolve, reject) => {
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        resolve(JSON.parse(xhr.responseText));
+                    } else {
+                        reject(new Error(`Upload failed: ${xhr.statusText}`));
+                    }
+                };
+                xhr.onerror = () => reject(new Error("Upload failed"));
+            });
+
+            xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`);
+            xhr.send(formData);
+
+            const result = await uploadPromise;
+
+            // 3. Update database with the URL
+            const updateRes = await fetch(`/api/admin/styles/${selectedStyleId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mixUrl: result.secure_url })
+            });
+
+            if (!updateRes.ok) {
+                throw new Error("Failed to update style with mix URL");
+            }
+
+            setShowUpload(false);
+            setFile(null);
+            setUploadProgress(0);
+            fetchStyles();
+            
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            alert("Erreur : " + err.message);
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -269,7 +329,9 @@ export default function TracksContent() {
                             </div>
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowUpload(false)} className="btn-secondary">Annuler</button>
-                                <button type="submit" className="btn-primary" disabled={uploading || !file}>{uploading ? "Upload..." : "Uploader"}</button>
+                                <button type="submit" className="btn-primary" disabled={uploading || !file}>
+                                    {uploading ? `Upload... ${uploadProgress}%` : "Uploader"}
+                                </button>
                             </div>
                         </form>
                     </div>

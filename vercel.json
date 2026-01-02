@@ -1,3 +1,10 @@
 {
-  "buildCommand": "npx prisma generate && npx prisma db push --accept-data-loss && next build"
+  "functions": {
+    "src/app/api/admin/mixes/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/admin/covers/route.ts": {
+      "maxDuration": 30
+    }
+  }
 }
