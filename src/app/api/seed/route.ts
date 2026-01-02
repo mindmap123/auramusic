@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 
 // Route temporaire pour initialiser la DB avec les données récupérées de Cloudinary
 // À SUPPRIMER après utilisation !
+// v2 - Force redeploy
 export async function GET() {
     try {
         // Create Admin
