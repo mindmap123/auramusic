@@ -78,7 +78,6 @@ export default function TracksContent() {
             formData.append("timestamp", timestamp.toString());
             formData.append("api_key", apiKey);
             formData.append("folder", folder);
-            formData.append("resource_type", "video");
 
             const xhr = new XMLHttpRequest();
             
@@ -94,12 +93,18 @@ export default function TracksContent() {
                     if (xhr.status === 200) {
                         resolve(JSON.parse(xhr.responseText));
                     } else {
-                        reject(new Error(`Upload failed: ${xhr.statusText}`));
+                        try {
+                            const err = JSON.parse(xhr.responseText);
+                            reject(new Error(err.error?.message || `Upload failed: ${xhr.status}`));
+                        } catch {
+                            reject(new Error(`Upload failed: ${xhr.statusText}`));
+                        }
                     }
                 };
-                xhr.onerror = () => reject(new Error("Upload failed"));
+                xhr.onerror = () => reject(new Error("Upload failed - network error"));
             });
 
+            // Use /video/upload for audio files
             xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`);
             xhr.send(formData);
 

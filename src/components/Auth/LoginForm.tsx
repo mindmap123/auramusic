@@ -1,15 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import styles from "./LoginForm.module.css";
 
-interface LoginFormProps {
-    isAdmin?: boolean;
-}
-
-export default function LoginForm({ isAdmin = false }: LoginFormProps) {
+export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -30,12 +26,23 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
 
             if (res?.error) {
                 setError("Identifiants invalides");
-            } else {
-                router.push(isAdmin ? "/admin/dashboard" : "/dashboard");
+                setLoading(false);
+                return;
+            }
+
+            // Get session to check role and redirect accordingly
+            const session = await getSession();
+            if (session?.user) {
+                const role = (session.user as any).role;
+                if (role === "ADMIN") {
+                    router.push("/admin/dashboard");
+                } else {
+                    router.push("/dashboard");
+                }
+                router.refresh();
             }
         } catch (err) {
             setError("Une erreur est survenue");
-        } finally {
             setLoading(false);
         }
     };
@@ -43,7 +50,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
     return (
         <div className={styles.container}>
             <form className={styles.form} onSubmit={handleSubmit}>
-                <h1 className="gradient-text">{isAdmin ? "Admin Login" : "Store Login"}</h1>
+                <h1 className="gradient-text">Connexion</h1>
                 <p className={styles.subtitle}>
                     Connectez-vous pour commencer à diffuser.
                 </p>
@@ -75,7 +82,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
                 </div>
 
                 <button type="submit" className={styles.button} disabled={loading}>
-                    {loading ? "Chargement..." : "Se connecter"}
+                    {loading ? "Connexion..." : "Se connecter"}
                 </button>
             </form>
         </div>
