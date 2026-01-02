@@ -1,0 +1,483 @@
+.page {
+    padding: 0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+    margin-top: 4px;
+}
+
+/* Table */
+.tableCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 14px 20px;
+    background: var(--background-subtle);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+}
+
+.table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover td {
+    background: var(--background-subtle);
+}
+
+/* Style Cell */
+.styleCell {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.styleCover {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+}
+
+.styleIcon {
+    font-size: 1.75rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary);
+    border-radius: var(--radius-sm);
+}
+
+.styleInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.styleName {
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.styleDesc {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Cover Cell */
+.coverCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.coverThumb {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+}
+
+.addCoverBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    background: var(--secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.addCoverBtn:hover {
+    background: var(--secondary-hover);
+    color: var(--foreground);
+}
+
+/* Mix Status */
+.mixStatus {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.statusActive {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--success);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.statusInactive {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--error);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.deleteMixBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    background: var(--secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.deleteMixBtn:hover {
+    background: var(--error-bg);
+    color: var(--error);
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.actionBtn {
+    padding: 8px;
+    color: var(--muted-foreground);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.actionBtn:hover {
+    background: var(--secondary);
+    color: var(--foreground);
+}
+
+.actionBtn.playing {
+    color: var(--primary);
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.deleteBtn:hover {
+    background: var(--error-bg);
+    color: var(--error);
+}
+
+.loading, .empty {
+    text-align: center;
+    color: var(--muted-foreground);
+    padding: 48px 20px !important;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn var(--transition-base) ease-out;
+}
+
+.modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 520px;
+    margin: 20px;
+    animation: slideUp var(--transition-slow) ease-out;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modalHeader h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.closeBtn {
+    padding: 8px;
+    color: var(--muted-foreground);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.closeBtn:hover {
+    background: var(--secondary);
+    color: var(--foreground);
+}
+
+.modalSubtitle {
+    padding: 16px 24px 0;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+}
+
+.modal form {
+    padding: 24px;
+}
+
+/* Form */
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+}
+
+.formGroup textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.colorInput {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.colorInput input[type="color"] {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.colorInput span {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    font-family: monospace;
+}
+
+/* Dropzone */
+.dropzone {
+    margin-bottom: 24px;
+}
+
+.dropzone input {
+    display: none;
+}
+
+.dropzone label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px 24px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-align: center;
+    color: var(--muted-foreground);
+}
+
+.dropzone label:hover,
+.dropzone.dragging label {
+    border-color: var(--primary);
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.dropzone.hasFile label {
+    border-color: var(--success);
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cover Section in Modal */
+.coverSection {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.coverSection > label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+}
+
+.coverUpload {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.coverPreview {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.coverPreview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+}
+
+.coverDeleteBtn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--error);
+    color: white;
+    border-radius: 50%;
+    transition: all var(--transition-base);
+}
+
+.coverDeleteBtn:hover {
+    transform: scale(1.1);
+}
+
+.coverPlaceholder {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: var(--secondary);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.coverPlaceholder:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.changeCoverBtn {
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    background: var(--secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.changeCoverBtn:hover {
+    background: var(--secondary-hover);
+    color: var(--foreground);
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .formRow {
+        grid-template-columns: 1fr;
+    }
+
+    .styleDesc {
+        display: none;
+    }
+
+    .mixStatus {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

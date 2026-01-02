@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Store {
+  id              String               @id @default(uuid())
+  name            String
+  email           String               @unique
+  password        String
+  currentStyleId  String?
+  volume          Int                  @default(70)
+  isPlaying       Boolean              @default(false)
+  isAutoMode      Boolean              @default(false)
+  isActive        Boolean              @default(true)
+  lastPlayedAt    DateTime?
+  role            String               @default("STORE")
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  style           MusicStyle?          @relation("CurrentStyle", fields: [currentStyleId], references: [id])
+  playSessions    PlaySession[]
+  styleProgress   StoreStyleProgress[]
+  schedules       StoreSchedule[]
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MusicStyle {
+  id            String               @id @default(uuid())
+  name          String
+  slug          String               @unique
+  description   String
+  mixUrl        String?
+  coverUrl      String?
+  duration      Int                  @default(3600)
+  icon          String?
+  colorTheme    String?
+  stores        Store[]              @relation("CurrentStyle")
+  playSessions  PlaySession[]
+  styleProgress StoreStyleProgress[]
+  schedules     StoreSchedule[]
+}
+
+model StoreSchedule {
+  id        String     @id @default(uuid())
+  storeId   String?
+  styleId   String
+  startTime String     // "HH:mm"
+  endTime   String     // "HH:mm"
+  store     Store?     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  style     MusicStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+}
+
+model StoreStyleProgress {
+  id           String     @id @default(uuid())
+  storeId      String
+  styleId      String
+  lastPosition Int        @default(0)
+  store        Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  style        MusicStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, styleId])
+}
+
+model PlaySession {
+  id          String     @id @default(uuid())
+  storeId     String
+  styleId     String
+  startedAt   DateTime   @default(now())
+  endedAt     DateTime?
+  totalPlayed Int        @default(0)
+  store       Store      @relation(fields: [storeId], references: [id])
+  style       MusicStyle @relation(fields: [styleId], references: [id])
+}

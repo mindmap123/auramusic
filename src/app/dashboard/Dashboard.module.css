@@ -1,0 +1,70 @@
+.layout {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+}
+
+/* Header */
+.header {
+    height: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    background: var(--background-subtle);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.storeInfo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.storeName {
+    font-weight: 500;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+}
+
+/* Mini Player Mode */
+.layoutMini {
+    min-height: auto;
+    height: auto;
+}
+
+.layoutMini .header {
+    display: none;
+}
+
+/* Main Content */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        padding: 0 20px;
+        height: 64px;
+    }
+    
+    .logo {
+        font-size: 1.25rem;
+    }
+    
+    .storeName {
+        display: none;
+    }
+}

@@ -1,0 +1,257 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 1.875rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--muted-foreground);
+    margin-top: 4px;
+}
+
+.addButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.grid {
+    margin-top: 24px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sectionHeader h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.scheduleList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scheduleItem {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    border-radius: 12px;
+    gap: 24px;
+}
+
+.timeSlot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--primary);
+    min-width: 140px;
+}
+
+.styleInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.icon {
+    font-size: 1.5rem;
+}
+
+.name {
+    font-weight: 600;
+}
+
+.targetInfo {
+    min-width: 150px;
+}
+
+.globalBadge {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.storeBadge {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.deleteButton {
+    color: var(--muted-foreground);
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.deleteButton:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted-foreground);
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+}
+
+.modal {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 32px;
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 500px;
+}
+
+.modal h2 {
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+}
+
+.inputGroup {
+    margin-bottom: 20px;
+}
+
+.inputRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.inputGroup label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+.inputGroup input,
+.inputGroup select {
+    width: 100%;
+    padding: 12px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: white;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.cancelButton {
+    padding: 10px 20px;
+    color: var(--muted-foreground);
+}
+
+.saveButton {
+    background: var(--primary);
+    color: white;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .addButton {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .scheduleItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        position: relative;
+        padding-top: 40px;
+    }
+
+    .deleteButton {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+    }
+
+    .timeSlot {
+        min-width: auto;
+    }
+
+    .targetInfo {
+        min-width: auto;
+        width: 100%;
+        border-top: 1px solid var(--border);
+        padding-top: 12px;
+    }
+
+    .modal {
+        padding: 24px;
+        margin: 16px;
+    }
+
+    .inputRow {
+        grid-template-columns: 1fr;
+    }
+}
