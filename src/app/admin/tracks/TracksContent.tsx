@@ -61,7 +61,7 @@ export default function TracksContent() {
             const sigRes = await fetch("/api/admin/upload-signature", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ folder: "music-streaming/mixes" })
+                body: JSON.stringify({})
             });
             
             if (!sigRes.ok) {
@@ -71,12 +71,12 @@ export default function TracksContent() {
             
             const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
 
-            // 2. Upload directly to Cloudinary
+            // 2. Upload directly to Cloudinary with signature
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("signature", signature);
-            formData.append("timestamp", timestamp.toString());
             formData.append("api_key", apiKey);
+            formData.append("timestamp", timestamp.toString());
+            formData.append("signature", signature);
             formData.append("folder", folder);
 
             const xhr = new XMLHttpRequest();
@@ -90,21 +90,20 @@ export default function TracksContent() {
 
             const uploadPromise = new Promise<any>((resolve, reject) => {
                 xhr.onload = () => {
-                    if (xhr.status === 200) {
-                        resolve(JSON.parse(xhr.responseText));
-                    } else {
-                        try {
-                            const err = JSON.parse(xhr.responseText);
-                            reject(new Error(err.error?.message || `Upload failed: ${xhr.status}`));
-                        } catch {
-                            reject(new Error(`Upload failed: ${xhr.statusText}`));
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (xhr.status === 200) {
+                            resolve(response);
+                        } else {
+                            reject(new Error(response.error?.message || `Upload failed: ${xhr.status}`));
                         }
+                    } catch {
+                        reject(new Error(`Upload failed: ${xhr.statusText}`));
                     }
                 };
                 xhr.onerror = () => reject(new Error("Upload failed - network error"));
             });
 
-            // Use /video/upload for audio files
             xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`);
             xhr.send(formData);
 
