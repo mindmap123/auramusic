@@ -137,7 +137,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
     const currentProgress = usePlayerStore(state => state.progress);
 
-    // Mini Player Mode
+    // Mini Player Mode - Full width bar at bottom
     if (isMiniMode && !isPreview) {
         return (
             <div className={styles.miniContainer}>
@@ -159,6 +159,9 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                             {formatTime(currentProgress)} / 1:00:00
                         </div>
                     </div>
+                    <div className={styles.miniVolume}>
+                        <VolumeControl compact />
+                    </div>
                     <div className={styles.miniControls}>
                         <button
                             onClick={togglePlay}
@@ -166,9 +169,9 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                             disabled={!mixUrl}
                         >
                             {isPlaying ? (
-                                <Pause size={20} fill="white" color="white" />
+                                <Pause size={22} fill="white" color="white" />
                             ) : (
-                                <Play size={20} fill="white" color="white" />
+                                <Play size={22} fill="white" color="white" />
                             )}
                         </button>
                         <button
@@ -179,9 +182,6 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                             <Maximize2 size={18} />
                         </button>
                     </div>
-                </div>
-                <div className={styles.miniVolume}>
-                    <VolumeControl compact />
                 </div>
             </div>
         );

@@ -285,19 +285,17 @@
     background: var(--secondary);
 }
 
-/* ===== MINI PLAYER MODE ===== */
+/* ===== MINI PLAYER MODE - FULL WIDTH BAR ===== */
 .miniContainer {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 380px;
-    background: var(--card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, var(--card) 0%, rgba(10, 10, 12, 0.98) 100%);
+    border-top: 1px solid var(--border);
     box-shadow: 
-        0 20px 60px -15px rgba(0, 0, 0, 0.5),
+        0 -10px 40px -10px rgba(0, 0, 0, 0.5),
         0 0 0 1px rgba(255, 255, 255, 0.03);
-    overflow: hidden;
     z-index: 1000;
     backdrop-filter: blur(20px);
 }
@@ -305,20 +303,23 @@
 .miniPlayer {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
+    gap: 20px;
+    padding: 16px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .miniCover {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     background: var(--secondary);
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .miniCover img {
@@ -328,7 +329,9 @@
 }
 
 .miniCover.playing {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        0 0 25px rgba(168, 85, 247, 0.4);
 }
 
 .miniInfo {
@@ -337,7 +340,7 @@
 }
 
 .miniTitle {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--foreground);
     white-space: nowrap;
@@ -346,31 +349,33 @@
 }
 
 .miniStyle {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: var(--muted-foreground);
+    margin-top: 2px;
 }
 
 .miniControls {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .miniPlayBtn {
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all var(--transition-base);
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
 }
 
 .miniPlayBtn:hover:not(:disabled) {
     background: var(--primary-hover);
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.5);
 }
 
 .miniPlayBtn:disabled {
@@ -379,10 +384,12 @@
 }
 
 .miniExpandBtn {
-    padding: 8px;
+    padding: 10px;
     border-radius: var(--radius-sm);
     color: var(--muted-foreground);
     transition: all var(--transition-base);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
 }
 
 .miniExpandBtn:hover {
@@ -391,9 +398,10 @@
 }
 
 .miniVolume {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    width: 180px;
+    flex-shrink: 0;
 }
 
 /* ===== RESPONSIVE - Tablet ===== */
@@ -480,10 +488,29 @@
     }
 
     .miniContainer {
-        left: 12px;
-        right: 12px;
-        bottom: 12px;
-        width: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .miniPlayer {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .miniCover {
+        width: 48px;
+        height: 48px;
+    }
+
+    .miniVolume {
+        display: none;
+    }
+
+    .miniPlayBtn {
+        width: 46px;
+        height: 46px;
     }
 
     .styleSection {
