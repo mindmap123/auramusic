@@ -125,6 +125,54 @@
     font-weight: 500;
 }
 
+/* Favorite button */
+.favoriteBtn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    color: var(--muted-foreground);
+    background: transparent;
+    transition: all 0.2s ease;
+    opacity: 0;
+    z-index: 2;
+}
+
+.card:hover .favoriteBtn {
+    opacity: 1;
+}
+
+.favoriteBtn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.favoriteActive {
+    color: #ef4444 !important;
+    opacity: 1 !important;
+}
+
+.favoriteActive:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+/* Favorite card highlight */
+.favorite {
+    border-color: rgba(239, 68, 68, 0.15);
+}
+
+.favorite::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.5), transparent);
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
 /* Scrollbar */
 .grid::-webkit-scrollbar {
     width: 4px;

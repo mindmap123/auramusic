@@ -1,0 +1,240 @@
+.page {
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--muted-foreground);
+}
+
+/* Stats Grid */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.statCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+
+.statHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.statName {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.statTotal {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+.statDetails {
+    display: flex;
+    gap: 20px;
+}
+
+.statPlay, .statPause {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+}
+
+.statPlay {
+    color: #22c55e;
+}
+
+.statPause {
+    color: #f59e0b;
+}
+
+.noStats {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--muted-foreground);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+/* Filters */
+.filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 16px;
+    color: var(--muted-foreground);
+}
+
+.dateInput, .select {
+    background: transparent;
+    border: none;
+    color: var(--foreground);
+    font-size: 0.875rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.select {
+    min-width: 150px;
+}
+
+.refreshBtn {
+    padding: 10px 14px;
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--muted-foreground);
+    transition: all 0.2s;
+}
+
+.refreshBtn:hover {
+    background: var(--secondary-hover);
+    color: var(--foreground);
+}
+
+/* Table */
+.tableCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 14px 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-foreground);
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--border);
+}
+
+.table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.timeCell {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-foreground);
+    font-family: monospace;
+}
+
+.detailsCell {
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+}
+
+.loading, .empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted-foreground);
+}
+
+/* Action badges */
+.actionBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.actionPLAY {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.actionPAUSE {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.actionCHANGE_STYLE {
+    background: rgba(168, 85, 247, 0.1);
+    color: var(--primary);
+}
+
+.iconPlay {
+    color: #22c55e;
+}
+
+.iconPause {
+    color: #f59e0b;
+}
+
+.iconChange {
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 20px;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+
+    .filterGroup {
+        width: 100%;
+    }
+
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        display: none;
+    }
+}

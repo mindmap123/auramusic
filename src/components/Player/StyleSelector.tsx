@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Heart } from "lucide-react";
 import styles from "./StyleSelector.module.css";
 import { clsx } from "clsx";
 
@@ -18,9 +19,11 @@ interface Style {
 interface StyleSelectorProps {
     activeStyle: string | null;
     onSelect: (slug: string) => void;
+    favorites?: string[];
+    onToggleFavorite?: (styleId: string) => void;
 }
 
-export default function StyleSelector({ activeStyle, onSelect }: StyleSelectorProps) {
+export default function StyleSelector({ activeStyle, onSelect, favorites = [], onToggleFavorite }: StyleSelectorProps) {
     const [stylesList, setStylesList] = useState<Style[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -50,11 +53,19 @@ export default function StyleSelector({ activeStyle, onSelect }: StyleSelectorPr
         );
     }
 
+    // Sort: favorites first, then others
+    const sortedStyles = [...stylesList].sort((a, b) => {
+        const aFav = favorites.includes(a.id) ? 0 : 1;
+        const bFav = favorites.includes(b.id) ? 0 : 1;
+        return aFav - bFav;
+    });
+
     return (
         <div className={styles.grid}>
-            {stylesList.map((style) => {
+            {sortedStyles.map((style) => {
                 const isActive = activeStyle === style.slug;
                 const hasMix = !!style.mixUrl;
+                const isFavorite = favorites.includes(style.id);
 
                 return (
                     <button
@@ -62,7 +73,8 @@ export default function StyleSelector({ activeStyle, onSelect }: StyleSelectorPr
                         className={clsx(
                             styles.card,
                             isActive && styles.active,
-                            !hasMix && styles.noMix
+                            !hasMix && styles.noMix,
+                            isFavorite && styles.favorite
                         )}
                         onClick={() => hasMix && onSelect(style.slug)}
                         disabled={!hasMix}
@@ -78,6 +90,18 @@ export default function StyleSelector({ activeStyle, onSelect }: StyleSelectorPr
                             <span className={styles.name}>{style.name}</span>
                             <span className={styles.description}>{style.description}</span>
                         </div>
+                        {onToggleFavorite && hasMix && (
+                            <button
+                                className={clsx(styles.favoriteBtn, isFavorite && styles.favoriteActive)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onToggleFavorite(style.id);
+                                }}
+                                title={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+                            >
+                                <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
+                            </button>
+                        )}
                         {!hasMix && (
                             <span className={styles.noMixBadge}>Bientôt</span>
                         )}

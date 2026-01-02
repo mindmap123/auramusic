@@ -31,7 +31,36 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
     const [localStore, setLocalStore] = useState(store);
     const [isMiniMode, setIsMiniMode] = useState(false);
+    const [favorites, setFavorites] = useState<string[]>([]);
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const lastPlayState = useRef<boolean | null>(null);
+
+    // Log activity helper
+    const logActivity = async (action: string, details?: any) => {
+        if (isPreview) return;
+        try {
+            await fetch("/api/store/activity", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action, details })
+            });
+        } catch (err) {
+            console.error("[Activity Log] Error:", err);
+        }
+    };
+
+    // Load favorites
+    useEffect(() => {
+        if (isPreview) return;
+        fetch("/api/store/favorites")
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setFavorites(data.map((s: any) => s.id));
+                }
+            })
+            .catch(console.error);
+    }, [isPreview]);
 
     // Initial Load
     useEffect(() => {
@@ -43,6 +72,17 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
             setAutoMode(true);
         }
     }, []);
+
+    // Log play/pause changes
+    useEffect(() => {
+        if (lastPlayState.current !== null && lastPlayState.current !== isPlaying) {
+            logActivity(isPlaying ? "PLAY" : "PAUSE", {
+                styleId: currentStyleId,
+                styleName: localStore.style?.name
+            });
+        }
+        lastPlayState.current = isPlaying;
+    }, [isPlaying]);
 
     // Auto-Mode Sync
     useEffect(() => {
@@ -103,6 +143,14 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         const style = stylesData.find((s: any) => s.slug === styleSlug);
 
         if (style && style.mixUrl) {
+            // Log style change
+            logActivity("CHANGE_STYLE", {
+                fromStyleId: currentStyleId,
+                fromStyleName: localStore.style?.name,
+                toStyleId: style.id,
+                toStyleName: style.name
+            });
+
             setStyle(style.id, style.mixUrl);
 
             const updateRes = await fetch("/api/store/change-style", {
@@ -115,6 +163,24 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
             initPlayer(style.mixUrl, updatedStore.currentPosition, volume);
             togglePlay();
+        }
+    };
+
+    const handleToggleFavorite = async (styleId: string) => {
+        try {
+            const res = await fetch("/api/store/favorites", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ styleId })
+            });
+            const data = await res.json();
+            if (data.isFavorite) {
+                setFavorites(prev => [...prev, styleId]);
+            } else {
+                setFavorites(prev => prev.filter(id => id !== styleId));
+            }
+        } catch (err) {
+            console.error("[Favorites] Error:", err);
         }
     };
 
@@ -259,6 +325,8 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                     <StyleSelector
                         activeStyle={localStore.style?.slug}
                         onSelect={handleStyleChange}
+                        favorites={favorites}
+                        onToggleFavorite={handleToggleFavorite}
                     />
                 </section>
             </div>

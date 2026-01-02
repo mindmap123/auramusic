@@ -26,6 +26,8 @@ model Store {
   playSessions    PlaySession[]
   styleProgress   StoreStyleProgress[]
   schedules       StoreSchedule[]
+  favorites       StoreFavorite[]
+  activityLogs    ActivityLog[]
 }
 
 model Admin {
@@ -52,6 +54,7 @@ model MusicStyle {
   playSessions  PlaySession[]
   styleProgress StoreStyleProgress[]
   schedules     StoreSchedule[]
+  favorites     StoreFavorite[]
 }
 
 model StoreSchedule {
@@ -84,4 +87,28 @@ model PlaySession {
   totalPlayed Int        @default(0)
   store       Store      @relation(fields: [storeId], references: [id])
   style       MusicStyle @relation(fields: [styleId], references: [id])
+}
+
+// Favoris des magasins
+model StoreFavorite {
+  id        String     @id @default(uuid())
+  storeId   String
+  styleId   String
+  createdAt DateTime   @default(now())
+  store     Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  style     MusicStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, styleId])
+}
+
+// Logs d'activité (play/pause/changement de style)
+model ActivityLog {
+  id        String   @id @default(uuid())
+  storeId   String
+  action    String   // "PLAY", "PAUSE", "CHANGE_STYLE"
+  details   String?  // JSON avec infos supplémentaires (styleId, styleName, etc.)
+  createdAt DateTime @default(now())
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, createdAt])
 }

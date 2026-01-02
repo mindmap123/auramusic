@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Store, Music, BarChart3, LogOut, Clock, Eye, Menu, X } from "lucide-react";
+import { LayoutDashboard, Store, Music, BarChart3, LogOut, Clock, Eye, Menu, X, Activity } from "lucide-react";
 import { signOut } from "next-auth/react";
 import styles from "./AdminLayout.module.css";
 import { clsx } from "clsx";
@@ -14,6 +14,7 @@ const menuItems = [
     { name: "Radios & Mixes", href: "/admin/tracks", icon: Music },
     { name: "Programmation", href: "/admin/scheduling", icon: Clock },
     { name: "Statistiques", href: "/admin/analytics", icon: BarChart3 },
+    { name: "Activité", href: "/admin/activity", icon: Activity },
     { name: "Aperçu", href: "/admin/preview", icon: Eye },
 ];
 
