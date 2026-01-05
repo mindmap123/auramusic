@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Music, Zap, Minimize2, Maximize2 } from "lucide-react";
+import { Play, Pause, Music, Zap, Minimize2, Maximize2, SkipBack, SkipForward } from "lucide-react";
 import styles from "./Player.module.css";
 import StyleSelector from "./StyleSelector";
 import VolumeControl from "./VolumeControl";
@@ -26,7 +26,8 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         setAutoMode,
         stop,
         progress,
-        mixUrl
+        mixUrl,
+        seekRelative
     } = usePlayerStore();
 
     const [localStore, setLocalStore] = useState(store);
@@ -230,6 +231,14 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                     </div>
                     <div className={styles.miniControls}>
                         <button
+                            onClick={() => seekRelative(-80)}
+                            className={styles.seekBtn}
+                            disabled={!mixUrl}
+                            title="Reculer 80s"
+                        >
+                            <SkipBack size={18} />
+                        </button>
+                        <button
                             onClick={togglePlay}
                             className={styles.miniPlayBtn}
                             disabled={!mixUrl}
@@ -239,6 +248,14 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                             ) : (
                                 <Play size={22} fill="white" color="white" />
                             )}
+                        </button>
+                        <button
+                            onClick={() => seekRelative(80)}
+                            className={styles.seekBtn}
+                            disabled={!mixUrl}
+                            title="Avancer 80s"
+                        >
+                            <SkipForward size={18} />
                         </button>
                         <button
                             onClick={() => setIsMiniMode(false)}
@@ -291,6 +308,14 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
                     <div className={styles.controls}>
                         <button
+                            onClick={() => seekRelative(-80)}
+                            className={styles.seekButton}
+                            disabled={!mixUrl}
+                            title="Reculer 80s"
+                        >
+                            <SkipBack size={24} />
+                        </button>
+                        <button
                             onClick={togglePlay}
                             className={clsx(styles.playButton, !mixUrl && styles.disabled)}
                             disabled={!mixUrl}
@@ -300,6 +325,14 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                             ) : (
                                 <Play size={40} fill="white" color="white" />
                             )}
+                        </button>
+                        <button
+                            onClick={() => seekRelative(80)}
+                            className={styles.seekButton}
+                            disabled={!mixUrl}
+                            title="Avancer 80s"
+                        >
+                            <SkipForward size={24} />
                         </button>
                     </div>
 

@@ -17,6 +17,7 @@ interface PlayerState {
     setStyle: (styleId: string, mixUrl: string) => void;
     setAutoMode: (auto: boolean) => void;
     seek: (seconds: number) => void;
+    seekRelative: (delta: number) => void;
     stop: () => void;
 }
 
@@ -103,6 +104,15 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         if (audio) {
             audio.currentTime = seconds;
             set({ progress: seconds });
+        }
+    },
+
+    seekRelative: (delta) => {
+        const audio = getAudioInstance();
+        if (audio && audio.duration) {
+            const newTime = Math.max(0, Math.min(audio.duration, audio.currentTime + delta));
+            audio.currentTime = newTime;
+            set({ progress: Math.floor(newTime) });
         }
     },
 

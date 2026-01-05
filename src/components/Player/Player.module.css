@@ -196,6 +196,35 @@
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
+/* Seek buttons (skip forward/back) */
+.seekButton {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-foreground);
+    transition: all 0.2s ease;
+}
+
+.seekButton:hover:not(:disabled) {
+    background: var(--secondary-hover);
+    color: var(--foreground);
+    transform: scale(1.05);
+}
+
+.seekButton:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.seekButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 /* ===== VOLUME ===== */
 .volumeWrapper {
     width: 100%;
@@ -395,6 +424,24 @@
 .miniExpandBtn:hover {
     color: var(--foreground);
     background: var(--secondary);
+}
+
+.seekBtn {
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    color: var(--muted-foreground);
+    transition: all var(--transition-base);
+    background: transparent;
+}
+
+.seekBtn:hover:not(:disabled) {
+    color: var(--foreground);
+    background: var(--secondary);
+}
+
+.seekBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
 .miniVolume {
