@@ -54,7 +54,7 @@ export default function DashboardContent() {
                 <div className={styles.logo}><span className="gradient-text">AURA</span></div>
                 <div className={styles.storeInfo}><span>{store.name}</span><SignOutButton /></div>
             </header>
-            <main><Player store={store} /></main>
+            <main className={styles.main}><Player store={store} /></main>
         </div>
     );
 }
