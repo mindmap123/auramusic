@@ -34,6 +34,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
     const [localStore, setLocalStore] = useState(store);
     const [isMobile, setIsMobile] = useState(false);
+    const [isTablet, setIsTablet] = useState(false);
     const [isMobileFullScreen, setIsMobileFullScreen] = useState(false);
     const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -44,10 +45,14 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
     // --- Effects (Logic unchanged from original) ---
 
     useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth <= 1024); // Tablet/Mobile threshold
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        const checkResponsive = () => {
+            const width = window.innerWidth;
+            setIsMobile(width <= 640);
+            setIsTablet(width > 640 && width <= 1024);
+        };
+        checkResponsive();
+        window.addEventListener('resize', checkResponsive);
+        return () => window.removeEventListener('resize', checkResponsive);
     }, []);
 
     const logActivity = async (action: string, details?: any) => {
@@ -216,7 +221,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                                 <Zap size={14} fill={isAutoMode ? "currentColor" : "none"} />
                                 <span>{isAutoMode ? "Auto" : "Manuel"}</span>
                             </button>
-                            <button 
+                            <button
                                 className={styles.logoutBtn}
                                 onClick={() => signOut()}
                                 title="Déconnexion"
@@ -298,7 +303,68 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         );
     }
 
-    // 2. Desktop Premium Layout
+
+    // 2. Tablet "Dashboard" Layout
+    if (isTablet && !isPreview) {
+        return (
+            <div className={styles.tabletContainer}>
+                {/* Header */}
+                <header className={styles.tabletHeader}>
+                    <div className={styles.brand}>Aura Music</div>
+                    <button className={styles.menuBtn} onClick={() => signOut()}>
+                        <div className={styles.hamburger} />
+                    </button>
+                </header>
+
+                {/* Hero Section */}
+                <section className={styles.tabletHero}>
+                    <div className={styles.heroContent}>
+                        <div className={styles.heroText}>
+                            <h1 className={styles.heroTitle}>{localStore.style?.name || "Ready to Explore"}</h1>
+                            <p className={styles.heroSubtitle}>{localStore.style?.description || "Select an ambiance to start your journey"}</p>
+                        </div>
+                        {localStore.style?.mixUrl && (
+                            <button className={styles.heroPlayBtn} onClick={togglePlay}>
+                                {isPlaying ? <Pause size={40} fill="currentColor" /> : <Play size={40} fill="currentColor" style={{ marginLeft: 4 }} />}
+                            </button>
+                        )}
+                    </div>
+                    {/* Hero Background using Cover Art */}
+                    <div className={styles.heroBackground}>
+                        {localStore.style?.coverUrl && <img src={localStore.style.coverUrl} alt="Hero" />}
+                        <div className={styles.heroOverlay} />
+                    </div>
+                </section>
+
+                {/* Categories / Filters */}
+                <div className={styles.tabletFilters}>
+                    {["Tout", "Relax", "Voyage", "Énergie", "Instrumental"].map((filter, i) => (
+                        <button key={filter} className={clsx(styles.filterPill, i === 0 && styles.filterActive)}>
+                            {filter}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Horizontal Recommendations */}
+                <div className={styles.tabletRecs}>
+                    <div className={styles.recHeader}>
+                        <h3>Recommandations</h3>
+                        <span className={styles.seeAll}>Voir tout &gt;</span>
+                    </div>
+                    <div className={styles.recListWrapper}>
+                        <StyleSelector
+                            activeStyle={localStore.style?.slug}
+                            onSelect={handleStyleChange}
+                            favorites={favorites}
+                            onToggleFavorite={handleToggleFavorite}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // 3. Desktop Premium Layout
     return (
         <div className={clsx(styles.container, isPreview && styles.previewContainer)}>
             <div className={styles.mainGrid}>
