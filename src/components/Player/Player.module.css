@@ -469,11 +469,57 @@
 
     .mainGrid {
         grid-template-columns: 1fr;
-        /* On tablet, maybe stack or hide list */
     }
 
     .styleSection {
         display: none;
-        /* Simplify focus for now */
     }
+}
+
+/* ========================================= */
+/*       MOBILE LAYOUT FIX                   */
+/* ========================================= */
+
+/* On mobile, mobileContainer takes over */
+.mobileContainer .styleSection {
+    display: flex !important;
+    flex: 1;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    max-height: none;
+    height: auto;
+    overflow: hidden;
+}
+
+.mobileContainer .styleHeader {
+    padding: 16px;
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
+}
+
+.mobileContainer .styleHeader h2 {
+    font-size: 1.125rem;
+}
+
+.placeholderIcon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--layer-2);
+    color: var(--foreground-muted);
+}
+
+.mobileCoverPlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--layer-2);
+    border-radius: 20px;
 }
