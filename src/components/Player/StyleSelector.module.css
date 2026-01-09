@@ -21,6 +21,8 @@
     position: relative;
     cursor: pointer;
     flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .card:hover {
@@ -175,15 +177,10 @@
 
 /* Card click area for desktop */
 .cardClickArea {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    cursor: pointer;
-    background: transparent;
-    border: none;
+    display: none;
 }
 
-/* Play button for mobile */
+/* Play button for mobile - removed, whole card is clickable */
 .playBtn {
     display: none;
 }
@@ -303,6 +300,13 @@
         position: relative;
         scroll-snap-align: center;
         flex-shrink: 0;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    .card:active {
+        transform: scale(0.98);
     }
 
     .card::before {
@@ -456,29 +460,11 @@
         display: none;
     }
 
-    /* Play button on mobile cards */
-    .playBtn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-        color: white;
-        font-size: 0.9375rem;
-        font-weight: 600;
-        padding: 12px 28px;
-        border-radius: 30px;
-        margin-top: 4px;
-        box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
-        transition: all 0.2s ease;
-    }
-
-    .playBtn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5);
-    }
-
     .cardClickArea {
+        display: none;
+    }
+
+    .playBtn {
         display: none;
     }
 }
