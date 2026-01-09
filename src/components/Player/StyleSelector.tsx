@@ -18,7 +18,7 @@ interface Style {
 
 interface StyleSelectorProps {
     activeStyle: string | null;
-    onSelect: (slug: string) => void;
+    onSelect: (style: any) => void;
     favorites?: string[];
     onToggleFavorite?: (styleId: string) => void;
 }
@@ -76,7 +76,7 @@ export default function StyleSelector({ activeStyle, onSelect, favorites = [], o
                             !hasMix && styles.noMix,
                             isFavorite && styles.favorite
                         )}
-                        onClick={() => hasMix && onSelect(style.slug)}
+                        onClick={() => hasMix && onSelect(style)}
                         role="button"
                         tabIndex={hasMix ? 0 : -1}
                     >

@@ -494,6 +494,7 @@
         padding-bottom: 80px; /* Space for mini player */
         height: 100vh;
         height: 100dvh;
+        overflow: hidden;
     }
 
     .mainGrid {
@@ -501,6 +502,7 @@
         flex-direction: column;
         gap: 0;
         height: 100%;
+        overflow: hidden;
     }
 
     /* Hide full player section on mobile - use mini player instead */
@@ -514,6 +516,9 @@
         border-radius: 0;
         border: none;
         background: transparent;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .styleHeader {
@@ -521,18 +526,17 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        padding: 16px 20px;
+        padding: 16px 16px 12px;
         background: var(--background);
-        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
     }
 
     .styleHeaderText h2 {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
     }
 
     .styleHeaderText p {
-        display: block;
-        font-size: 0.75rem;
+        display: none;
     }
 
     .autoModeBtn {

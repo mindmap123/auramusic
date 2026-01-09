@@ -103,7 +103,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                 const res = await fetch("/api/store/current-program");
                 const data = await res.json();
                 if (data.style && data.style.id !== currentStyleId) {
-                    handleStyleChange(data.style.slug);
+                    handleStyleChange(data.style);
                 }
             } catch (err) {
                 console.error("[Auto-Mode] Sync error:", err);
@@ -139,41 +139,36 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         };
     }, []);
 
-    const handleStyleChange = async (styleSlug: string) => {
-        stop();
+    const handleStyleChange = (style: any) => {
+        if (!style || !style.mixUrl) return;
 
-        await fetch("/api/store/save-position", {
+        // IMMEDIATELY start playing - don't wait for API calls
+        stop();
+        setStyle(style.id, style.mixUrl);
+        setLocalStore((prev: any) => ({ ...prev, style, currentStyleId: style.id }));
+        initPlayer(style.mixUrl, 0, volume);
+        togglePlay();
+
+        // Do API calls in background (non-blocking)
+        fetch("/api/store/save-position", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ position: progress, isPlaying: false })
+        }).catch(console.error);
+
+        fetch("/api/store/change-style", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ styleId: style.id })
+        }).catch(console.error);
+
+        // Log activity in background
+        logActivity("CHANGE_STYLE", {
+            fromStyleId: currentStyleId,
+            fromStyleName: localStore.style?.name,
+            toStyleId: style.id,
+            toStyleName: style.name
         });
-
-        const res = await fetch("/api/styles");
-        const stylesData = await res.json();
-        const style = stylesData.find((s: any) => s.slug === styleSlug);
-
-        if (style && style.mixUrl) {
-            // Log style change
-            logActivity("CHANGE_STYLE", {
-                fromStyleId: currentStyleId,
-                fromStyleName: localStore.style?.name,
-                toStyleId: style.id,
-                toStyleName: style.name
-            });
-
-            setStyle(style.id, style.mixUrl);
-
-            const updateRes = await fetch("/api/store/change-style", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ styleId: style.id })
-            });
-            const updatedStore = await updateRes.json();
-            setLocalStore(updatedStore);
-
-            initPlayer(style.mixUrl, updatedStore.currentPosition, volume);
-            togglePlay();
-        }
     };
 
     const handleToggleFavorite = async (styleId: string) => {
