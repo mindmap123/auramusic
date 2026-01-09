@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Music, Zap, Minimize2, Maximize2, SkipBack, SkipForward } from "lucide-react";
+import { Play, Pause, Music, Zap, SkipBack, SkipForward, ChevronDown, ChevronUp } from "lucide-react";
 import styles from "./Player.module.css";
 import StyleSelector from "./StyleSelector";
 import VolumeControl from "./VolumeControl";
@@ -32,21 +32,23 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
     } = usePlayerStore();
 
     const [localStore, setLocalStore] = useState(store);
-    const [isMiniMode, setIsMiniMode] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isMobileFullScreen, setIsMobileFullScreen] = useState(false);
     const [favorites, setFavorites] = useState<string[]>([]);
+
+    // Activity & Save Logic
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
 
-    // Check if mobile
+    // --- Effects (Logic unchanged from original) ---
+
     useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth <= 640);
+        const checkMobile = () => setIsMobile(window.innerWidth <= 1024); // Tablet/Mobile threshold
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Log activity helper
     const logActivity = async (action: string, details?: any) => {
         if (isPreview) return;
         try {
@@ -60,7 +62,6 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         }
     };
 
-    // Load favorites
     useEffect(() => {
         if (isPreview) return;
         fetch("/api/store/favorites")
@@ -73,7 +74,6 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
             .catch(console.error);
     }, [isPreview]);
 
-    // Initial Load
     useEffect(() => {
         if (store.style?.mixUrl) {
             setStyle(store.currentStyleId, store.style.mixUrl);
@@ -84,7 +84,6 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         }
     }, []);
 
-    // Log play/pause changes
     useEffect(() => {
         if (lastPlayState.current !== null && lastPlayState.current !== isPlaying) {
             logActivity(isPlaying ? "PLAY" : "PAUSE", {
@@ -95,10 +94,8 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         lastPlayState.current = isPlaying;
     }, [isPlaying]);
 
-    // Auto-Mode Sync
     useEffect(() => {
         if (!isAutoMode) return;
-
         const checkProgram = async () => {
             try {
                 const res = await fetch("/api/store/current-program");
@@ -110,13 +107,11 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                 console.error("[Auto-Mode] Sync error:", err);
             }
         };
-
         checkProgram();
         const programInterval = setInterval(checkProgram, 30000);
         return () => clearInterval(programInterval);
     }, [isAutoMode, currentStyleId]);
 
-    // Auto-Save Effect
     useEffect(() => {
         saveIntervalRef.current = setInterval(async () => {
             if (isPlaying) {
@@ -127,33 +122,24 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                 });
             }
         }, 10000);
-
         return () => {
             if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
         };
     }, [isPlaying, progress]);
 
-    // Cleanup on unmount
     useEffect(() => {
-        return () => {
-            stop();
-        };
+        return () => stop();
     }, []);
 
     const handleStyleChange = (style: any) => {
         if (!style || !style.mixUrl) return;
-
-        // Initialize AudioContext on first interaction (required for iOS)
         initAudioContext();
-
-        // IMMEDIATELY start playing - don't wait for API calls
         stop();
         setStyle(style.id, style.mixUrl);
         setLocalStore((prev: any) => ({ ...prev, style, currentStyleId: style.id }));
         initPlayer(style.mixUrl, 0, volume);
         togglePlay();
 
-        // Do API calls in background (non-blocking)
         fetch("/api/store/save-position", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -166,7 +152,6 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
             body: JSON.stringify({ styleId: style.id })
         }).catch(console.error);
 
-        // Log activity in background
         logActivity("CHANGE_STYLE", {
             fromStyleId: currentStyleId,
             fromStyleName: localStore.style?.name,
@@ -212,241 +197,154 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
     const currentProgress = usePlayerStore(state => state.progress);
 
-    // Mobile: Always show mini player at bottom + full style selector
-    // Desktop: Show mini mode OR full player based on isMiniMode
+    // --- Render Logic ---
 
-    // Mini Player Component
-    const MiniPlayer = () => (
-        <div className={styles.miniContainer}>
-            <div className={styles.miniPlayer}>
-                <div className={clsx(styles.miniCover, isPlaying && styles.playing)}>
-                    {localStore.style?.coverUrl ? (
-                        <img src={localStore.style.coverUrl} alt={localStore.style.name} />
-                    ) : isPlaying ? (
-                        <AudioVisualizer size="small" />
-                    ) : (
-                        <Music size={24} color="var(--muted-foreground)" />
-                    )}
-                </div>
-                <div className={styles.miniInfo}>
-                    <div className={styles.miniTitle}>
-                        {localStore.style?.name || "Aucune ambiance"}
-                    </div>
-                    <div className={styles.miniStyle}>
-                        {formatTime(currentProgress)} / 1:00:00
-                    </div>
-                </div>
-                {!isMobile && (
-                    <div className={styles.miniVolume}>
-                        <VolumeControl compact />
-                    </div>
-                )}
-                <div className={styles.miniControls}>
-                    <button
-                        onClick={() => seekRelative(-80)}
-                        className={styles.seekBtn}
-                        disabled={!mixUrl}
-                        title="Reculer 80s"
-                    >
-                        <SkipBack size={18} />
-                    </button>
-                    <button
-                        onClick={togglePlay}
-                        className={styles.miniPlayBtn}
-                        disabled={!mixUrl}
-                    >
-                        {isPlaying ? (
-                            <Pause size={22} fill="white" color="white" />
-                        ) : (
-                            <Play size={22} fill="white" color="white" />
-                        )}
-                    </button>
-                    <button
-                        onClick={() => seekRelative(80)}
-                        className={styles.seekBtn}
-                        disabled={!mixUrl}
-                        title="Avancer 80s"
-                    >
-                        <SkipForward size={18} />
-                    </button>
-                    {!isMobile && (
-                        <button
-                            onClick={() => setIsMiniMode(false)}
-                            className={styles.miniExpandBtn}
-                            title="Agrandir"
-                        >
-                            <Maximize2 size={18} />
-                        </button>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-
-    // Desktop Mini Mode
-    if (isMiniMode && !isPreview && !isMobile) {
-        return <MiniPlayer />;
-    }
-
-    // Mobile Layout: Style cards + mini player at bottom
+    // 1. Mobile & Tablet Layout (Responsive)
     if (isMobile && !isPreview) {
         return (
-            <div className={clsx(styles.container)}>
-                <div className={styles.mainGrid}>
-                    <section className={styles.styleSection}>
-                        <header className={styles.styleHeader}>
-                            <div className={styles.styleHeaderText}>
-                                <h2>Ambiances</h2>
-                                <p>Choisissez votre atmosphère</p>
-                            </div>
-                            <button
-                                className={clsx(styles.autoModeBtn, isAutoMode && styles.autoActive)}
-                                onClick={handleAutoModeToggle}
-                            >
-                                <Zap size={14} fill={isAutoMode ? "currentColor" : "none"} />
-                                <span>{isAutoMode ? "Auto" : "Manuel"}</span>
-                            </button>
-                        </header>
-                        <StyleSelector
-                            activeStyle={localStore.style?.slug}
-                            onSelect={handleStyleChange}
-                            favorites={favorites}
-                            onToggleFavorite={handleToggleFavorite}
-                        />
-                    </section>
+            <div className={styles.mobileContainer}>
+                {/* Main List View (Behind overlay) */}
+                <div className={styles.styleSection} style={{ border: 'none', background: 'transparent', boxShadow: 'none' }}>
+                    <div className={styles.styleHeader}>
+                        <h2>Ambiances</h2>
+                        <button
+                            className={clsx(styles.autoModeBtn, isAutoMode && styles.autoActive)}
+                            onClick={handleAutoModeToggle}
+                        >
+                            <Zap size={14} fill={isAutoMode ? "currentColor" : "none"} />
+                            <span>{isAutoMode ? "Auto" : "Manuel"}</span>
+                        </button>
+                    </div>
+                    <StyleSelector
+                        activeStyle={localStore.style?.slug}
+                        onSelect={handleStyleChange}
+                        favorites={favorites}
+                        onToggleFavorite={handleToggleFavorite}
+                    />
                 </div>
-                <MiniPlayer />
-            </div>
-        );
-    }
 
-    // Desktop Mini Player Mode (old code - now handled above)
-    if (isMiniMode && !isPreview) {
-        return (
-            <div className={styles.miniContainer}>
-                <div className={styles.miniPlayer}>
-                    <div className={clsx(styles.miniCover, isPlaying && styles.playing)}>
+                {/* Mini Player Bar (Bottom) */}
+                <div
+                    className={clsx(styles.miniBar, isMobileFullScreen && styles.hidden)}
+                    onClick={() => setIsMobileFullScreen(true)}
+                >
+                    <div className={styles.miniArt}>
                         {localStore.style?.coverUrl ? (
-                            <img src={localStore.style.coverUrl} alt={localStore.style.name} />
-                        ) : isPlaying ? (
-                            <AudioVisualizer size="small" />
+                            <img src={localStore.style.coverUrl} alt="Cover" />
                         ) : (
-                            <Music size={24} color="var(--muted-foreground)" />
+                            <div className={styles.placeholderIcon}><Music size={20} /></div>
                         )}
                     </div>
                     <div className={styles.miniInfo}>
-                        <div className={styles.miniTitle}>
-                            {localStore.style?.name || "Aucune ambiance"}
-                        </div>
-                        <div className={styles.miniStyle}>
-                            {formatTime(currentProgress)} / 1:00:00
-                        </div>
+                        <div className={styles.miniTitle}>{localStore.style?.name || "Aucune lecture"}</div>
+                        <div className={styles.miniSub}>{localStore.style?.name ? "En lecture" : "Sélectionnez une ambiance"}</div>
                     </div>
-                    <div className={styles.miniVolume}>
-                        <VolumeControl compact />
+                    <div className={styles.miniPlay} onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
+                        {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" />}
                     </div>
-                    <div className={styles.miniControls}>
-                        <button
-                            onClick={() => seekRelative(-80)}
-                            className={styles.seekBtn}
-                            disabled={!mixUrl}
-                            title="Reculer 80s"
-                        >
-                            <SkipBack size={18} />
+                </div>
+
+                {/* Full Screen Overlay */}
+                <div className={clsx(styles.fullScreenOverlay, isMobileFullScreen && styles.open)}>
+                    <div className={styles.mobileHeader}>
+                        <button className={styles.closeBtn} onClick={() => setIsMobileFullScreen(false)}>
+                            <ChevronDown size={32} />
                         </button>
-                        <button
-                            onClick={togglePlay}
-                            className={styles.miniPlayBtn}
-                            disabled={!mixUrl}
-                        >
-                            {isPlaying ? (
-                                <Pause size={22} fill="white" color="white" />
-                            ) : (
-                                <Play size={22} fill="white" color="white" />
-                            )}
+                        <div className={styles.styleName}>En lecture</div>
+                        <div style={{ width: 44 }}></div> {/* Spacer */}
+                    </div>
+
+                    <div className={styles.mobileCover}>
+                        {localStore.style?.coverUrl ? (
+                            <>
+                                <img src={localStore.style.coverUrl} alt="Cover" />
+                                {isPlaying && <div className={styles.mobileCoverGlow} />}
+                            </>
+                        ) : (
+                            <div className={clsx(styles.coverArt, styles.mobileCoverPlaceholder)}>
+                                <Music size={64} color="var(--muted-foreground)" />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.mobileTrackInfo}>
+                        <h1 className={styles.trackTitle}>Mix Continu</h1>
+                        <p className={styles.styleName}>{localStore.style?.name || "Sélectionnez une ambiance"}</p>
+                    </div>
+
+                    <div className={styles.mobileControls}>
+                        <button onClick={() => seekRelative(-15)} className={styles.seekButton}><SkipBack size={24} /></button>
+                        <button onClick={togglePlay} className={styles.mobilePlayMain}>
+                            {isPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" style={{ marginLeft: 4 }} />}
                         </button>
-                        <button
-                            onClick={() => seekRelative(80)}
-                            className={styles.seekBtn}
-                            disabled={!mixUrl}
-                            title="Avancer 80s"
-                        >
-                            <SkipForward size={18} />
-                        </button>
-                        <button
-                            onClick={() => setIsMiniMode(false)}
-                            className={styles.miniExpandBtn}
-                            title="Agrandir"
-                        >
-                            <Maximize2 size={18} />
-                        </button>
+                        <button onClick={() => seekRelative(15)} className={styles.seekButton}><SkipForward size={24} /></button>
+                    </div>
+
+                    <div className={styles.volumeWrapper} style={{ marginTop: 'auto' }}>
+                        <VolumeControl />
                     </div>
                 </div>
             </div>
         );
     }
 
-    // Full Player Mode
+    // 2. Desktop Premium Layout
     return (
         <div className={clsx(styles.container, isPreview && styles.previewContainer)}>
             <div className={styles.mainGrid}>
+                {/* Left: Player Island */}
                 <section className={styles.playerSection}>
-                    {!isPreview && (
-                        <button
-                            onClick={() => setIsMiniMode(true)}
-                            className={styles.miniToggle}
-                            title="Mode mini"
-                        >
-                            <Minimize2 size={18} />
-                        </button>
-                    )}
-
-                    <div className={styles.trackInfo}>
+                    <div className={styles.coverContainer}>
                         <div className={clsx(styles.coverArt, isPlaying && styles.playing)}>
                             {localStore.style?.coverUrl ? (
-                                <img src={localStore.style.coverUrl} alt={localStore.style.name} className={styles.coverImage} />
+                                <img src={localStore.style.coverUrl} alt="Cover" className={styles.coverImage} />
                             ) : isPlaying ? (
                                 <AudioVisualizer />
                             ) : (
-                                <Music size={64} color="var(--muted-foreground)" />
+                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Music size={80} color="var(--border-highlight)" />
+                                </div>
                             )}
+                            <div className={styles.shimmer} />
                         </div>
+                        {localStore.style?.coverUrl && isPlaying && <div className={styles.coverGlow} />}
+                    </div>
+
+                    <div className={styles.trackInfo}>
                         <div className={styles.titles}>
                             <h1 className={styles.trackTitle}>Mix Continu</h1>
                             <p className={styles.styleName}>
                                 {localStore.style?.name || "Aucune ambiance sélectionnée"}
                             </p>
-                            <div className={styles.timeInfo}>
-                                {formatTime(currentProgress)} / 1:00:00
+                            <div className={styles.timeInfo} style={{ marginTop: 8, opacity: 0.6 }}>
+                                {formatTime(currentProgress)} / ∞
                             </div>
                         </div>
                     </div>
 
                     <div className={styles.controls}>
                         <button
-                            onClick={() => seekRelative(-80)}
+                            onClick={() => seekRelative(-15)}
                             className={styles.seekButton}
                             disabled={!mixUrl}
-                            title="Reculer 80s"
                         >
                             <SkipBack size={24} />
                         </button>
                         <button
                             onClick={togglePlay}
-                            className={clsx(styles.playButton, !mixUrl && styles.disabled)}
+                            className={styles.playButton}
                             disabled={!mixUrl}
                         >
                             {isPlaying ? (
-                                <Pause size={40} fill="white" color="white" />
+                                <Pause size={36} fill="currentColor" />
                             ) : (
-                                <Play size={40} fill="white" color="white" />
+                                <Play size={36} fill="currentColor" style={{ marginLeft: 4 }} />
                             )}
                         </button>
                         <button
-                            onClick={() => seekRelative(80)}
+                            onClick={() => seekRelative(15)}
                             className={styles.seekButton}
                             disabled={!mixUrl}
-                            title="Avancer 80s"
                         >
                             <SkipForward size={24} />
                         </button>
@@ -457,12 +355,10 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                     </div>
                 </section>
 
+                {/* Right: Style List */}
                 <section className={styles.styleSection}>
                     <header className={styles.styleHeader}>
-                        <div className={styles.styleHeaderText}>
-                            <h2>Ambiances</h2>
-                            <p>Choisissez l'atmosphère de votre espace</p>
-                        </div>
+                        <h2>Ambiances</h2>
                         <button
                             className={clsx(styles.autoModeBtn, isAutoMode && styles.autoActive)}
                             onClick={handleAutoModeToggle}

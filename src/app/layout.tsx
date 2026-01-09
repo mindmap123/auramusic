@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit } from "next/font/google"; // [NEW] Import Outfit
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { clsx } from "clsx";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body", // [NEW] CSS Variable
+  display: "swap",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-display", // [NEW] CSS Variable
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Aura Streaming | Musique d'ambiance pour magasins",
@@ -17,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={clsx(inter.variable, outfit.variable)} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
