@@ -23,10 +23,10 @@ export default function HomePage() {
     }, [session, status, router]);
 
     return (
-        <div style={{ 
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center", 
+        <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             height: "100vh",
             background: "var(--background)"
         }}>
@@ -34,3 +34,5 @@ export default function HomePage() {
         </div>
     );
 }
+
+

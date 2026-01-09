@@ -91,7 +91,7 @@ body {
 
 /* Root container fix for Safari */
 #__next,
-body > div:first-child {
+body>div:first-child {
   height: 100%;
   width: 100%;
   overflow: hidden;
