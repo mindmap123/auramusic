@@ -272,14 +272,15 @@
     display: flex;
     flex-direction: column;
     /* Safari scroll fix */
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
     width: 100vw;
     max-width: 100vw;
-    height: 100vh;
     height: 100dvh;
     touch-action: none;
+    /* Prevent browser gestures if desired, or pan-y */
 }
 
 /* The "Mini Bar" at bottom (always visible on mobile unless expanded) */
@@ -564,11 +565,18 @@
 .tabletContainer {
     display: flex;
     flex-direction: column;
+    position: fixed;
+    /* Lock to viewport */
+    inset: 0;
     height: 100dvh;
+    width: 100vw;
     padding: 24px 32px;
     background: var(--background);
     overflow-y: auto;
-    position: relative;
+    /* Internal scroll only */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+    /* Prevent bounce */
 }
 
 .tabletHeader {

@@ -216,29 +216,26 @@
 /* ===== RESPONSIVE ===== */
 
 /* Tablet: Horizontal Scroll */
-/* Tablet: Premium Horizontal List */
+/* Tablet: 4-Column Fixed Grid */
 @media (max-width: 1024px) and (min-width: 641px) {
     .grid {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 4px;
-        /* Gap compensation */
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
         gap: 16px;
-        scroll-padding-left: 32px;
-        /* Align with parent padding */
+        padding: 4px;
         padding-bottom: 24px;
-        /* Scrollbar space/shadow */
+        overflow-y: visible;
+        /* Let page scroll handle it */
+        overflow-x: hidden;
     }
 
     .card {
         flex-direction: column;
-        min-width: 180px;
-        /* Wider cards */
-        width: 180px;
-        height: 240px;
-        /* Taller */
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        aspect-ratio: 3/4;
+        /* Consistent ratio */
         padding: 0;
         text-align: left;
         background: var(--layer-2);
