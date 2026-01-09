@@ -44,6 +44,14 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         audio.volume = volume;
         audio.loop = true;
 
+        // Hint the browser to start fetching immediately.
+        // This helps mobile Safari where caching/preload behavior can be less eager.
+        try {
+            audio.load();
+        } catch {
+            // ignore
+        }
+
         audio.onplay = () => set({ isPlaying: true });
         audio.onpause = () => set({ isPlaying: false });
         audio.ontimeupdate = () => {
@@ -52,11 +60,15 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
         const onLoaded = () => {
             if (startPosition > 0) {
-                audio.currentTime = startPosition;
+                try {
+                    audio.currentTime = startPosition;
+                } catch {
+                    // If seeking fails (rare on iOS before data is available), we still allow instant play.
+                }
             }
             audio.removeEventListener('loadedmetadata', onLoaded);
         };
-        audio.addEventListener('loadedmetadata', onLoaded);
+        audio.addEventListener('loadedmetadata', onLoaded, { once: true } as any);
 
         set({ mixUrl, volume, currentStyleId: get().currentStyleId });
     },
@@ -64,7 +76,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     togglePlay: () => {
         // Initialize AudioContext on first play (required for iOS)
         initAudioContext();
-        
+
         const audio = getAudioInstance();
         if (!audio) return;
 
@@ -77,8 +89,28 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
         if (!audio.src || audio.src === window.location.href) {
             audio.src = mixUrl;
-            audio.currentTime = progress;
             audio.loop = true;
+
+            // Load immediately so play() resolves faster on mobile.
+            try {
+                audio.load();
+            } catch {
+                // ignore
+            }
+
+            // Don't block play on a seek: seeking before metadata can delay startup on iOS.
+            // We'll apply the seek once metadata is available.
+            if (progress > 0) {
+                const seekOnce = () => {
+                    try {
+                        audio.currentTime = progress;
+                    } catch {
+                        // ignore
+                    }
+                    audio.removeEventListener('loadedmetadata', seekOnce);
+                };
+                audio.addEventListener('loadedmetadata', seekOnce, { once: true } as any);
+            }
         }
 
         if (get().isPlaying) {
@@ -124,7 +156,13 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         const audio = getAudioInstance();
         if (audio) {
             audio.pause();
-            audio.removeAttribute('src');
+            // Keep src to preserve buffer/cache for faster resume on mobile.
+            // We still reset progress state.
+            try {
+                audio.currentTime = 0;
+            } catch {
+                // ignore
+            }
             set({ isPlaying: false, progress: 0 });
         }
     }

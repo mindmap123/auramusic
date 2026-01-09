@@ -491,8 +491,15 @@
 @media (max-width: 640px) {
     .container {
         padding: 0;
-        height: 100dvh;
-        max-height: 100dvh;
+        /*
+         * IMPORTANT (mobile):
+         * The Player is rendered inside Dashboard <main>, which already
+         * has a constrained height (viewport minus header). Setting 100dvh
+         * here makes the Player taller than its parent on iOS Safari,
+         * creating a small but annoying vertical scroll.
+         */
+        height: 100%;
+        max-height: 100%;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -505,8 +512,8 @@
         flex: 1;
         overflow: hidden;
         min-height: 0;
-        /* Leave space for fixed mini player */
-        padding-bottom: 80px;
+        /* Leave space for the fixed mini player (incl. safe-area) */
+        padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
     }
 
     /* Hide full player section on mobile - use mini player instead */

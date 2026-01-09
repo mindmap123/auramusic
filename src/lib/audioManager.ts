@@ -2,6 +2,10 @@
 
 // Simple Singleton pattern for the Audio element
 let globalAudio: HTMLAudioElement | null = null;
+
+// Keep lightweight preloader Audio elements to warm HTTP cache, especially on iOS.
+const preloadPool: Map<string, HTMLAudioElement> = new Map();
+
 let audioContextInitialized = false;
 let audioContext: AudioContext | null = null;
 
@@ -39,6 +43,10 @@ export const getAudioInstance = () => {
         globalAudio.preload = "auto";
         globalAudio.crossOrigin = "anonymous";
         
+        // iOS: avoid forcing fullscreen playback & reduce gesture friction
+        (globalAudio as any).playsInline = true;
+        (globalAudio as any).webkitPlaysInline = true;
+        
         // Optimize for low latency
         if ('mozPreservesPitch' in globalAudio) {
             (globalAudio as any).mozPreservesPitch = false;
@@ -60,6 +68,31 @@ export const preloadAudio = (url: string) => {
         link.href = url;
         link.crossOrigin = 'anonymous';
         document.head.appendChild(link);
+    }
+
+    // Also warm the media pipeline (Safari can ignore <link preload> for audio).
+    if (!preloadPool.has(url)) {
+        const a = new Audio();
+        a.preload = 'auto';
+        a.crossOrigin = 'anonymous';
+        (a as any).playsInline = true;
+        (a as any).webkitPlaysInline = true;
+        a.src = url;
+
+        // Calling load() hints the browser to start fetching right away.
+        try {
+            a.load();
+        } catch {
+            // no-op
+        }
+
+        preloadPool.set(url, a);
+
+        // Keep the pool small to avoid memory bloat on mobile.
+        if (preloadPool.size > 8) {
+            const firstKey = preloadPool.keys().next().value;
+            if (firstKey) preloadPool.delete(firstKey);
+        }
     }
 };
 
