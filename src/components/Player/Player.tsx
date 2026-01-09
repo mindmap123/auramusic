@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
-import { Play, Pause, Music, Zap, SkipBack, SkipForward, ChevronDown, ChevronUp } from "lucide-react";
+import { Play, Pause, Music, Zap, SkipBack, SkipForward, ChevronDown, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import styles from "./Player.module.css";
 import StyleSelector from "./StyleSelector";
 import VolumeControl from "./VolumeControl";
@@ -207,13 +208,22 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                 <div className={styles.styleSection} style={{ border: 'none', background: 'transparent', boxShadow: 'none' }}>
                     <div className={styles.styleHeader}>
                         <h2>Ambiances</h2>
-                        <button
-                            className={clsx(styles.autoModeBtn, isAutoMode && styles.autoActive)}
-                            onClick={handleAutoModeToggle}
-                        >
-                            <Zap size={14} fill={isAutoMode ? "currentColor" : "none"} />
-                            <span>{isAutoMode ? "Auto" : "Manuel"}</span>
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <button
+                                className={clsx(styles.autoModeBtn, isAutoMode && styles.autoActive)}
+                                onClick={handleAutoModeToggle}
+                            >
+                                <Zap size={14} fill={isAutoMode ? "currentColor" : "none"} />
+                                <span>{isAutoMode ? "Auto" : "Manuel"}</span>
+                            </button>
+                            <button 
+                                className={styles.logoutBtn}
+                                onClick={() => signOut()}
+                                title="Déconnexion"
+                            >
+                                <LogOut size={20} />
+                            </button>
+                        </div>
                     </div>
                     <StyleSelector
                         activeStyle={localStore.style?.slug}

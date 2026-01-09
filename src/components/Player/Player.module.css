@@ -272,6 +272,10 @@
     background: var(--background);
     display: flex;
     flex-direction: column;
+    /* Safari scroll fix */
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
 }
 
 /* The "Mini Bar" at bottom (always visible on mobile unless expanded) */
@@ -492,16 +496,35 @@
     max-height: none;
     height: auto;
     overflow: hidden;
+    /* Safari scroll fix */
+    -webkit-overflow-scrolling: touch;
 }
 
 .mobileContainer .styleHeader {
     padding: 16px;
     background: var(--background);
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
 }
 
 .mobileContainer .styleHeader h2 {
     font-size: 1.125rem;
+}
+
+/* Logout button in mobile header */
+.logoutBtn {
+    padding: 10px;
+    color: var(--foreground-muted);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logoutBtn:hover {
+    background: var(--layer-2);
+    color: var(--foreground);
 }
 
 .placeholderIcon {
