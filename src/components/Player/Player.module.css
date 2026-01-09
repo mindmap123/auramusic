@@ -490,96 +490,126 @@
 /* ===== RESPONSIVE - Mobile ===== */
 @media (max-width: 640px) {
     .container {
-        padding: 12px;
-        padding-bottom: 20px;
+        padding: 10px;
+        padding-bottom: 16px;
     }
 
     .mainGrid {
         grid-template-rows: auto 1fr;
-        gap: 16px;
+        gap: 12px;
     }
 
     .playerSection {
-        padding: 20px 16px;
+        padding: 16px;
         border-radius: var(--radius);
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 16px;
     }
 
-    .coverArt {
-        width: 160px;
-        height: 160px;
-        margin-bottom: 16px;
-        border-radius: 16px;
-    }
-
-    .coverImage {
-        border-radius: 16px;
+    .playerSection::before {
+        display: none;
     }
 
     .trackInfo {
-        margin-bottom: 20px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 0;
+        text-align: left;
+        flex: 1;
+    }
+
+    .coverArt {
+        width: 70px;
+        height: 70px;
+        margin: 0;
+        border-radius: 12px;
+        flex-shrink: 0;
+    }
+
+    .coverArt.playing {
+        transform: none;
+    }
+
+    .coverImage {
+        border-radius: 12px;
     }
 
     .titles {
-        gap: 4px;
+        gap: 2px;
+        flex: 1;
+        min-width: 0;
     }
 
     .trackTitle {
-        font-size: 1rem;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .styleName {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .timeInfo {
-        font-size: 0.75rem;
-        margin-top: 6px;
-    }
-
-    .playButton {
-        width: 64px;
-        height: 64px;
-    }
-
-    .playButton svg {
-        width: 26px;
-        height: 26px;
-    }
-
-    .seekButton {
-        width: 44px;
-        height: 44px;
-    }
-
-    .seekButton svg {
-        width: 18px;
-        height: 18px;
+        font-size: 0.6875rem;
+        margin-top: 4px;
     }
 
     .controls {
-        gap: 16px;
-        margin-bottom: 20px;
+        gap: 8px;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .playButton {
+        width: 50px;
+        height: 50px;
+    }
+
+    .playButton svg {
+        width: 22px;
+        height: 22px;
+        margin-left: 2px;
+    }
+
+    .seekButton {
+        width: 36px;
+        height: 36px;
+    }
+
+    .seekButton svg {
+        width: 16px;
+        height: 16px;
     }
 
     .volumeWrapper {
-        max-width: 100%;
+        display: none;
     }
 
     .styleSection {
         max-height: none;
         flex: 1;
-        min-height: 200px;
+        min-height: 0;
     }
 
     .styleHeader {
         flex-direction: row;
         align-items: center;
+        justify-content: space-between;
         gap: 10px;
-        padding: 12px 14px;
+        padding: 10px 12px;
     }
 
     .styleHeaderText h2 {
-        font-size: 1rem;
+        font-size: 0.9375rem;
     }
 
     .styleHeaderText p {
@@ -587,8 +617,8 @@
     }
 
     .autoModeBtn {
-        padding: 6px 12px;
-        font-size: 0.75rem;
+        padding: 6px 10px;
+        font-size: 0.6875rem;
     }
 
     .miniContainer {
@@ -626,12 +656,12 @@
     }
 
     .miniControls {
-        gap: 6px;
+        gap: 4px;
     }
 
     .miniPlayBtn {
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
     }
 
     .miniPlayBtn svg {
@@ -644,8 +674,8 @@
     }
 
     .seekBtn svg {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
     }
 
     .miniExpandBtn {
@@ -653,9 +683,9 @@
     }
 
     .miniToggle {
-        top: 10px;
-        right: 10px;
-        padding: 6px;
+        top: 8px;
+        right: 8px;
+        padding: 5px;
     }
 }
 
