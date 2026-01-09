@@ -276,6 +276,11 @@
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    touch-action: none;
 }
 
 /* The "Mini Bar" at bottom (always visible on mobile unless expanded) */
@@ -498,6 +503,7 @@
     overflow: hidden;
     /* Safari scroll fix */
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 }
 
 .mobileContainer .styleHeader {
