@@ -32,9 +32,18 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
     const [localStore, setLocalStore] = useState(store);
     const [isMiniMode, setIsMiniMode] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const [favorites, setFavorites] = useState<string[]>([]);
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
+
+    // Check if mobile
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth <= 640);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Log activity helper
     const logActivity = async (action: string, details?: any) => {
@@ -204,7 +213,115 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
     const currentProgress = usePlayerStore(state => state.progress);
 
-    // Mini Player Mode - Full width bar at bottom
+    // Mobile: Always show mini player at bottom + full style selector
+    // Desktop: Show mini mode OR full player based on isMiniMode
+
+    // Mini Player Component
+    const MiniPlayer = () => (
+        <div className={styles.miniContainer}>
+            <div className={styles.miniPlayer}>
+                <div className={clsx(styles.miniCover, isPlaying && styles.playing)}>
+                    {localStore.style?.coverUrl ? (
+                        <img src={localStore.style.coverUrl} alt={localStore.style.name} />
+                    ) : isPlaying ? (
+                        <AudioVisualizer size="small" />
+                    ) : (
+                        <Music size={24} color="var(--muted-foreground)" />
+                    )}
+                </div>
+                <div className={styles.miniInfo}>
+                    <div className={styles.miniTitle}>
+                        {localStore.style?.name || "Aucune ambiance"}
+                    </div>
+                    <div className={styles.miniStyle}>
+                        {formatTime(currentProgress)} / 1:00:00
+                    </div>
+                </div>
+                {!isMobile && (
+                    <div className={styles.miniVolume}>
+                        <VolumeControl compact />
+                    </div>
+                )}
+                <div className={styles.miniControls}>
+                    <button
+                        onClick={() => seekRelative(-80)}
+                        className={styles.seekBtn}
+                        disabled={!mixUrl}
+                        title="Reculer 80s"
+                    >
+                        <SkipBack size={18} />
+                    </button>
+                    <button
+                        onClick={togglePlay}
+                        className={styles.miniPlayBtn}
+                        disabled={!mixUrl}
+                    >
+                        {isPlaying ? (
+                            <Pause size={22} fill="white" color="white" />
+                        ) : (
+                            <Play size={22} fill="white" color="white" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => seekRelative(80)}
+                        className={styles.seekBtn}
+                        disabled={!mixUrl}
+                        title="Avancer 80s"
+                    >
+                        <SkipForward size={18} />
+                    </button>
+                    {!isMobile && (
+                        <button
+                            onClick={() => setIsMiniMode(false)}
+                            className={styles.miniExpandBtn}
+                            title="Agrandir"
+                        >
+                            <Maximize2 size={18} />
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+
+    // Desktop Mini Mode
+    if (isMiniMode && !isPreview && !isMobile) {
+        return <MiniPlayer />;
+    }
+
+    // Mobile Layout: Style cards + mini player at bottom
+    if (isMobile && !isPreview) {
+        return (
+            <div className={clsx(styles.container)}>
+                <div className={styles.mainGrid}>
+                    <section className={styles.styleSection}>
+                        <header className={styles.styleHeader}>
+                            <div className={styles.styleHeaderText}>
+                                <h2>Ambiances</h2>
+                                <p>Choisissez votre atmosphère</p>
+                            </div>
+                            <button
+                                className={clsx(styles.autoModeBtn, isAutoMode && styles.autoActive)}
+                                onClick={handleAutoModeToggle}
+                            >
+                                <Zap size={14} fill={isAutoMode ? "currentColor" : "none"} />
+                                <span>{isAutoMode ? "Auto" : "Manuel"}</span>
+                            </button>
+                        </header>
+                        <StyleSelector
+                            activeStyle={localStore.style?.slug}
+                            onSelect={handleStyleChange}
+                            favorites={favorites}
+                            onToggleFavorite={handleToggleFavorite}
+                        />
+                    </section>
+                </div>
+                <MiniPlayer />
+            </div>
+        );
+    }
+
+    // Desktop Mini Player Mode (old code - now handled above)
     if (isMiniMode && !isPreview) {
         return (
             <div className={styles.miniContainer}>

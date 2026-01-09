@@ -490,114 +490,30 @@
 /* ===== RESPONSIVE - Mobile ===== */
 @media (max-width: 640px) {
     .container {
-        padding: 10px;
-        padding-bottom: 16px;
+        padding: 0;
+        padding-bottom: 80px; /* Space for mini player */
+        height: 100vh;
+        height: 100dvh;
     }
 
     .mainGrid {
-        grid-template-rows: auto 1fr;
-        gap: 12px;
-    }
-
-    .playerSection {
-        padding: 16px;
-        border-radius: var(--radius);
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .playerSection::before {
-        display: none;
-    }
-
-    .trackInfo {
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 0;
-        text-align: left;
-        flex: 1;
+        flex-direction: column;
+        gap: 0;
+        height: 100%;
     }
 
-    .coverArt {
-        width: 70px;
-        height: 70px;
-        margin: 0;
-        border-radius: 12px;
-        flex-shrink: 0;
-    }
-
-    .coverArt.playing {
-        transform: none;
-    }
-
-    .coverImage {
-        border-radius: 12px;
-    }
-
-    .titles {
-        gap: 2px;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .trackTitle {
-        font-size: 0.875rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .styleName {
-        font-size: 0.75rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .timeInfo {
-        font-size: 0.6875rem;
-        margin-top: 4px;
-    }
-
-    .controls {
-        gap: 8px;
-        margin-bottom: 0;
-        flex-shrink: 0;
-    }
-
-    .playButton {
-        width: 50px;
-        height: 50px;
-    }
-
-    .playButton svg {
-        width: 22px;
-        height: 22px;
-        margin-left: 2px;
-    }
-
-    .seekButton {
-        width: 36px;
-        height: 36px;
-    }
-
-    .seekButton svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .volumeWrapper {
+    /* Hide full player section on mobile - use mini player instead */
+    .playerSection {
         display: none;
     }
 
     .styleSection {
-        max-height: none;
         flex: 1;
-        min-height: 0;
+        max-height: none;
+        border-radius: 0;
+        border: none;
+        background: transparent;
     }
 
     .styleHeader {
@@ -605,38 +521,45 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        padding: 10px 12px;
+        padding: 16px 20px;
+        background: var(--background);
+        border-bottom: 1px solid var(--border);
     }
 
     .styleHeaderText h2 {
-        font-size: 0.9375rem;
+        font-size: 1.25rem;
     }
 
     .styleHeaderText p {
-        display: none;
+        display: block;
+        font-size: 0.75rem;
     }
 
     .autoModeBtn {
-        padding: 6px 10px;
-        font-size: 0.6875rem;
+        padding: 8px 14px;
+        font-size: 0.75rem;
     }
 
+    /* Mini player always visible on mobile */
     .miniContainer {
+        position: fixed;
         left: 0;
         right: 0;
         bottom: 0;
         width: 100%;
+        border-radius: 20px 20px 0 0;
+        background: linear-gradient(180deg, var(--card) 0%, rgba(10, 10, 12, 0.98) 100%);
     }
 
     .miniPlayer {
-        padding: 10px 12px;
-        gap: 10px;
+        padding: 14px 16px;
+        gap: 12px;
     }
 
     .miniCover {
-        width: 44px;
-        height: 44px;
-        border-radius: 8px;
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
     }
 
     .miniInfo {
@@ -644,7 +567,7 @@
     }
 
     .miniTitle {
-        font-size: 0.875rem;
+        font-size: 0.9375rem;
     }
 
     .miniStyle {
@@ -656,36 +579,34 @@
     }
 
     .miniControls {
-        gap: 4px;
+        gap: 6px;
     }
 
     .miniPlayBtn {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
     }
 
     .miniPlayBtn svg {
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
     }
 
     .seekBtn {
-        padding: 6px;
+        padding: 8px;
     }
 
     .seekBtn svg {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
     }
 
     .miniExpandBtn {
-        padding: 6px;
+        display: none;
     }
 
     .miniToggle {
-        top: 8px;
-        right: 8px;
-        padding: 5px;
+        display: none;
     }
 }
 

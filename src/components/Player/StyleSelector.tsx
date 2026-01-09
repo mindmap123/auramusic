@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, Play } from "lucide-react";
 import styles from "./StyleSelector.module.css";
 import { clsx } from "clsx";
 
@@ -26,6 +26,15 @@ interface StyleSelectorProps {
 export default function StyleSelector({ activeStyle, onSelect, favorites = [], onToggleFavorite }: StyleSelectorProps) {
     const [stylesList, setStylesList] = useState<Style[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        // Check if mobile
+        const checkMobile = () => setIsMobile(window.innerWidth <= 640);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         fetch("/api/styles")
@@ -68,7 +77,7 @@ export default function StyleSelector({ activeStyle, onSelect, favorites = [], o
                 const isFavorite = favorites.includes(style.id);
 
                 return (
-                    <button
+                    <div
                         key={style.id}
                         className={clsx(
                             styles.card,
@@ -76,8 +85,6 @@ export default function StyleSelector({ activeStyle, onSelect, favorites = [], o
                             !hasMix && styles.noMix,
                             isFavorite && styles.favorite
                         )}
-                        onClick={() => hasMix && onSelect(style.slug)}
-                        disabled={!hasMix}
                     >
                         <div className={styles.iconWrapper}>
                             {style.coverUrl ? (
@@ -89,6 +96,18 @@ export default function StyleSelector({ activeStyle, onSelect, favorites = [], o
                         <div className={styles.info}>
                             <span className={styles.name}>{style.name}</span>
                             <span className={styles.description}>{style.description}</span>
+                            {isMobile && hasMix && !isActive && (
+                                <button 
+                                    className={styles.playBtn}
+                                    onClick={() => onSelect(style.slug)}
+                                >
+                                    <Play size={18} fill="white" />
+                                    <span>Lancer le mix</span>
+                                </button>
+                            )}
+                            {!hasMix && (
+                                <span className={styles.noMixBadge}>Bientôt disponible</span>
+                            )}
                         </div>
                         {onToggleFavorite && hasMix && (
                             <button
@@ -102,11 +121,17 @@ export default function StyleSelector({ activeStyle, onSelect, favorites = [], o
                                 <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
                             </button>
                         )}
-                        {!hasMix && (
-                            <span className={styles.noMixBadge}>Bientôt</span>
+                        {/* Desktop click handler */}
+                        {!isMobile && hasMix && (
+                            <button 
+                                className={styles.cardClickArea}
+                                onClick={() => onSelect(style.slug)}
+                                aria-label={`Jouer ${style.name}`}
+                            />
                         )}
-                        {isActive && hasMix && <div className={styles.indicator} />}
-                    </button>
+                        {!hasMix && <div className={styles.cardClickArea} style={{ cursor: 'not-allowed' }} />}
+                        {isActive && hasMix && !isMobile && <div className={styles.indicator} />}
+                    </div>
                 );
             })}
         </div>
