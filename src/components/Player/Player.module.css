@@ -491,47 +491,104 @@
 @media (max-width: 640px) {
     .container {
         padding: 12px;
+        padding-bottom: 20px;
+    }
+
+    .mainGrid {
+        grid-template-rows: auto 1fr;
+        gap: 16px;
     }
 
     .playerSection {
-        padding: 24px 16px;
+        padding: 20px 16px;
         border-radius: var(--radius);
     }
 
     .coverArt {
-        width: 180px;
-        height: 180px;
+        width: 160px;
+        height: 160px;
+        margin-bottom: 16px;
+        border-radius: 16px;
+    }
+
+    .coverImage {
+        border-radius: 16px;
+    }
+
+    .trackInfo {
         margin-bottom: 20px;
     }
 
+    .titles {
+        gap: 4px;
+    }
+
     .trackTitle {
-        font-size: 1.125rem;
+        font-size: 1rem;
+    }
+
+    .styleName {
+        font-size: 0.875rem;
+    }
+
+    .timeInfo {
+        font-size: 0.75rem;
+        margin-top: 6px;
     }
 
     .playButton {
-        width: 68px;
-        height: 68px;
+        width: 64px;
+        height: 64px;
     }
 
     .playButton svg {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
+    }
+
+    .seekButton {
+        width: 44px;
+        height: 44px;
+    }
+
+    .seekButton svg {
+        width: 18px;
+        height: 18px;
     }
 
     .controls {
-        margin-bottom: 24px;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .volumeWrapper {
+        max-width: 100%;
+    }
+
+    .styleSection {
+        max-height: none;
+        flex: 1;
+        min-height: 200px;
     }
 
     .styleHeader {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: center;
         gap: 10px;
         padding: 12px 14px;
     }
 
+    .styleHeaderText h2 {
+        font-size: 1rem;
+    }
+
+    .styleHeaderText p {
+        display: none;
+    }
+
     .autoModeBtn {
-        width: 100%;
-        justify-content: center;
+        padding: 6px 12px;
+        font-size: 0.75rem;
     }
 
     .miniContainer {
@@ -542,26 +599,63 @@
     }
 
     .miniPlayer {
-        padding: 12px 16px;
-        gap: 12px;
+        padding: 10px 12px;
+        gap: 10px;
     }
 
     .miniCover {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+    }
+
+    .miniInfo {
+        flex: 1;
+    }
+
+    .miniTitle {
+        font-size: 0.875rem;
+    }
+
+    .miniStyle {
+        font-size: 0.75rem;
     }
 
     .miniVolume {
         display: none;
     }
 
-    .miniPlayBtn {
-        width: 46px;
-        height: 46px;
+    .miniControls {
+        gap: 6px;
     }
 
-    .styleSection {
-        max-height: 160px;
+    .miniPlayBtn {
+        width: 42px;
+        height: 42px;
+    }
+
+    .miniPlayBtn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .seekBtn {
+        padding: 6px;
+    }
+
+    .seekBtn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .miniExpandBtn {
+        padding: 6px;
+    }
+
+    .miniToggle {
+        top: 10px;
+        right: 10px;
+        padding: 6px;
     }
 }
 
