@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getAudioInstance } from '@/lib/audioManager';
+import { getAudioInstance, initAudioContext } from '@/lib/audioManager';
 
 interface PlayerState {
     isPlaying: boolean;
@@ -62,6 +62,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     },
 
     togglePlay: () => {
+        // Initialize AudioContext on first play (required for iOS)
+        initAudioContext();
+        
         const audio = getAudioInstance();
         if (!audio) return;
 
@@ -81,6 +84,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         if (get().isPlaying) {
             audio.pause();
         } else {
+            // Play immediately - don't wait
             audio.play().catch(console.error);
         }
     },

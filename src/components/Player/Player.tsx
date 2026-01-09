@@ -8,6 +8,7 @@ import StyleSelector from "./StyleSelector";
 import VolumeControl from "./VolumeControl";
 import AudioVisualizer from "./AudioVisualizer";
 import { clsx } from "clsx";
+import { initAudioContext } from "@/lib/audioManager";
 
 interface PlayerProps {
     store: any;
@@ -141,6 +142,9 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
     const handleStyleChange = (style: any) => {
         if (!style || !style.mixUrl) return;
+
+        // Initialize AudioContext on first interaction (required for iOS)
+        initAudioContext();
 
         // IMMEDIATELY start playing - don't wait for API calls
         stop();

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 import styles from "./StyleSelector.module.css";
 import { clsx } from "clsx";
+import { preloadMultipleAudio, initAudioContext } from "@/lib/audioManager";
 
 interface Style {
     id: string;
@@ -33,9 +34,26 @@ export default function StyleSelector({ activeStyle, onSelect, favorites = [], o
             .then(data => {
                 setStylesList(data);
                 setLoading(false);
+                
+                // Preload all mix URLs for instant playback
+                const mixUrls = data
+                    .filter((s: Style) => s.mixUrl)
+                    .map((s: Style) => s.mixUrl as string);
+                preloadMultipleAudio(mixUrls);
             })
             .catch(() => setLoading(false));
     }, []);
+
+    // Initialize AudioContext on first touch (required for iOS)
+    const handleCardClick = (style: Style) => {
+        if (!style.mixUrl) return;
+        
+        // Init audio context on first tap
+        initAudioContext();
+        
+        // Trigger selection immediately
+        onSelect(style);
+    };
 
     if (loading) {
         return (
@@ -76,7 +94,7 @@ export default function StyleSelector({ activeStyle, onSelect, favorites = [], o
                             !hasMix && styles.noMix,
                             isFavorite && styles.favorite
                         )}
-                        onClick={() => hasMix && onSelect(style)}
+                        onClick={() => handleCardClick(style)}
                         role="button"
                         tabIndex={hasMix ? 0 : -1}
                     >
