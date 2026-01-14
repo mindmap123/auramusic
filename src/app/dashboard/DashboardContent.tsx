@@ -307,7 +307,6 @@ export default function DashboardContent() {
                 <div className={styles.scrollWatcher} />
                 {/* Header Section */}
                 <header className={clsx(styles.header, scrolled && styles.headerScrolled)}>
-                    <div className={styles.headerSpacer} />
                     <div className={styles.greeting}>
                         <h1>
                             {currentView === "home" && `Bonjour ${store.name}`}
@@ -315,18 +314,6 @@ export default function DashboardContent() {
                             {currentView === "favorites" && "Vos favoris"}
                             {currentView === "settings" && "Paramètres"}
                         </h1>
-                    </div>
-                    <div className={styles.headerActions}>
-                        <button
-                            className={clsx(
-                                styles.autoModeBtn,
-                                isAutoMode && styles.active
-                            )}
-                            onClick={handleAutoModeToggle}
-                        >
-                            <Zap size={16} fill={isAutoMode ? "currentColor" : "none"} />
-                            <span>{isAutoMode ? "Auto" : "Manuel"}</span>
-                        </button>
                     </div>
                 </header>
 
@@ -354,6 +341,16 @@ export default function DashboardContent() {
                         <section className={styles.section}>
                             <div className={styles.sectionHeader}>
                                 <h2>Ambiances disponibles</h2>
+                                <button
+                                    className={clsx(
+                                        styles.autoModeBtn,
+                                        isAutoMode && styles.active
+                                    )}
+                                    onClick={handleAutoModeToggle}
+                                >
+                                    <Zap size={16} fill={isAutoMode ? "currentColor" : "none"} />
+                                    <span>{isAutoMode ? "Mode " + (isAutoMode ? "Auto" : "Manuel")}</span>
+                                </button>
                             </div>
                             <StyleGrid
                                 activeStyleId={currentStyleId}
