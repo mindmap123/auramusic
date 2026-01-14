@@ -36,7 +36,6 @@ export default function DashboardContent() {
         initPlayer,
         volume,
         setVolume,
-        currentStyleId,
         setStyle,
         isAutoMode,
         setAutoMode,
@@ -44,10 +43,8 @@ export default function DashboardContent() {
         progress,
     } = usePlayerStore();
 
-    // Add guard for currentStyleId
-    if (currentStyleId === undefined) {
-        return null;
-    }
+    // Fix hydration issue
+    const currentStyleId = usePlayerStore((state) => state.currentStyleId) ?? null;
 
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
@@ -326,7 +323,7 @@ export default function DashboardContent() {
                                 <h2>Ambiances disponibles</h2>
                             </div>
                             <StyleGrid
-                                activeStyleId={currentStyleId || null}
+                                activeStyleId={currentStyleId}
                                 onSelect={handleStyleChange}
                                 favorites={favorites}
                                 onToggleFavorite={handleToggleFavorite}
@@ -339,7 +336,7 @@ export default function DashboardContent() {
                 {currentView === "styles" && (
                     <section className={styles.section}>
                         <StyleGrid
-                            activeStyleId={currentStyleId || null}
+                            activeStyleId={currentStyleId}
                             onSelect={handleStyleChange}
                             favorites={favorites}
                             onToggleFavorite={handleToggleFavorite}
@@ -357,7 +354,7 @@ export default function DashboardContent() {
                             </div>
                         ) : (
                             <StyleGrid
-                                activeStyleId={currentStyleId || null}
+                                activeStyleId={currentStyleId}
                                 onSelect={handleStyleChange}
                                 favorites={favorites}
                                 onToggleFavorite={handleToggleFavorite}

@@ -22,7 +22,6 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         togglePlay,
         initPlayer,
         volume,
-        currentStyleId,
         setStyle,
         isAutoMode,
         setAutoMode,
@@ -31,6 +30,9 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         mixUrl,
         seekRelative
     } = usePlayerStore();
+
+    // Fix hydration issue
+    const currentStyleId = usePlayerStore((state) => state.currentStyleId) ?? null;
 
     const [localStore, setLocalStore] = useState(store);
     const [isMobile, setIsMobile] = useState(false);
