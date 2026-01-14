@@ -1,0 +1,221 @@
+/* ===== SIDEBAR - SPOTIFY STYLE ===== */
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100%;
+    background: var(--bg-base);
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-8);
+    transition: width var(--transition-slow);
+    flex-shrink: 0;
+    z-index: 100;
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed);
+}
+
+/* Logo Section */
+.logoSection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-16) var(--spacing-8);
+    margin-bottom: var(--spacing-8);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+}
+
+.logoIcon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent-base), var(--accent-bright));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--bg-base);
+}
+
+.logoText {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-base);
+    letter-spacing: -0.02em;
+}
+
+.collapseBtn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--bg-highlight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-subdued);
+    transition: var(--transition-fast);
+    opacity: 0;
+}
+
+.sidebar:hover .collapseBtn {
+    opacity: 1;
+}
+
+.collapseBtn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-base);
+}
+
+/* Navigation */
+.nav {
+    flex: 1;
+    padding: var(--spacing-8) 0;
+}
+
+.navList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.navItem {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-16);
+    width: 100%;
+    padding: var(--spacing-12) var(--spacing-16);
+    border-radius: var(--radius-md);
+    color: var(--text-subdued);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: var(--transition-fast);
+    text-align: left;
+}
+
+.navItem:hover {
+    color: var(--text-base);
+    background: var(--bg-highlight);
+}
+
+.navItem.active {
+    color: var(--text-base);
+    background: var(--bg-highlight);
+}
+
+.navItem.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 3px;
+    height: 24px;
+    background: var(--accent-base);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.sidebar.collapsed .navItem {
+    justify-content: center;
+    padding: var(--spacing-12);
+}
+
+.sidebar.collapsed .navItem span {
+    display: none;
+}
+
+/* Footer */
+.footer {
+    padding: var(--spacing-16) var(--spacing-8);
+    border-top: 1px solid var(--decorative-base);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-12);
+}
+
+.storeInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    flex: 1;
+    min-width: 0;
+}
+
+.storeAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--bg-highlight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--text-base);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.storeDetails {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.storeName {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.storeLabel {
+    font-size: 0.75rem;
+    color: var(--text-subdued);
+}
+
+.logoutBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-subdued);
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.logoutBtn:hover {
+    background: var(--bg-highlight);
+    color: var(--essential-negative);
+}
+
+.sidebar.collapsed .storeDetails {
+    display: none;
+}
+
+.sidebar.collapsed .footer {
+    flex-direction: column;
+    gap: var(--spacing-8);
+}
+
+.sidebar.collapsed .storeInfo {
+    justify-content: center;
+}
+
+/* Mobile: Hide sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+}

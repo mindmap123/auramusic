@@ -20,14 +20,40 @@ model Store {
   isActive        Boolean              @default(true)
   lastPlayedAt    DateTime?
   role            String               @default("STORE")
+  accentColor     String               @default("green") // green, violet, blue, orange, pink, red
+  // Grouping & Organization
+  groupId         String?
+  city            String?
+  country         String?
+  storeType       String?              // cafe, restaurant, boutique, hotel, etc.
+  // Metadata
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
+  // Relations
+  group           StoreGroup?          @relation(fields: [groupId], references: [id])
   style           MusicStyle?          @relation("CurrentStyle", fields: [currentStyleId], references: [id])
   playSessions    PlaySession[]
   styleProgress   StoreStyleProgress[]
   schedules       StoreSchedule[]
   favorites       StoreFavorite[]
   activityLogs    ActivityLog[]
+
+  @@index([groupId])
+  @@index([city])
+  @@index([isActive])
+}
+
+// Groupes de magasins (chaînes, enseignes)
+model StoreGroup {
+  id              String    @id @default(uuid())
+  name            String    @unique
+  description     String?
+  color           String    @default("#1db954") // Couleur pour identifier le groupe
+  defaultStyleId  String?   // Style par défaut pour les nouveaux magasins
+  defaultVolume   Int       @default(70)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  stores          Store[]
 }
 
 model Admin {

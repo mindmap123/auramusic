@@ -1,0 +1,79 @@
+/* ===== APP LAYOUT - SPOTIFY STRUCTURE ===== */
+
+.appLayout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    background: var(--bg-base);
+    overflow: hidden;
+}
+
+/* Main area: Sidebar + Content side by side */
+.sidebarWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: calc(100% - var(--playerbar-height));
+    z-index: 50;
+}
+
+.mainWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: var(--sidebar-width);
+    height: calc(100vh - var(--playerbar-height));
+    height: calc(100dvh - var(--playerbar-height));
+    overflow: hidden;
+    transition: margin-left var(--transition-slow);
+}
+
+.mainContent {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: linear-gradient(to bottom, var(--bg-surface) 0%, var(--bg-base) 300px);
+    padding: var(--spacing-24);
+}
+
+/* Player Bar: Fixed at bottom, full width */
+.playerBarWrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+/* === RESPONSIVE === */
+
+/* Tablet: Collapsed sidebar */
+@media (max-width: 1024px) {
+    .mainWrapper {
+        margin-left: var(--sidebar-collapsed);
+    }
+}
+
+/* Mobile: No sidebar, different player */
+@media (max-width: 768px) {
+    .sidebarWrapper {
+        display: none;
+    }
+
+    .mainWrapper {
+        margin-left: 0;
+        height: calc(100vh - 72px); /* Mini player height */
+        height: calc(100dvh - 72px);
+    }
+
+    .mainContent {
+        padding: var(--spacing-16);
+        padding-bottom: 80px; /* Space for mini player */
+    }
+
+    .playerBarWrapper {
+        display: none;
+    }
+}

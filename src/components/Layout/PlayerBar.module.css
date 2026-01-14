@@ -1,0 +1,285 @@
+/* ===== PLAYER BAR - SPOTIFY STYLE ===== */
+
+.playerBar {
+    height: var(--playerbar-height);
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--decorative-base);
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 2fr minmax(180px, 1fr);
+    align-items: center;
+    padding: 0 var(--spacing-16);
+    gap: var(--spacing-16);
+    position: relative;
+    z-index: 100;
+}
+
+/* === NOW PLAYING (Left) === */
+.nowPlaying {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    min-width: 0;
+}
+
+.coverArt {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.coverArt img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.coverPlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-highlight);
+    color: var(--text-subdued);
+    font-size: 1.25rem;
+}
+
+.trackInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.trackName {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trackName:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.artistName {
+    font-size: 0.6875rem;
+    color: var(--text-subdued);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artistName:hover {
+    text-decoration: underline;
+    color: var(--text-base);
+    cursor: pointer;
+}
+
+/* === CONTROLS (Center) === */
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-8);
+    max-width: 722px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.controlButtons {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-16);
+}
+
+.controlBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-subdued);
+    transition: var(--transition-fast);
+}
+
+.controlBtn:hover:not(:disabled) {
+    color: var(--text-base);
+    transform: scale(1.05);
+}
+
+.controlBtn:disabled {
+    opacity: 0.4;
+}
+
+.controlBtn.secondary {
+    width: 32px;
+    height: 32px;
+}
+
+.playBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--text-base);
+    color: var(--bg-base) !important;
+}
+
+.playBtn:hover:not(:disabled) {
+    transform: scale(1.06);
+    background: var(--text-bright);
+}
+
+/* Progress Bar */
+.progressSection {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    width: 100%;
+}
+
+.time {
+    font-size: 0.6875rem;
+    color: var(--text-subdued);
+    min-width: 40px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.progressBar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg-highlight);
+    border-radius: var(--radius-full);
+    position: relative;
+    cursor: pointer;
+    overflow: visible;
+}
+
+.progressBar:hover {
+    height: 6px;
+}
+
+.progressBar:hover .progressDot {
+    opacity: 1;
+}
+
+.progressFill {
+    height: 100%;
+    background: var(--text-base);
+    border-radius: var(--radius-full);
+    transition: background var(--transition-fast);
+}
+
+.progressBar:hover .progressFill {
+    background: var(--accent-base);
+}
+
+.progressDot {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: var(--text-base);
+    border-radius: var(--radius-full);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+/* === EXTRA CONTROLS (Right) === */
+.extraControls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-16);
+}
+
+.autoModeBadge {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent-base);
+    background: var(--accent-subtle);
+    padding: var(--spacing-4) var(--spacing-8);
+    border-radius: var(--radius-sm);
+}
+
+.volumeControl {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    width: 140px;
+}
+
+.volumeBtn {
+    color: var(--text-subdued);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.volumeBtn:hover {
+    color: var(--text-base);
+}
+
+.volumeSlider {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--bg-highlight);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--text-base);
+    border-radius: var(--radius-full);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.volumeControl:hover .volumeSlider::-webkit-slider-thumb {
+    opacity: 1;
+}
+
+.volumeSlider::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        var(--text-base) 0%,
+        var(--text-base) calc(var(--volume-percent, 70) * 1%),
+        var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
+        var(--bg-highlight) 100%
+    );
+    border-radius: var(--radius-full);
+    height: 4px;
+}
+
+.volumeControl:hover .volumeSlider::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        var(--accent-base) 0%,
+        var(--accent-base) calc(var(--volume-percent, 70) * 1%),
+        var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
+        var(--bg-highlight) 100%
+    );
+}
+
+/* === MOBILE === */
+@media (max-width: 768px) {
+    .playerBar {
+        display: none;
+    }
+}

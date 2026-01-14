@@ -1,15 +1,16 @@
+/* ===== ADMIN LAYOUT - SPOTIFY STYLE ===== */
+
 .layout {
     display: flex;
     min-height: 100vh;
     min-height: 100dvh;
-    background: var(--background);
+    background: var(--bg-base);
 }
 
-/* Sidebar */
+/* === SIDEBAR === */
 .sidebar {
-    width: 260px;
-    background: var(--background-subtle);
-    border-right: 1px solid var(--border);
+    width: 280px;
+    background: var(--bg-base);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -17,95 +18,196 @@
     left: 0;
     bottom: 0;
     z-index: 100;
+    padding: var(--spacing-8);
+}
+
+.logoSection {
+    padding: var(--spacing-16) var(--spacing-8);
+    margin-bottom: var(--spacing-8);
 }
 
 .logo {
-    padding: 24px;
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
 }
 
+.logoIcon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent-base), var(--accent-bright));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--bg-base);
+}
+
+.logoText {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-base);
+    letter-spacing: -0.02em;
+}
+
+/* Navigation */
 .nav {
     flex: 1;
-    padding: 16px 12px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--spacing-24);
     overflow-y: auto;
+    padding: var(--spacing-8) 0;
+}
+
+.navSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.navLabel {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding: var(--spacing-8) var(--spacing-16);
 }
 
 .navItem {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: var(--radius-sm);
-    color: var(--muted-foreground);
+    gap: var(--spacing-16);
+    padding: var(--spacing-12) var(--spacing-16);
+    border-radius: var(--radius-md);
+    color: var(--text-subdued);
     font-size: 0.9375rem;
-    font-weight: 500;
-    transition: all var(--transition-base);
+    font-weight: 600;
+    transition: var(--transition-fast);
+    text-decoration: none;
 }
 
 .navItem:hover {
-    background: var(--secondary);
-    color: var(--foreground);
+    background: var(--bg-highlight);
+    color: var(--text-base);
+    text-decoration: none;
 }
 
 .navItem.active {
-    background: rgba(168, 85, 247, 0.1);
-    color: var(--primary);
-}
-
-.navItem.active svg {
-    color: var(--primary);
+    background: var(--bg-highlight);
+    color: var(--text-base);
 }
 
 .navItem svg {
     flex-shrink: 0;
+    color: inherit;
+}
+
+.badge {
+    margin-left: auto;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: var(--spacing-4) var(--spacing-8);
+    border-radius: var(--radius-sm);
+    background: var(--essential-negative);
+    color: var(--text-base);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Sidebar Footer */
+.sidebarFooter {
+    padding: var(--spacing-8);
+    border-top: 1px solid var(--decorative-base);
 }
 
 .logout {
-    margin: 12px;
-    padding: 12px 16px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border-radius: var(--radius-sm);
-    color: var(--muted-foreground);
-    font-size: 0.9375rem;
+    gap: var(--spacing-12);
+    width: 100%;
+    padding: var(--spacing-12) var(--spacing-16);
+    border-radius: var(--radius-md);
+    color: var(--text-subdued);
+    font-size: 0.875rem;
     font-weight: 500;
-    transition: all var(--transition-base);
-    border-top: 1px solid var(--border);
+    transition: var(--transition-fast);
 }
 
 .logout:hover {
-    background: var(--error-bg);
-    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--essential-negative);
 }
 
-/* Main Content */
+/* === MAIN CONTENT === */
 .main {
     flex: 1;
-    margin-left: 260px;
-    padding: 32px;
+    margin-left: 280px;
+    padding: var(--spacing-32);
     min-height: 100vh;
+    background: linear-gradient(to bottom, var(--bg-surface) 0%, var(--bg-base) 300px);
+    overflow-y: auto;
 }
 
-/* Mobile */
+/* === MOBILE === */
 .mobileHeader {
     display: none;
 }
 
+.mobileLogoWrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+}
+
+.mobileLogo {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-base);
+}
+
 .menuToggle {
     display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    color: var(--text-base);
+}
+
+.menuToggle:hover {
+    background: var(--bg-highlight);
 }
 
 .overlay {
     display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
 }
 
+.overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* === RESPONSIVE === */
 @media (max-width: 1024px) {
     .sidebar {
         transform: translateX(-100%);
@@ -118,8 +220,8 @@
 
     .main {
         margin-left: 0;
-        padding: 24px 20px;
-        padding-top: 80px;
+        padding: var(--spacing-24) var(--spacing-16);
+        padding-top: 88px;
     }
 
     .mobileHeader {
@@ -131,44 +233,17 @@
         left: 0;
         right: 0;
         height: 64px;
-        padding: 0 20px;
-        background: var(--background-subtle);
-        border-bottom: 1px solid var(--border);
+        padding: 0 var(--spacing-16);
+        background: var(--bg-elevated);
+        border-bottom: 1px solid var(--decorative-base);
         z-index: 90;
-    }
-
-    .mobileLogo {
-        font-size: 1.125rem;
-        font-weight: 800;
     }
 
     .menuToggle {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: var(--radius-sm);
-        color: var(--foreground);
-    }
-
-    .menuToggle:hover {
-        background: var(--secondary);
     }
 
     .overlay {
         display: block;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 99;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity var(--transition-base);
-    }
-
-    .overlay.visible {
-        opacity: 1;
-        pointer-events: auto;
     }
 }

@@ -11,7 +11,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     try {
-        const { currentStyleId, volume, isPlaying, isAutoMode } = await req.json();
+        const { currentStyleId, volume, isPlaying, isAutoMode, accentColor } = await req.json();
         const storeId = (session.user as any).id;
 
         const updatedStore = await prisma.store.update({
@@ -21,6 +21,7 @@ export async function PATCH(req: NextRequest) {
                 ...(volume !== undefined && { volume }),
                 ...(isPlaying !== undefined && { isPlaying }),
                 ...(isAutoMode !== undefined && { isAutoMode }),
+                ...(accentColor !== undefined && { accentColor }),
             },
         });
 
