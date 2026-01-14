@@ -62,20 +62,20 @@ model Admin {
 }
 
 model MusicStyle {
-  id               String               @id @default(uuid())
-  name             String
-  slug             String               @unique
-  description      String
-  mixUrl           String?
-  coverUrl         String?
-  duration         Int                  @default(3600)
-  icon             String?
-  colorTheme       String?
-  playSessions     PlaySession[]
-  stores           Store[]              @relation("CurrentStyle")
-  favorites        StoreFavorite[]
-  schedules        StoreSchedule[]
-  styleProgress    StoreStyleProgress[]
+  id            String               @id @default(uuid())
+  name          String
+  slug          String               @unique
+  description   String
+  mixUrl        String?
+  coverUrl      String?
+  duration      Int                  @default(3600)
+  icon          String?
+  colorTheme    String?
+  playSessions  PlaySession[]
+  stores        Store[]              @relation("CurrentStyle")
+  favorites     StoreFavorite[]
+  schedules     StoreSchedule[]
+  styleProgress StoreStyleProgress[]
 }
 
 model StoreSchedule {

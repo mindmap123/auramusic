@@ -15,7 +15,7 @@ export async function PATCH(
     try {
         const { id } = await params;
         const body = await req.json();
-        
+
         // Filter only allowed fields
         const data: any = {};
         if (body.name !== undefined) data.name = body.name;
@@ -23,12 +23,13 @@ export async function PATCH(
         if (body.icon !== undefined) data.icon = body.icon;
         if (body.colorTheme !== undefined) data.colorTheme = body.colorTheme;
         if (body.mixUrl !== undefined) data.mixUrl = body.mixUrl;
-        
+        if (body.coverUrl !== undefined) data.coverUrl = body.coverUrl;
+
         const updatedStyle = await prisma.musicStyle.update({
             where: { id },
             data
         });
-        
+
         return NextResponse.json(updatedStyle);
     } catch (error: any) {
         console.error("PATCH style error:", error);

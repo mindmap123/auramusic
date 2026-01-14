@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session || (session.user as any).role !== "ADMIN") {
+        console.warn("[CoverUpload] Unauthorized attempt:", session?.user?.email, "Role:", (session?.user as any)?.role);
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
