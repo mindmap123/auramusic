@@ -90,7 +90,7 @@ export default function DashboardContent() {
     useEffect(() => {
         if (!store) return;
 
-        if (store.style?.mixUrl) {
+        if (store.style?.mixUrl && store.currentStyleId) {
             setStyle(store.currentStyleId, store.style.mixUrl);
             initPlayer(store.style.mixUrl, store.currentPosition, store.volume / 100);
         }
@@ -115,8 +115,8 @@ export default function DashboardContent() {
     useEffect(() => {
         if (lastPlayState.current !== null && lastPlayState.current !== isPlaying) {
             logActivity(isPlaying ? "PLAY" : "PAUSE", {
-                styleId: currentStyleId,
-                styleName: store?.style?.name,
+                styleId: currentStyleId || null,
+                styleName: store?.style?.name || null,
             });
         }
         lastPlayState.current = isPlaying;
@@ -193,8 +193,8 @@ export default function DashboardContent() {
         }).catch(console.error);
 
         logActivity("CHANGE_STYLE", {
-            fromStyleId: currentStyleId,
-            fromStyleName: store?.style?.name,
+            fromStyleId: currentStyleId || null,
+            fromStyleName: store?.style?.name || null,
             toStyleId: style.id,
             toStyleName: style.name,
         });
