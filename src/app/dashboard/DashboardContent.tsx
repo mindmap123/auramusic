@@ -29,6 +29,8 @@ export default function DashboardContent() {
     const [loading, setLoading] = useState(true);
     const [currentView, setCurrentView] = useState<"home" | "styles" | "favorites" | "settings">("home");
     const [favorites, setFavorites] = useState<string[]>([]);
+    const [headerVisible, setHeaderVisible] = useState(true);
+    const lastScrollY = useRef(0);
 
     const {
         isPlaying,
@@ -46,6 +48,27 @@ export default function DashboardContent() {
 
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
+
+    // Handle scroll to hide/show header
+    useEffect(() => {
+        const handleScroll = (e: Event) => {
+            const target = e.target as HTMLElement;
+            const currentScrollY = target.scrollTop;
+            
+            if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
+                setHeaderVisible(false);
+            } else {
+                setHeaderVisible(true);
+            }
+            lastScrollY.current = currentScrollY;
+        };
+
+        const contentEl = document.querySelector('[data-scroll-container]');
+        if (contentEl) {
+            contentEl.addEventListener('scroll', handleScroll);
+            return () => contentEl.removeEventListener('scroll', handleScroll);
+        }
+    }, []);
 
     // Auth check
     useEffect(() => {
@@ -269,17 +292,9 @@ export default function DashboardContent() {
             }
         >
             {/* Main Content */}
-            <div className={styles.content}>
+            <div className={styles.content} data-scroll-container>
                 {/* Header Section */}
-                <header className={styles.header}>
-                    <div className={styles.greeting}>
-                        <h1>
-                            {currentView === "home" && "Bonjour"}
-                            {currentView === "styles" && "Tous les styles"}
-                            {currentView === "favorites" && "Vos favoris"}
-                            {currentView === "settings" && "Paramètres"}
-                        </h1>
-                    </div>
+                <header className={clsx(styles.header, !headerVisible && styles.headerHidden)}>
                     <div className={styles.headerActions}>
                         <button
                             className={clsx(
@@ -291,6 +306,14 @@ export default function DashboardContent() {
                             <Zap size={16} fill={isAutoMode ? "currentColor" : "none"} />
                             <span>{isAutoMode ? "Auto ON" : "Auto OFF"}</span>
                         </button>
+                    </div>
+                    <div className={styles.greeting}>
+                        <h1>
+                            {currentView === "home" && "Bonjour"}
+                            {currentView === "styles" && "Tous les styles"}
+                            {currentView === "favorites" && "Vos favoris"}
+                            {currentView === "settings" && "Paramètres"}
+                        </h1>
                     </div>
                 </header>
 
