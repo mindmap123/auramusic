@@ -63,7 +63,7 @@ export default function Sidebar({ storeName, currentView, onViewChange }: Sideba
             <div className={styles.footer}>
                 <div className={styles.storeInfo}>
                     <div className={styles.storeAvatar}>
-                        {storeName.charAt(0).toUpperCase()}
+                        {(storeName || 'A').charAt(0).toUpperCase()}
                     </div>
                     {!collapsed && (
                         <div className={styles.storeDetails}>

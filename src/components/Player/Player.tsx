@@ -104,7 +104,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
     useEffect(() => {
         if (store?.style?.mixUrl && store?.currentStyleId) {
             setStyle(store.currentStyleId, store.style.mixUrl);
-            initPlayer(store.style.mixUrl, store.currentPosition, store.volume / 100);
+            initPlayer(store.style.mixUrl, store.currentPosition || 0, (store.volume || 70) / 100);
         }
         if (store.isAutoMode) {
             setAutoMode(true);
@@ -188,7 +188,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
 
         logActivity("CHANGE_STYLE", {
             fromStyleId: currentStyleId,
-            fromStyleName: localStore.style?.name,
+            fromStyleName: localStore?.style?.name,
             toStyleId: style.id,
             toStyleName: style.name
         });

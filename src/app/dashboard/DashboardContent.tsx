@@ -64,7 +64,7 @@ export default function DashboardContent() {
     useEffect(() => {
         if (status === "loading") return;
 
-        if (!session || (session.user as any).role !== "STORE") {
+        if (!session || (session.user as any)?.role !== "STORE") {
             router.replace("/login");
             return;
         }
@@ -105,7 +105,7 @@ export default function DashboardContent() {
 
         if (store?.style?.mixUrl && store?.currentStyleId) {
             setStyle(store.currentStyleId, store.style.mixUrl);
-            initPlayer(store.style.mixUrl, store.currentPosition, store.volume / 100);
+            initPlayer(store.style.mixUrl, store.currentPosition || 0, (store.volume || 70) / 100);
         }
         if (store.isAutoMode) {
             setAutoMode(true);
@@ -275,7 +275,7 @@ export default function DashboardContent() {
             accentColor={store.accentColor || "green"}
             sidebar={
                 <Sidebar
-                    storeName={store.name}
+                    storeName={store?.name || ""}
                     currentView={currentView}
                     onViewChange={setCurrentView}
                 />

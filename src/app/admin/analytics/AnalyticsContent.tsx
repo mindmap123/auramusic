@@ -60,7 +60,7 @@ export default function AnalyticsContent() {
                         </div>
 
                         <div className={styles.progressContainer}>
-                            <div className={styles.progressBar} style={{ width: `${Math.min(parseFloat(store.totalHours) * 10, 100)}%` }} />
+                            <div className={styles.progressBar} style={{ width: `${Math.min((parseFloat(store.totalHours) || 0) * 10, 100)}%` }} />
                         </div>
                     </div>
                 ))}
