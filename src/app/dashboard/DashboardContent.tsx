@@ -300,12 +300,7 @@ export default function DashboardContent() {
                     <>
                         {/* Currently Playing Hero */}
                         {store.style && (
-                            <section 
-                                className={styles.heroSection}
-                                style={{
-                                    '--banner-position': `${store.style.bannerPositionX || 50}% ${store.style.bannerPositionY || 50}%`
-                                } as React.CSSProperties}
-                            >
+                            <section className={styles.heroSection}>
                                 <div className={styles.heroBg}>
                                     {store.style.coverUrl && (
                                         <img src={store.style.coverUrl} alt="" />

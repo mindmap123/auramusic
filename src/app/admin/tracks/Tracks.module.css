@@ -231,7 +231,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     width: 100%;
-    max-width: 1200px;
+    max-width: 900px;
     max-height: 90vh;
     animation: slideUp var(--transition-slow) ease-out;
     display: flex;
@@ -279,7 +279,7 @@
 }
 
 /* Desktop: Horizontal Layout */
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
     .modal form {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -306,7 +306,7 @@
 }
 
 /* Mobile: Vertical with scroll */
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
     .modal {
         max-width: 100%;
         margin: 0;
@@ -535,208 +535,4 @@
         align-items: flex-start;
         gap: 8px;
     }
-}
-/* Banner Position Section */
-.bannerSection {
-    margin-top: 0;
-    padding-top: 0;
-    border-top: none;
-}
-
-.bannerSection h3 {
-    color: var(--text-base);
-    font-size: 1.125rem;
-    margin-bottom: var(--spacing-8);
-}
-
-.bannerDesc {
-    color: var(--text-subdued);
-    font-size: 0.875rem;
-    margin-bottom: var(--spacing-16);
-}
-
-/* Focal Point Picker */
-.focalPointPicker {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-16);
-    margin-bottom: var(--spacing-20);
-}
-
-.sourceImageContainer {
-    position: relative;
-    aspect-ratio: 1;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    border: 2px solid var(--decorative-base);
-    cursor: crosshair;
-    max-width: 300px;
-    margin: 0 auto;
-}
-
-.sourceImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.focalPoint {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 2;
-}
-
-.focalPointInner {
-    width: 100%;
-    height: 100%;
-    border: 3px solid #fff;
-    border-radius: 50%;
-    background: var(--accent-base);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-
-.arrow {
-    font-size: 1.5rem;
-    color: var(--text-subdued);
-    font-weight: bold;
-    text-align: center;
-    transform: rotate(90deg);
-}
-
-.bannerPreview {
-    width: 100%;
-    height: 120px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    position: relative;
-    border: 2px solid var(--decorative-base);
-    margin: 0 auto;
-    max-width: 400px;
-}
-
-.bannerPreview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: grayscale(100%) contrast(1.1) brightness(0.7);
-}
-
-.bannerOverlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to right,
-        rgba(0, 0, 0, 0.7) 0%,
-        rgba(0, 0, 0, 0.4) 50%,
-        rgba(0, 0, 0, 0.2) 100%
-    );
-    display: flex;
-    align-items: flex-end;
-    padding: var(--spacing-12);
-}
-
-.bannerText {
-    color: white;
-}
-
-.bannerLabel {
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--accent-base);
-    display: block;
-    margin-bottom: var(--spacing-4);
-}
-
-.bannerText h4 {
-    font-size: 1rem;
-    font-weight: 800;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-    margin: 0;
-}
-
-/* Desktop: Side by side layout */
-@media (min-width: 1024px) {
-    .focalPointPicker {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: var(--spacing-24);
-        align-items: center;
-    }
-    
-    .arrow {
-        transform: rotate(0deg);
-        justify-self: center;
-    }
-    
-    .sourceImageContainer {
-        margin: 0;
-    }
-    
-    .bannerPreview {
-        margin: 0;
-    }
-}
-
-/* Quick Presets */
-.quickPresets {
-    margin-bottom: var(--spacing-16);
-}
-
-.presetsLabel {
-    font-size: 0.875rem;
-    color: var(--text-subdued);
-    margin-bottom: var(--spacing-8);
-    display: block;
-}
-
-.presetButtons {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-6);
-}
-
-.presetBtn {
-    padding: var(--spacing-6) var(--spacing-8);
-    background: var(--bg-highlight);
-    border: 1px solid var(--decorative-base);
-    border-radius: var(--radius-sm);
-    color: var(--text-subdued);
-    font-size: 0.75rem;
-    transition: all var(--transition-fast);
-    text-align: center;
-}
-
-.presetBtn:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-base);
-}
-
-.presetBtn.active {
-    background: var(--accent-base);
-    color: white;
-    border-color: var(--accent-base);
-}
-
-/* Coordinates Display */
-.coordinates {
-    font-size: 0.75rem;
-    color: var(--text-subdued);
-    text-align: center;
-    font-family: monospace;
-    background: var(--bg-highlight);
-    padding: var(--spacing-6) var(--spacing-12);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--decorative-base);
 }

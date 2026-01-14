@@ -71,8 +71,6 @@ model MusicStyle {
   duration         Int                  @default(3600)
   icon             String?
   colorTheme       String?
-  bannerPositionX  Float                @default(50.0)
-  bannerPositionY  Float                @default(50.0)
   playSessions     PlaySession[]
   stores           Store[]              @relation("CurrentStyle")
   favorites        StoreFavorite[]
