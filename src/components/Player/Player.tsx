@@ -6,7 +6,7 @@ import { Play, Pause, Music, Zap, SkipBack, SkipForward, ChevronDown, LogOut } f
 import { signOut } from "next-auth/react";
 import styles from "./Player.module.css";
 import StyleSelector from "./StyleSelector";
-import VolumeControl from "./VolumeControl";
+import VolumeKnob from "./VolumeKnob";
 import AudioVisualizer from "./AudioVisualizer";
 import { clsx } from "clsx";
 import { initAudioContext } from "@/lib/audioManager";
@@ -296,7 +296,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                     </div>
 
                     <div className={styles.volumeWrapper} style={{ marginTop: 'auto' }}>
-                        <VolumeControl />
+                        <VolumeKnob />
                     </div>
                 </div>
             </div>
@@ -427,7 +427,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
                     </div>
 
                     <div className={styles.volumeWrapper}>
-                        <VolumeControl />
+                        <VolumeKnob />
                     </div>
                 </section>
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Shuffle, Repeat, Music } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Volume1, VolumeX, Music } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { clsx } from "clsx";
+import { useState, useRef, useCallback, useEffect } from "react";
 import styles from "./PlayerBar.module.css";
 
 interface Style {
@@ -18,6 +19,9 @@ interface PlayerBarProps {
     onVolumeChange: (volume: number) => void;
 }
 
+const STEPS = 10;
+const TRACK_PADDING = 12;
+
 export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarProps) {
     const {
         isPlaying,
@@ -30,11 +34,42 @@ export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarPro
         isAutoMode,
     } = usePlayerStore();
 
-    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newVolume = parseFloat(e.target.value);
-        setVolume(newVolume);
-        onVolumeChange(newVolume);
-    };
+    const [isDragging, setIsDragging] = useState(false);
+    const volumeRef = useRef<HTMLDivElement>(null);
+
+    const handleVolumeChange = useCallback((newVolume: number) => {
+        const clamped = Math.max(0, Math.min(1, newVolume));
+        setVolume(clamped);
+        onVolumeChange(clamped);
+    }, [setVolume, onVolumeChange]);
+
+    const setByCoords = useCallback((clientX: number) => {
+        if (!volumeRef.current) return;
+        const rect = volumeRef.current.getBoundingClientRect();
+        const trackWidth = rect.width - TRACK_PADDING * 2;
+        const x = clientX - rect.left - TRACK_PADDING;
+        handleVolumeChange(x / trackWidth);
+    }, [handleVolumeChange]);
+
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+        setByCoords(e.clientX);
+    }, [setByCoords]);
+
+    useEffect(() => {
+        if (!isDragging) return;
+        const handleMouseMove = (e: MouseEvent) => setByCoords(e.clientX);
+        const handleEnd = () => setIsDragging(false);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleEnd);
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleEnd);
+        };
+    }, [isDragging, setByCoords]);
+
+    const VolumeIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -122,26 +157,61 @@ export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarPro
                     <span className={styles.autoModeBadge}>AUTO</span>
                 )}
 
-                <div className={styles.volumeControl}>
+                <div 
+                    ref={volumeRef}
+                    className={clsx(styles.volumeControl, isDragging && styles.dragging)}
+                    onMouseDown={handleMouseDown}
+                >
                     <button
                         className={styles.volumeBtn}
-                        onClick={() => setVolume(volume > 0 ? 0 : 0.7)}
+                        onClick={(e) => { e.stopPropagation(); setVolume(volume > 0 ? 0 : 0.7); }}
                     >
-                        {volume === 0 ? (
-                            <VolumeX size={20} />
-                        ) : (
-                            <Volume2 size={20} />
-                        )}
+                        <VolumeIcon size={20} />
                     </button>
-                    <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={volume}
-                        onChange={handleVolumeChange}
-                        className={styles.volumeSlider}
-                    />
+                    
+                    <svg viewBox="0 0 120 24" className={styles.volumeSvg} preserveAspectRatio="none">
+                        <defs>
+                            {/* Gradient froid → chaud basé sur le volume */}
+                            <linearGradient id="volGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="hsl(200, 80%, 50%)" />
+                                <stop offset="50%" stopColor="hsl(60, 80%, 50%)" />
+                                <stop offset="100%" stopColor="hsl(0, 80%, 55%)" />
+                            </linearGradient>
+                        </defs>
+                        
+                        {/* Track background */}
+                        <line x1={TRACK_PADDING} y1="12" x2={120 - TRACK_PADDING} y2="12" 
+                              stroke="var(--bg-highlight)" strokeWidth="4" strokeLinecap="round" />
+                        
+                        {/* Track fill */}
+                        <line x1={TRACK_PADDING} y1="12" x2={TRACK_PADDING + volume * (120 - TRACK_PADDING * 2)} y2="12"
+                              stroke="url(#volGrad)" strokeWidth="4" strokeLinecap="round" 
+                              className={styles.volumeFill}
+                              style={{ filter: `drop-shadow(0 0 6px hsl(${200 - volume * 200}, 80%, 50%))` }} />
+                        
+                        {/* Graduation marks - couleur froid→chaud */}
+                        {Array.from({ length: STEPS + 1 }, (_, i) => {
+                            const progress = i / STEPS;
+                            const x = TRACK_PADDING + progress * (120 - TRACK_PADDING * 2);
+                            const isActive = progress <= volume;
+                            // Hue: 200 (bleu) → 0 (rouge)
+                            const hue = 200 - progress * 200;
+                            return (
+                                <line key={i} x1={x} y1="4" x2={x} y2="8"
+                                      stroke={isActive ? `hsl(${hue}, 80%, 55%)` : "var(--text-subdued)"}
+                                      strokeWidth="1.5" strokeLinecap="round"
+                                      opacity={isActive ? 1 : 0.3}
+                                      style={isActive ? { filter: `drop-shadow(0 0 3px hsl(${hue}, 80%, 55%))` } : {}}
+                                      className={styles.gradMark} />
+                            );
+                        })}
+                        
+                        {/* Thumb - couleur basée sur le volume */}
+                        <circle cx={TRACK_PADDING + volume * (120 - TRACK_PADDING * 2)} cy="12" r="6"
+                                fill={`hsl(${200 - volume * 200}, 80%, 60%)`} 
+                                className={styles.volumeThumb}
+                                style={{ filter: `drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 0 8px hsl(${200 - volume * 200}, 80%, 50%))` }} />
+                    </svg>
                 </div>
             </div>
         </footer>

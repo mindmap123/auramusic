@@ -3,13 +3,36 @@
 .sidebar {
     width: var(--sidebar-width);
     height: 100%;
-    background: var(--bg-base);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--accent-base) 12%, var(--bg-base)) 0%,
+        color-mix(in srgb, var(--accent-base) 5%, var(--bg-base)) 30%,
+        var(--bg-base) 100%
+    );
     display: flex;
     flex-direction: column;
     padding: var(--spacing-8);
     transition: width var(--transition-slow);
     flex-shrink: 0;
     z-index: 100;
+    position: relative;
+    border-right: 1px solid color-mix(in srgb, var(--accent-base) 15%, transparent);
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--accent-base) 8%, transparent) 0%,
+        transparent 100%
+    );
+    pointer-events: none;
+    border-radius: var(--radius-lg) 0 0 0;
 }
 
 .sidebar.collapsed {
@@ -79,6 +102,16 @@
 .nav {
     flex: 1;
     padding: var(--spacing-8) 0;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--accent-base) 10%, transparent) 0%,
+        color-mix(in srgb, var(--accent-base) 8%, transparent) 40%,
+        color-mix(in srgb, var(--accent-base) 4%, transparent) 70%,
+        transparent 100%
+    );
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-8) 0;
+    padding: var(--spacing-12);
 }
 
 .navList {
@@ -109,7 +142,8 @@
 
 .navItem.active {
     color: var(--text-base);
-    background: var(--bg-highlight);
+    background: color-mix(in srgb, var(--accent-base) 15%, var(--bg-highlight));
+    border: 1px solid color-mix(in srgb, var(--accent-base) 25%, transparent);
 }
 
 .navItem.active::before {
@@ -120,6 +154,7 @@
     height: 24px;
     background: var(--accent-base);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    box-shadow: 0 0 8px var(--accent-base);
 }
 
 .sidebar.collapsed .navItem {

@@ -2,13 +2,19 @@
 
 .playerBar {
     height: var(--playerbar-height);
-    background: var(--bg-elevated);
-    border-top: 1px solid var(--decorative-base);
+    min-height: 90px;
+    background: linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--accent-base) 12%, var(--bg-elevated)) 0%,
+        color-mix(in srgb, var(--accent-base) 6%, var(--bg-elevated)) 50%,
+        var(--bg-elevated) 100%
+    );
+    border-top: 1px solid color-mix(in srgb, var(--accent-base) 20%, var(--decorative-base));
     display: grid;
     grid-template-columns: minmax(180px, 1fr) 2fr minmax(180px, 1fr);
     align-items: center;
-    padding: 0 var(--spacing-16);
-    gap: var(--spacing-16);
+    padding: 0 var(--spacing-24);
+    gap: var(--spacing-24);
     position: relative;
     z-index: 100;
 }
@@ -199,6 +205,7 @@
     align-items: center;
     justify-content: flex-end;
     gap: var(--spacing-16);
+    padding-right: var(--spacing-16);
 }
 
 .autoModeBadge {
@@ -215,7 +222,14 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-8);
-    width: 140px;
+    width: 160px;
+    margin-right: var(--spacing-8);
+    cursor: pointer;
+    user-select: none;
+}
+
+.volumeControl.dragging {
+    cursor: grabbing;
 }
 
 .volumeBtn {
@@ -224,57 +238,45 @@
     align-items: center;
     justify-content: center;
     transition: var(--transition-fast);
+    cursor: pointer;
 }
 
 .volumeBtn:hover {
     color: var(--text-base);
 }
 
-.volumeSlider {
+.volumeSvg {
     flex: 1;
-    height: 4px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: var(--bg-highlight);
-    border-radius: var(--radius-full);
-    cursor: pointer;
+    height: 24px;
+    overflow: visible;
 }
 
-.volumeSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    background: var(--text-base);
-    border-radius: var(--radius-full);
-    opacity: 0;
-    transition: opacity var(--transition-fast);
+.volumeFill {
+    filter: drop-shadow(0 0 6px var(--accent-base));
+    transition: filter 0.2s ease;
 }
 
-.volumeControl:hover .volumeSlider::-webkit-slider-thumb {
-    opacity: 1;
+.volumeControl:hover .volumeFill,
+.volumeControl.dragging .volumeFill {
+    filter: drop-shadow(0 0 10px var(--accent-base));
 }
 
-.volumeSlider::-webkit-slider-runnable-track {
-    background: linear-gradient(
-        to right,
-        var(--text-base) 0%,
-        var(--text-base) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) 100%
-    );
-    border-radius: var(--radius-full);
-    height: 4px;
+.gradMark {
+    transition: opacity 0.15s ease, stroke 0.15s ease;
 }
 
-.volumeControl:hover .volumeSlider::-webkit-slider-runnable-track {
-    background: linear-gradient(
-        to right,
-        var(--accent-base) 0%,
-        var(--accent-base) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) 100%
-    );
+.volumeThumb {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: transform 0.15s ease, filter 0.15s ease;
+    transform-origin: center;
+}
+
+.volumeControl:hover .volumeThumb {
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 8px var(--accent-base));
+}
+
+.volumeControl.dragging .volumeThumb {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 12px var(--accent-base));
 }
 
 /* === MOBILE === */

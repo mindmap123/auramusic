@@ -177,6 +177,7 @@ export default function MobilePlayer({ currentStyle, onVolumeChange }: MobilePla
                         value={volume}
                         onChange={handleVolumeChange}
                         className={styles.volumeSlider}
+                        style={{ '--volume-percent': volume * 100 } as React.CSSProperties}
                     />
                 </div>
             </div>

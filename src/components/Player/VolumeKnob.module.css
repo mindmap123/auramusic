@@ -1,0 +1,156 @@
+/* ===== VOLUME KNOB - HORIZONTAL FLUID STYLE ===== */
+
+.container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 8px 0;
+}
+
+.knobWrapper {
+    flex: 1;
+    position: relative;
+    height: 48px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.knobWrapper.dragging {
+    cursor: grabbing;
+}
+
+.svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Track background */
+.trackBg {
+    fill: none;
+    stroke: var(--layer-3, rgba(255, 255, 255, 0.08));
+    stroke-width: 6;
+    stroke-linecap: round;
+}
+
+/* Track fill - animated gradient */
+.trackFill {
+    fill: none;
+    stroke: url(#volumeGradient);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.1s ease-out;
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+}
+
+/* Graduation marks */
+.graduations {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.knobWrapper:hover .graduations {
+    opacity: 1;
+}
+
+.gradMark {
+    fill: none;
+    stroke: var(--foreground-muted, rgba(255, 255, 255, 0.3));
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0.3;
+    transition: all 0.15s ease;
+}
+
+.gradMark.active {
+    stroke: hsl(var(--hue, 260), 70%, 65%);
+    opacity: 1;
+    filter: drop-shadow(0 0 4px hsla(var(--hue, 260), 70%, 65%, 0.6));
+}
+
+/* Thumb / Handle */
+.thumb {
+    fill: var(--foreground, #fff);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+    transition: transform 0.1s ease-out, filter 0.2s ease;
+    cursor: grab;
+}
+
+.knobWrapper:hover .thumb {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5))
+            drop-shadow(0 0 12px rgba(139, 92, 246, 0.4));
+}
+
+.knobWrapper.dragging .thumb {
+    cursor: grabbing;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.6))
+            drop-shadow(0 0 16px rgba(139, 92, 246, 0.6));
+}
+
+/* Glow effect behind thumb */
+.thumbGlow {
+    fill: var(--primary, #8b5cf6);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.knobWrapper:hover .thumbGlow {
+    opacity: 0.3;
+}
+
+.knobWrapper.dragging .thumbGlow {
+    opacity: 0.5;
+}
+
+/* Percentage display */
+.percentage {
+    font-weight: 600;
+    font-size: 0.875rem;
+    min-width: 42px;
+    text-align: right;
+    color: var(--foreground-muted, rgba(255, 255, 255, 0.6));
+    font-variant-numeric: tabular-nums;
+    transition: color 0.2s ease;
+}
+
+.knobWrapper:hover ~ .percentage,
+.container:hover .percentage {
+    color: var(--foreground, #fff);
+}
+
+/* Icon */
+.icon {
+    color: var(--foreground-muted, rgba(255, 255, 255, 0.6));
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+
+.container:hover .icon {
+    color: var(--foreground, #fff);
+}
+
+/* Hidden range for accessibility */
+.hiddenRange {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Smooth animations */
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+.knobWrapper.dragging .trackFill {
+    filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.6));
+}
