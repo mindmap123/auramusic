@@ -25,7 +25,9 @@ export default function TracksContent() {
         description: "",
         icon: "🎵",
         colorTheme: "#a855f7",
-        coverUrl: "" as string | null
+        coverUrl: "" as string | null,
+        bannerHorizontal: 50, // Pourcentage 0-100
+        bannerVertical: 50    // Pourcentage 0-100
     });
     const coverInputRef = useRef<HTMLInputElement>(null);
     
@@ -174,7 +176,7 @@ export default function TracksContent() {
         
         try {
             const isEditing = !!selectedStyleId;
-            const { coverUrl, ...dataToSend } = styleFormData; // Don't send coverUrl in this request
+            const { coverUrl, bannerHorizontal, bannerVertical, ...dataToSend } = styleFormData; // Don't send coverUrl and banner positions in main request
             const res = await fetch(isEditing ? `/api/admin/styles/${selectedStyleId}` : "/api/admin/styles", {
                 method: isEditing ? "PATCH" : "POST",
                 headers: { "Content-Type": "application/json" },
@@ -182,6 +184,15 @@ export default function TracksContent() {
             });
 
             if (res.ok) {
+                // If editing and banner positions have changed, save them separately
+                if (isEditing && (bannerHorizontal !== 50 || bannerVertical !== 50)) {
+                    await fetch(`/api/admin/styles/${selectedStyleId}/banner-position`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bannerHorizontal, bannerVertical }),
+                    });
+                }
+                
                 setShowStyleModal(false);
                 resetStyleForm();
                 fetchStyles();
@@ -216,18 +227,39 @@ export default function TracksContent() {
 
     const resetStyleForm = () => {
         setSelectedStyleId("");
-        setStyleFormData({ name: "", slug: "", description: "", icon: "🎵", colorTheme: "#a855f7", coverUrl: null });
+        setStyleFormData({ 
+            name: "", 
+            slug: "", 
+            description: "", 
+            icon: "🎵", 
+            colorTheme: "#a855f7", 
+            coverUrl: null,
+            bannerHorizontal: 50,
+            bannerVertical: 50
+        });
     };
 
     const openEditModal = (style: any) => {
         setSelectedStyleId(style.id);
+        
+        // Convertir les anciennes valeurs string en pourcentages
+        const convertPosition = (pos: string) => {
+            switch(pos) {
+                case 'left': case 'top': return 0;
+                case 'right': case 'bottom': return 100;
+                default: return 50;
+            }
+        };
+        
         setStyleFormData({
             name: style.name,
             slug: style.slug,
             description: style.description,
             icon: style.icon || "🎵",
             colorTheme: style.colorTheme || "#a855f7",
-            coverUrl: style.coverUrl || null
+            coverUrl: style.coverUrl || null,
+            bannerHorizontal: style.bannerPositionX || 50,
+            bannerVertical: style.bannerPositionY || 50
         });
         setShowStyleModal(true);
     };
@@ -404,6 +436,103 @@ export default function TracksContent() {
                                     </div>
                                 </div>
                             </div>
+                            
+                            {/* Banner Position - Only show if editing and has cover */}
+                            {selectedStyleId && styleFormData.coverUrl && (
+                                <div className={styles.bannerSection}>
+                                    <h3>Position du bandeau</h3>
+                                    <p className={styles.bannerDesc}>Cliquez sur l'image pour choisir le point focal de la bannière</p>
+                                    
+                                    {/* Focal Point Picker */}
+                                    <div className={styles.focalPointPicker}>
+                                        <div className={styles.sourceImageContainer}>
+                                            <img 
+                                                src={styleFormData.coverUrl} 
+                                                alt="Source"
+                                                className={styles.sourceImage}
+                                                onClick={(e) => {
+                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                                                    setStyleFormData(prev => ({
+                                                        ...prev,
+                                                        bannerHorizontal: Math.round(x),
+                                                        bannerVertical: Math.round(y)
+                                                    }));
+                                                }}
+                                            />
+                                            {/* Focal Point Indicator */}
+                                            <div 
+                                                className={styles.focalPoint}
+                                                style={{
+                                                    left: `${styleFormData.bannerHorizontal}%`,
+                                                    top: `${styleFormData.bannerVertical}%`
+                                                }}
+                                            >
+                                                <div className={styles.focalPointInner}></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className={styles.arrow}>→</div>
+                                        
+                                        {/* Banner Preview */}
+                                        <div className={styles.bannerPreview}>
+                                            <img 
+                                                src={styleFormData.coverUrl} 
+                                                alt="Preview"
+                                                style={{ 
+                                                    objectPosition: `${styleFormData.bannerHorizontal}% ${styleFormData.bannerVertical}%`
+                                                }}
+                                            />
+                                            <div className={styles.bannerOverlay}>
+                                                <div className={styles.bannerText}>
+                                                    <span className={styles.bannerLabel}>EN LECTURE</span>
+                                                    <h4>{styleFormData.name}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Quick Presets */}
+                                    <div className={styles.quickPresets}>
+                                        <span className={styles.presetsLabel}>Positions rapides :</span>
+                                        <div className={styles.presetButtons}>
+                                            {[
+                                                { label: 'Centre', x: 50, y: 50 },
+                                                { label: 'Haut gauche', x: 0, y: 0 },
+                                                { label: 'Haut centre', x: 50, y: 0 },
+                                                { label: 'Haut droite', x: 100, y: 0 },
+                                                { label: 'Centre gauche', x: 0, y: 50 },
+                                                { label: 'Centre droite', x: 100, y: 50 },
+                                                { label: 'Bas gauche', x: 0, y: 100 },
+                                                { label: 'Bas centre', x: 50, y: 100 },
+                                                { label: 'Bas droite', x: 100, y: 100 }
+                                            ].map(({ label, x, y }) => (
+                                                <button
+                                                    key={label}
+                                                    type="button"
+                                                    className={`${styles.presetBtn} ${
+                                                        styleFormData.bannerHorizontal === x && styleFormData.bannerVertical === y ? styles.active : ''
+                                                    }`}
+                                                    onClick={() => setStyleFormData(prev => ({ 
+                                                        ...prev, 
+                                                        bannerHorizontal: x, 
+                                                        bannerVertical: y 
+                                                    }))}
+                                                >
+                                                    {label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Coordinates Display */}
+                                    <div className={styles.coordinates}>
+                                        Point focal : {styleFormData.bannerHorizontal}%, {styleFormData.bannerVertical}%
+                                    </div>
+                                </div>
+                            )}
+                            
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowStyleModal(false)} className="btn-secondary">Annuler</button>
                                 <button type="submit" className="btn-primary" disabled={saving}>{saving ? "..." : selectedStyleId ? "Enregistrer" : "Créer"}</button>

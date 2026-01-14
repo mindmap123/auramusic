@@ -273,6 +273,29 @@ button:disabled {
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
+/* === SMOOTH SCROLL OPTIMIZATION === */
+
+html {
+  scroll-behavior: auto; /* Disable smooth scroll for better performance */
+}
+
+/* Optimize scroll containers */
+[class*="content"],
+[class*="grid"],
+[class*="list"] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  contain: layout style;
+}
+
+/* Reduce GPU layers - only for elements that actually animate */
+.animate-fadeIn,
+.animate-slideUp,
+[class*="playing"] {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 /* === UTILITY CLASSES === */
 
 .sr-only {

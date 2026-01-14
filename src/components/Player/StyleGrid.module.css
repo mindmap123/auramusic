@@ -5,7 +5,10 @@
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: var(--spacing-24);
     padding: var(--spacing-8) 0;
-    padding-bottom: var(--spacing-32);
+    padding-bottom: var(--spacing-24); /* Un peu plus d'espace */
+    /* Optimized scroll performance */
+    contain: layout style paint;
+    will-change: auto;
 }
 
 /* === CARD === */
@@ -16,8 +19,10 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-16);
     cursor: pointer;
-    transition: background var(--transition-normal);
+    transition: background-color 0.15s ease;
     position: relative;
+    /* Optimized for scroll performance */
+    contain: layout style paint;
 }
 
 .card:hover {
@@ -58,11 +63,14 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-slow);
+    /* Removed expensive transform animation during scroll */
+    transition: none;
 }
 
 .card:hover .cover img {
+    /* Only apply transform on hover, not during scroll */
     transform: scale(1.02);
+    transition: transform 0.2s ease;
 }
 
 .coverPlaceholder {
@@ -91,8 +99,10 @@
     justify-content: center;
     opacity: 0;
     transform: translateY(8px);
-    transition: all var(--transition-normal);
+    transition: opacity 0.2s ease, transform 0.2s ease;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    /* Optimize for performance */
+    contain: layout style paint;
 }
 
 .playButton:hover {
@@ -249,7 +259,7 @@
     .grid {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-12);
-        padding-bottom: 100px; /* Space for mobile player */
+        padding-bottom: 6px; /* Réduit de 35% (9px → 6px) */
     }
 
     .card {

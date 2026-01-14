@@ -3,57 +3,52 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Store {
-  id              String               @id @default(uuid())
-  name            String
-  email           String               @unique
-  password        String
-  currentStyleId  String?
-  volume          Int                  @default(70)
-  isPlaying       Boolean              @default(false)
-  isAutoMode      Boolean              @default(false)
-  isActive        Boolean              @default(true)
-  lastPlayedAt    DateTime?
-  role            String               @default("STORE")
-  accentColor     String               @default("green") // green, violet, blue, orange, pink, red
-  // Grouping & Organization
-  groupId         String?
-  city            String?
-  country         String?
-  storeType       String?              // cafe, restaurant, boutique, hotel, etc.
-  // Metadata
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  // Relations
-  group           StoreGroup?          @relation(fields: [groupId], references: [id])
-  style           MusicStyle?          @relation("CurrentStyle", fields: [currentStyleId], references: [id])
-  playSessions    PlaySession[]
-  styleProgress   StoreStyleProgress[]
-  schedules       StoreSchedule[]
-  favorites       StoreFavorite[]
-  activityLogs    ActivityLog[]
+  id             String               @id @default(uuid())
+  name           String
+  email          String               @unique
+  password       String
+  currentStyleId String?
+  volume         Int                  @default(70)
+  isPlaying      Boolean              @default(false)
+  isAutoMode     Boolean              @default(false)
+  isActive       Boolean              @default(true)
+  lastPlayedAt   DateTime?
+  role           String               @default("STORE")
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  accentColor    String               @default("green")
+  city           String?
+  country        String?
+  groupId        String?
+  storeType      String?
+  activityLogs   ActivityLog[]
+  playSessions   PlaySession[]
+  style          MusicStyle?          @relation("CurrentStyle", fields: [currentStyleId], references: [id])
+  group          StoreGroup?          @relation(fields: [groupId], references: [id])
+  favorites      StoreFavorite[]
+  schedules      StoreSchedule[]
+  styleProgress  StoreStyleProgress[]
 
   @@index([groupId])
   @@index([city])
   @@index([isActive])
 }
 
-// Groupes de magasins (chaînes, enseignes)
 model StoreGroup {
-  id              String    @id @default(uuid())
-  name            String    @unique
-  description     String?
-  color           String    @default("#1db954") // Couleur pour identifier le groupe
-  defaultStyleId  String?   // Style par défaut pour les nouveaux magasins
-  defaultVolume   Int       @default(70)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  stores          Store[]
+  id             String   @id @default(uuid())
+  name           String   @unique
+  description    String?
+  color          String   @default("#1db954")
+  defaultStyleId String?
+  defaultVolume  Int      @default(70)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  stores         Store[]
 }
 
 model Admin {
@@ -67,28 +62,30 @@ model Admin {
 }
 
 model MusicStyle {
-  id            String               @id @default(uuid())
-  name          String
-  slug          String               @unique
-  description   String
-  mixUrl        String?
-  coverUrl      String?
-  duration      Int                  @default(3600)
-  icon          String?
-  colorTheme    String?
-  stores        Store[]              @relation("CurrentStyle")
-  playSessions  PlaySession[]
-  styleProgress StoreStyleProgress[]
-  schedules     StoreSchedule[]
-  favorites     StoreFavorite[]
+  id               String               @id @default(uuid())
+  name             String
+  slug             String               @unique
+  description      String
+  mixUrl           String?
+  coverUrl         String?
+  duration         Int                  @default(3600)
+  icon             String?
+  colorTheme       String?
+  bannerPositionX  Float                @default(50.0)
+  bannerPositionY  Float                @default(50.0)
+  playSessions     PlaySession[]
+  stores           Store[]              @relation("CurrentStyle")
+  favorites        StoreFavorite[]
+  schedules        StoreSchedule[]
+  styleProgress    StoreStyleProgress[]
 }
 
 model StoreSchedule {
   id        String     @id @default(uuid())
   storeId   String?
   styleId   String
-  startTime String     // "HH:mm"
-  endTime   String     // "HH:mm"
+  startTime String
+  endTime   String
   store     Store?     @relation(fields: [storeId], references: [id], onDelete: Cascade)
   style     MusicStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
 }
@@ -115,7 +112,6 @@ model PlaySession {
   style       MusicStyle @relation(fields: [styleId], references: [id])
 }
 
-// Favoris des magasins
 model StoreFavorite {
   id        String     @id @default(uuid())
   storeId   String
@@ -127,12 +123,11 @@ model StoreFavorite {
   @@unique([storeId, styleId])
 }
 
-// Logs d'activité (play/pause/changement de style)
 model ActivityLog {
   id        String   @id @default(uuid())
   storeId   String
-  action    String   // "PLAY", "PAUSE", "CHANGE_STYLE"
-  details   String?  // JSON avec infos supplémentaires (styleId, styleName, etc.)
+  action    String
+  details   String?
   createdAt DateTime @default(now())
   store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
