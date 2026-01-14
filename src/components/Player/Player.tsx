@@ -81,7 +81,7 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
     }, [isPreview]);
 
     useEffect(() => {
-        if (store.style?.mixUrl) {
+        if (store?.style?.mixUrl && store?.currentStyleId) {
             setStyle(store.currentStyleId, store.style.mixUrl);
             initPlayer(store.style.mixUrl, store.currentPosition, store.volume / 100);
         }

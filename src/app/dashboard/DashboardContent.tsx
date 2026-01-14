@@ -61,10 +61,10 @@ export default function DashboardContent() {
             .then((res) => res.json())
             .then(async (storeData) => {
                 let currentPosition = 0;
-                if (storeData.currentStyleId) {
+                if (storeData?.currentStyleId) {
                     try {
                         const posRes = await fetch(
-                            `/api/store/position?styleId=${storeData.currentStyleId}`
+                            `/api/store/position?styleId=${storeData?.currentStyleId}`
                         );
                         const posData = await posRes.json();
                         currentPosition = posData.position || 0;
@@ -90,7 +90,7 @@ export default function DashboardContent() {
     useEffect(() => {
         if (!store) return;
 
-        if (store.style?.mixUrl && store.currentStyleId) {
+        if (store?.style?.mixUrl && store?.currentStyleId) {
             setStyle(store.currentStyleId, store.style.mixUrl);
             initPlayer(store.style.mixUrl, store.currentPosition, store.volume / 100);
         }
