@@ -306,6 +306,15 @@ export default function DashboardContent() {
             <div className={styles.content} ref={contentRef}>
                 {/* Header Section */}
                 <header className={clsx(styles.header, scrolled && styles.headerScrolled)}>
+                    <div className={styles.headerSpacer} />
+                    <div className={styles.greeting}>
+                        <h1>
+                            {currentView === "home" && `Bonjour ${store.name}`}
+                            {currentView === "styles" && "Tous les styles"}
+                            {currentView === "favorites" && "Vos favoris"}
+                            {currentView === "settings" && "Paramètres"}
+                        </h1>
+                    </div>
                     <div className={styles.headerActions}>
                         <button
                             className={clsx(
@@ -315,18 +324,9 @@ export default function DashboardContent() {
                             onClick={handleAutoModeToggle}
                         >
                             <Zap size={16} fill={isAutoMode ? "currentColor" : "none"} />
-                            <span>{isAutoMode ? "Auto ON" : "Auto OFF"}</span>
+                            <span>{isAutoMode ? "Auto" : "Manuel"}</span>
                         </button>
                     </div>
-                    <div className={styles.greeting}>
-                        <h1>
-                            {currentView === "home" && `Bonjour ${store.name}`}
-                            {currentView === "styles" && "Tous les styles"}
-                            {currentView === "favorites" && "Vos favoris"}
-                            {currentView === "settings" && "Paramètres"}
-                        </h1>
-                    </div>
-                    <div className={styles.headerSpacer} />
                 </header>
 
                 {/* Content based on view */}
