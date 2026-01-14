@@ -3,9 +3,10 @@ import prisma from "@/lib/prisma";
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params; // await params for Next.js 15+
         const { bannerHorizontal, bannerVertical } = await request.json();
         
         // Convert to Float and validate input
@@ -24,7 +25,7 @@ export async function PATCH(
         }
 
         const style = await prisma.musicStyle.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 bannerPositionX: posX,
                 bannerPositionY: posY

@@ -223,6 +223,7 @@
     justify-content: center;
     z-index: 1000;
     animation: fadeIn var(--transition-base) ease-out;
+    padding: 20px;
 }
 
 .modal {
@@ -230,22 +231,27 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     width: 100%;
-    max-width: 520px;
-    margin: 20px;
+    max-width: 1200px;
+    max-height: 90vh;
     animation: slideUp var(--transition-slow) ease-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
+    padding: 24px 32px;
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
 }
 
 .modalHeader h2 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 600;
+    color: var(--text-base);
 }
 
 .closeBtn {
@@ -261,13 +267,62 @@
 }
 
 .modalSubtitle {
-    padding: 16px 24px 0;
+    padding: 16px 32px 0;
     color: var(--muted-foreground);
     font-size: 0.9375rem;
 }
 
 .modal form {
-    padding: 24px;
+    padding: 32px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Desktop: Horizontal Layout */
+@media (min-width: 1024px) {
+    .modal form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        align-items: start;
+    }
+    
+    .formLeft {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .formRight {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .modalActions {
+        grid-column: 1 / -1;
+        margin-top: 24px;
+    }
+}
+
+/* Mobile: Vertical with scroll */
+@media (max-width: 1023px) {
+    .modal {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+        height: 100vh;
+        max-height: 100vh;
+    }
+    
+    .modal form {
+        padding: 24px;
+    }
+    
+    .formLeft,
+    .formRight {
+        display: contents;
+    }
 }
 
 /* Form */
@@ -483,9 +538,9 @@
 }
 /* Banner Position Section */
 .bannerSection {
-    margin-top: var(--spacing-24);
-    padding-top: var(--spacing-24);
-    border-top: 1px solid var(--decorative-base);
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
 }
 
 .bannerSection h3 {
@@ -502,10 +557,9 @@
 
 /* Focal Point Picker */
 .focalPointPicker {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-16);
-    align-items: center;
     margin-bottom: var(--spacing-20);
 }
 
@@ -516,6 +570,8 @@
     overflow: hidden;
     border: 2px solid var(--decorative-base);
     cursor: crosshair;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .sourceImage {
@@ -553,6 +609,8 @@
     font-size: 1.5rem;
     color: var(--text-subdued);
     font-weight: bold;
+    text-align: center;
+    transform: rotate(90deg);
 }
 
 .bannerPreview {
@@ -562,6 +620,8 @@
     overflow: hidden;
     position: relative;
     border: 2px solid var(--decorative-base);
+    margin: 0 auto;
+    max-width: 400px;
 }
 
 .bannerPreview img {
@@ -606,6 +666,29 @@
     margin: 0;
 }
 
+/* Desktop: Side by side layout */
+@media (min-width: 1024px) {
+    .focalPointPicker {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: var(--spacing-24);
+        align-items: center;
+    }
+    
+    .arrow {
+        transform: rotate(0deg);
+        justify-self: center;
+    }
+    
+    .sourceImageContainer {
+        margin: 0;
+    }
+    
+    .bannerPreview {
+        margin: 0;
+    }
+}
+
 /* Quick Presets */
 .quickPresets {
     margin-bottom: var(--spacing-16);
@@ -619,19 +702,20 @@
 }
 
 .presetButtons {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-6);
 }
 
 .presetBtn {
-    padding: var(--spacing-4) var(--spacing-8);
+    padding: var(--spacing-6) var(--spacing-8);
     background: var(--bg-highlight);
     border: 1px solid var(--decorative-base);
     border-radius: var(--radius-sm);
     color: var(--text-subdued);
     font-size: 0.75rem;
     transition: all var(--transition-fast);
+    text-align: center;
 }
 
 .presetBtn:hover {
@@ -655,28 +739,4 @@
     padding: var(--spacing-6) var(--spacing-12);
     border-radius: var(--radius-sm);
     border: 1px solid var(--decorative-base);
-}
-
-@media (max-width: 768px) {
-    .focalPointPicker {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-12);
-    }
-    
-    .arrow {
-        transform: rotate(90deg);
-        justify-self: center;
-    }
-    
-    .bannerPreview {
-        height: 100px;
-    }
-    
-    .bannerText h4 {
-        font-size: 0.875rem;
-    }
-    
-    .presetButtons {
-        justify-content: center;
-    }
 }

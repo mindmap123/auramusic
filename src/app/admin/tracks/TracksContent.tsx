@@ -383,155 +383,159 @@ export default function TracksContent() {
                             <button onClick={() => setShowStyleModal(false)} className={styles.closeBtn}><X size={20} /></button>
                         </div>
                         <form onSubmit={handleStyleSubmit}>
-                            {/* Cover Upload Section */}
-                            {selectedStyleId && (
-                                <div className={styles.coverSection}>
-                                    <label>Pochette</label>
-                                    <div className={styles.coverUpload}>
-                                        {styleFormData.coverUrl ? (
-                                            <div className={styles.coverPreview}>
-                                                <img src={styleFormData.coverUrl} alt="Cover" />
-                                                <button type="button" onClick={handleDeleteCover} className={styles.coverDeleteBtn}><Trash2 size={14} /></button>
-                                            </div>
-                                        ) : (
-                                            <div className={styles.coverPlaceholder} onClick={() => coverInputRef.current?.click()}>
-                                                <Image size={24} />
-                                                <span>{uploadingCover ? "Upload..." : "Ajouter"}</span>
-                                            </div>
-                                        )}
-                                        <input ref={coverInputRef} type="file" accept="image/*" onChange={handleCoverUpload} style={{ display: 'none' }} />
-                                        {styleFormData.coverUrl && (
-                                            <button type="button" onClick={() => coverInputRef.current?.click()} className={styles.changeCoverBtn}>
-                                                {uploadingCover ? "Upload..." : "Changer"}
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className={styles.formRow}>
-                                <div className={styles.formGroup}>
-                                    <label>Nom</label>
-                                    <input type="text" className="input" value={styleFormData.name} onChange={e => setStyleFormData({ ...styleFormData, name: e.target.value, slug: selectedStyleId ? styleFormData.slug : generateSlug(e.target.value) })} required />
-                                </div>
-                                <div className={styles.formGroup}>
-                                    <label>Slug</label>
-                                    <input type="text" className="input" value={styleFormData.slug} onChange={e => setStyleFormData({ ...styleFormData, slug: e.target.value })} disabled={!!selectedStyleId} required />
-                                </div>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label>Description</label>
-                                <textarea className="input" value={styleFormData.description} onChange={e => setStyleFormData({ ...styleFormData, description: e.target.value })} rows={3} required />
-                            </div>
-                            <div className={styles.formRow}>
-                                <div className={styles.formGroup}>
-                                    <label>Icône (emoji)</label>
-                                    <input type="text" className="input" value={styleFormData.icon} onChange={e => setStyleFormData({ ...styleFormData, icon: e.target.value })} maxLength={8} />
-                                </div>
-                                <div className={styles.formGroup}>
-                                    <label>Couleur</label>
-                                    <div className={styles.colorInput}>
-                                        <input type="color" value={styleFormData.colorTheme} onChange={e => setStyleFormData({ ...styleFormData, colorTheme: e.target.value })} />
-                                        <span>{styleFormData.colorTheme}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Banner Position - Only show if editing and has cover */}
-                            {selectedStyleId && styleFormData.coverUrl && (
-                                <div className={styles.bannerSection}>
-                                    <h3>Position du bandeau</h3>
-                                    <p className={styles.bannerDesc}>Cliquez sur l'image pour choisir le point focal de la bannière</p>
-                                    
-                                    {/* Focal Point Picker */}
-                                    <div className={styles.focalPointPicker}>
-                                        <div className={styles.sourceImageContainer}>
-                                            <img 
-                                                src={styleFormData.coverUrl} 
-                                                alt="Source"
-                                                className={styles.sourceImage}
-                                                onClick={(e) => {
-                                                    const rect = e.currentTarget.getBoundingClientRect();
-                                                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                                                    const y = ((e.clientY - rect.top) / rect.height) * 100;
-                                                    setStyleFormData(prev => ({
-                                                        ...prev,
-                                                        bannerHorizontal: Math.round(x),
-                                                        bannerVertical: Math.round(y)
-                                                    }));
-                                                }}
-                                            />
-                                            {/* Focal Point Indicator */}
-                                            <div 
-                                                className={styles.focalPoint}
-                                                style={{
-                                                    left: `${styleFormData.bannerHorizontal}%`,
-                                                    top: `${styleFormData.bannerVertical}%`
-                                                }}
-                                            >
-                                                <div className={styles.focalPointInner}></div>
-                                            </div>
+                            <div className={styles.formLeft}>
+                                {/* Cover Upload Section */}
+                                {selectedStyleId && (
+                                    <div className={styles.coverSection}>
+                                        <label>Pochette</label>
+                                        <div className={styles.coverUpload}>
+                                            {styleFormData.coverUrl ? (
+                                                <div className={styles.coverPreview}>
+                                                    <img src={styleFormData.coverUrl} alt="Cover" />
+                                                    <button type="button" onClick={handleDeleteCover} className={styles.coverDeleteBtn}><Trash2 size={14} /></button>
+                                                </div>
+                                            ) : (
+                                                <div className={styles.coverPlaceholder} onClick={() => coverInputRef.current?.click()}>
+                                                    <Image size={24} />
+                                                    <span>{uploadingCover ? "Upload..." : "Ajouter"}</span>
+                                                </div>
+                                            )}
+                                            <input ref={coverInputRef} type="file" accept="image/*" onChange={handleCoverUpload} style={{ display: 'none' }} />
+                                            {styleFormData.coverUrl && (
+                                                <button type="button" onClick={() => coverInputRef.current?.click()} className={styles.changeCoverBtn}>
+                                                    {uploadingCover ? "Upload..." : "Changer"}
+                                                </button>
+                                            )}
                                         </div>
+                                    </div>
+                                )}
+
+                                <div className={styles.formRow}>
+                                    <div className={styles.formGroup}>
+                                        <label>Nom</label>
+                                        <input type="text" className="input" value={styleFormData.name} onChange={e => setStyleFormData({ ...styleFormData, name: e.target.value, slug: selectedStyleId ? styleFormData.slug : generateSlug(e.target.value) })} required />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label>Slug</label>
+                                        <input type="text" className="input" value={styleFormData.slug} onChange={e => setStyleFormData({ ...styleFormData, slug: e.target.value })} disabled={!!selectedStyleId} required />
+                                    </div>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label>Description</label>
+                                    <textarea className="input" value={styleFormData.description} onChange={e => setStyleFormData({ ...styleFormData, description: e.target.value })} rows={3} required />
+                                </div>
+                                <div className={styles.formRow}>
+                                    <div className={styles.formGroup}>
+                                        <label>Icône (emoji)</label>
+                                        <input type="text" className="input" value={styleFormData.icon} onChange={e => setStyleFormData({ ...styleFormData, icon: e.target.value })} maxLength={8} />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label>Couleur</label>
+                                        <div className={styles.colorInput}>
+                                            <input type="color" value={styleFormData.colorTheme} onChange={e => setStyleFormData({ ...styleFormData, colorTheme: e.target.value })} />
+                                            <span>{styleFormData.colorTheme}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={styles.formRight}>
+                                {/* Banner Position - Only show if editing and has cover */}
+                                {selectedStyleId && styleFormData.coverUrl && (
+                                    <div className={styles.bannerSection}>
+                                        <h3>Position du bandeau</h3>
+                                        <p className={styles.bannerDesc}>Cliquez sur l'image pour choisir le point focal de la bannière</p>
                                         
-                                        <div className={styles.arrow}>→</div>
-                                        
-                                        {/* Banner Preview */}
-                                        <div className={styles.bannerPreview}>
-                                            <img 
-                                                src={styleFormData.coverUrl} 
-                                                alt="Preview"
-                                                style={{ 
-                                                    objectPosition: `${styleFormData.bannerHorizontal}% ${styleFormData.bannerVertical}%`
-                                                }}
-                                            />
-                                            <div className={styles.bannerOverlay}>
-                                                <div className={styles.bannerText}>
-                                                    <span className={styles.bannerLabel}>EN LECTURE</span>
-                                                    <h4>{styleFormData.name}</h4>
+                                        {/* Focal Point Picker */}
+                                        <div className={styles.focalPointPicker}>
+                                            <div className={styles.sourceImageContainer}>
+                                                <img 
+                                                    src={styleFormData.coverUrl} 
+                                                    alt="Source"
+                                                    className={styles.sourceImage}
+                                                    onClick={(e) => {
+                                                        const rect = e.currentTarget.getBoundingClientRect();
+                                                        const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                                        const y = ((e.clientY - rect.top) / rect.height) * 100;
+                                                        setStyleFormData(prev => ({
+                                                            ...prev,
+                                                            bannerHorizontal: Math.round(x),
+                                                            bannerVertical: Math.round(y)
+                                                        }));
+                                                    }}
+                                                />
+                                                {/* Focal Point Indicator */}
+                                                <div 
+                                                    className={styles.focalPoint}
+                                                    style={{
+                                                        left: `${styleFormData.bannerHorizontal}%`,
+                                                        top: `${styleFormData.bannerVertical}%`
+                                                    }}
+                                                >
+                                                    <div className={styles.focalPointInner}></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className={styles.arrow}>→</div>
+                                            
+                                            {/* Banner Preview */}
+                                            <div className={styles.bannerPreview}>
+                                                <img 
+                                                    src={styleFormData.coverUrl} 
+                                                    alt="Preview"
+                                                    style={{ 
+                                                        objectPosition: `${styleFormData.bannerHorizontal}% ${styleFormData.bannerVertical}%`
+                                                    }}
+                                                />
+                                                <div className={styles.bannerOverlay}>
+                                                    <div className={styles.bannerText}>
+                                                        <span className={styles.bannerLabel}>EN LECTURE</span>
+                                                        <h4>{styleFormData.name}</h4>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Quick Presets */}
-                                    <div className={styles.quickPresets}>
-                                        <span className={styles.presetsLabel}>Positions rapides :</span>
-                                        <div className={styles.presetButtons}>
-                                            {[
-                                                { label: 'Centre', x: 50, y: 50 },
-                                                { label: 'Haut gauche', x: 0, y: 0 },
-                                                { label: 'Haut centre', x: 50, y: 0 },
-                                                { label: 'Haut droite', x: 100, y: 0 },
-                                                { label: 'Centre gauche', x: 0, y: 50 },
-                                                { label: 'Centre droite', x: 100, y: 50 },
-                                                { label: 'Bas gauche', x: 0, y: 100 },
-                                                { label: 'Bas centre', x: 50, y: 100 },
-                                                { label: 'Bas droite', x: 100, y: 100 }
-                                            ].map(({ label, x, y }) => (
-                                                <button
-                                                    key={label}
-                                                    type="button"
-                                                    className={`${styles.presetBtn} ${
-                                                        styleFormData.bannerHorizontal === x && styleFormData.bannerVertical === y ? styles.active : ''
-                                                    }`}
-                                                    onClick={() => setStyleFormData(prev => ({ 
-                                                        ...prev, 
-                                                        bannerHorizontal: x, 
-                                                        bannerVertical: y 
-                                                    }))}
-                                                >
-                                                    {label}
-                                                </button>
-                                            ))}
+                                        {/* Quick Presets */}
+                                        <div className={styles.quickPresets}>
+                                            <span className={styles.presetsLabel}>Positions rapides :</span>
+                                            <div className={styles.presetButtons}>
+                                                {[
+                                                    { label: 'Centre', x: 50, y: 50 },
+                                                    { label: 'Haut gauche', x: 0, y: 0 },
+                                                    { label: 'Haut centre', x: 50, y: 0 },
+                                                    { label: 'Haut droite', x: 100, y: 0 },
+                                                    { label: 'Centre gauche', x: 0, y: 50 },
+                                                    { label: 'Centre droite', x: 100, y: 50 },
+                                                    { label: 'Bas gauche', x: 0, y: 100 },
+                                                    { label: 'Bas centre', x: 50, y: 100 },
+                                                    { label: 'Bas droite', x: 100, y: 100 }
+                                                ].map(({ label, x, y }) => (
+                                                    <button
+                                                        key={label}
+                                                        type="button"
+                                                        className={`${styles.presetBtn} ${
+                                                            styleFormData.bannerHorizontal === x && styleFormData.bannerVertical === y ? styles.active : ''
+                                                        }`}
+                                                        onClick={() => setStyleFormData(prev => ({ 
+                                                            ...prev, 
+                                                            bannerHorizontal: x, 
+                                                            bannerVertical: y 
+                                                        }))}
+                                                    >
+                                                        {label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Coordinates Display */}
+                                        <div className={styles.coordinates}>
+                                            Point focal : {styleFormData.bannerHorizontal}%, {styleFormData.bannerVertical}%
                                         </div>
                                     </div>
-                                    
-                                    {/* Coordinates Display */}
-                                    <div className={styles.coordinates}>
-                                        Point focal : {styleFormData.bannerHorizontal}%, {styleFormData.bannerVertical}%
-                                    </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                             
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowStyleModal(false)} className="btn-secondary">Annuler</button>
