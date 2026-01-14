@@ -30,6 +30,8 @@ export default function DashboardContent() {
     const [loading, setLoading] = useState(true);
     const [currentView, setCurrentView] = useState<"home" | "styles" | "favorites" | "settings">("home");
     const [favorites, setFavorites] = useState<string[]>([]);
+    const [scrolled, setScrolled] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const {
         isPlaying,
@@ -179,6 +181,19 @@ export default function DashboardContent() {
         };
     }, [isPlaying]);
 
+    // Scroll listener for header
+    useEffect(() => {
+        const content = contentRef.current;
+        if (!content) return;
+
+        const handleScroll = () => {
+            setScrolled(content.scrollTop > 20);
+        };
+
+        content.addEventListener("scroll", handleScroll);
+        return () => content.removeEventListener("scroll", handleScroll);
+    }, [currentView]);
+
     // Cleanup
     useEffect(() => {
         return () => stop();
@@ -288,9 +303,9 @@ export default function DashboardContent() {
             }
         >
             {/* Main Content */}
-            <div className={styles.content}>
+            <div className={styles.content} ref={contentRef}>
                 {/* Header Section */}
-                <header className={styles.header}>
+                <header className={clsx(styles.header, scrolled && styles.headerScrolled)}>
                     <div className={styles.headerActions}>
                         <button
                             className={clsx(

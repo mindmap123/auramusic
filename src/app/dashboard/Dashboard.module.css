@@ -22,7 +22,9 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* === MAIN CONTENT === */
@@ -47,16 +49,30 @@
     justify-content: space-between;
     margin-bottom: var(--spacing-24);
     padding: var(--spacing-16) var(--spacing-24);
-    border-radius: var(--radius-lg);
-    position: relative;
-    background: color-mix(in srgb, var(--accent-base) 8%, var(--bg-base));
-    border: 1px solid color-mix(in srgb, var(--accent-base) 15%, transparent);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    transition: all 0.3s ease;
+    background: transparent;
+    margin-left: calc(-1 * var(--spacing-24));
+    margin-right: calc(-1 * var(--spacing-24));
+    margin-top: calc(-1 * var(--spacing-24));
+    padding-top: var(--spacing-24);
     /* Optimize for scroll performance */
     contain: layout style paint;
 }
 
+.headerScrolled {
+    background: color-mix(in srgb, var(--bg-surface) 80%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid color-mix(in srgb, var(--accent-base) 10%, transparent);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .header::before {
-    display: none; /* Remove expensive pseudo-element */
+    display: none;
+    /* Remove expensive pseudo-element */
 }
 
 .greeting {
@@ -107,18 +123,20 @@
     color: var(--accent-base);
     border-color: var(--accent-base);
     box-shadow: 0 0 12px color-mix(in srgb, var(--accent-base) 30%, transparent),
-                var(--shadow-sm);
+        var(--shadow-sm);
 }
 
 /* === HERO SECTION === */
 .heroSection {
     position: relative;
-    height: 280px;
+    height: 340px;
     border-radius: var(--radius-lg);
     overflow: hidden;
     margin-bottom: var(--spacing-32);
-    /* Ombre simple */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    margin-top: calc(-1 * var(--spacing-24) - 80px);
+    /* Move under header */
+    /* simple shadow */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
 .heroBg {
@@ -132,11 +150,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        135deg,
-        var(--accent-base) 0%,
-        var(--accent-dark) 100%
-    );
+    background: linear-gradient(135deg,
+            var(--accent-base) 0%,
+            var(--accent-dark) 100%);
     mix-blend-mode: multiply;
     z-index: 2;
 }
@@ -145,11 +161,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        45deg,
-        rgba(0, 0, 0, 0.8) 0%,
-        var(--accent-base) 100%
-    );
+    background: linear-gradient(45deg,
+            rgba(0, 0, 0, 0.8) 0%,
+            var(--accent-base) 100%);
     mix-blend-mode: screen;
     z-index: 3;
 }
@@ -169,12 +183,10 @@
 .heroOverlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        to right,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(0, 0, 0, 0.3) 50%,
-        rgba(0, 0, 0, 0.1) 100%
-    );
+    background: linear-gradient(to right,
+            rgba(0, 0, 0, 0.6) 0%,
+            rgba(0, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.1) 100%);
     z-index: 4;
 }
 
@@ -219,7 +231,8 @@
 /* === SECTIONS === */
 .section {
     margin-bottom: var(--spacing-32);
-    padding-bottom: 32px; /* Un peu plus d'espace */
+    padding-bottom: 32px;
+    /* Un peu plus d'espace */
 }
 
 .sectionHeader {
@@ -272,7 +285,7 @@
     margin-bottom: var(--spacing-8);
 }
 
-.settingsCard > p {
+.settingsCard>p {
     font-size: 0.875rem;
     color: var(--text-subdued);
     margin-bottom: var(--spacing-24);
@@ -314,21 +327,27 @@
 .colorOption[data-color="green"] {
     background: #1db954;
 }
+
 .colorOption[data-color="violet"] {
     background: #a855f7;
 }
+
 .colorOption[data-color="blue"] {
     background: #3b82f6;
 }
+
 .colorOption[data-color="orange"] {
     background: #f97316;
 }
+
 .colorOption[data-color="pink"] {
     background: #ec4899;
 }
+
 .colorOption[data-color="red"] {
     background: #ef4444;
 }
+
 .colorOption[data-color="cyan"] {
     background: #06b6d4;
 }
@@ -396,7 +415,8 @@
 
     .section {
         margin-bottom: var(--spacing-16);
-        padding-bottom: 6px; /* Réduit de 35% (9px → 6px) */
+        padding-bottom: 6px;
+        /* Réduit de 35% (9px → 6px) */
     }
 
     .sectionHeader h2 {
