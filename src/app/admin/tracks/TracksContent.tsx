@@ -8,13 +8,13 @@ import { clsx } from "clsx";
 export default function TracksContent() {
     const [stylesList, setStylesList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    
+
     // Upload mix modal
     const [showUpload, setShowUpload] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [selectedStyleId, setSelectedStyleId] = useState("");
-    
+
     // Style modal (create/edit)
     const [showStyleModal, setShowStyleModal] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -28,7 +28,7 @@ export default function TracksContent() {
         coverUrl: "" as string | null
     });
     const coverInputRef = useRef<HTMLInputElement>(null);
-    
+
     // Audio
     const [playingId, setPlayingId] = useState<string | null>(null);
     const [audio] = useState(() => typeof window !== 'undefined' ? new Audio() : null);
@@ -63,12 +63,12 @@ export default function TracksContent() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({})
             });
-            
+
             if (!sigRes.ok) {
                 const err = await sigRes.json();
                 throw new Error(err.error || "Failed to get upload signature");
             }
-            
+
             const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
 
             // 2. Upload directly to Cloudinary with signature
@@ -80,7 +80,7 @@ export default function TracksContent() {
             formData.append("folder", folder);
 
             const xhr = new XMLHttpRequest();
-            
+
             xhr.upload.onprogress = (event) => {
                 if (event.lengthComputable) {
                     const percent = Math.round((event.loaded / event.total) * 100);
@@ -124,7 +124,7 @@ export default function TracksContent() {
             setFile(null);
             setUploadProgress(0);
             fetchStyles();
-            
+
         } catch (err: any) {
             console.error("Upload error:", err);
             alert("Erreur : " + err.message);
@@ -135,19 +135,21 @@ export default function TracksContent() {
 
     const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file || !selectedStyleId) return;
+        if (!file) return;
 
         setUploadingCover(true);
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("styleId", selectedStyleId);
+        if (selectedStyleId) {
+            formData.append("styleId", selectedStyleId);
+        }
 
         try {
             const res = await fetch("/api/admin/covers", { method: "POST", body: formData });
             const data = await res.json();
             if (res.ok) {
                 setStyleFormData(prev => ({ ...prev, coverUrl: data.url }));
-                fetchStyles();
+                if (selectedStyleId) fetchStyles();
             } else {
                 alert(data.error || "Erreur upload");
             }
@@ -171,14 +173,13 @@ export default function TracksContent() {
     const handleStyleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        
+
         try {
             const isEditing = !!selectedStyleId;
-            const { coverUrl, ...dataToSend } = styleFormData; // Don't send coverUrl in this request
             const res = await fetch(isEditing ? `/api/admin/styles/${selectedStyleId}` : "/api/admin/styles", {
                 method: isEditing ? "PATCH" : "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(dataToSend),
+                body: JSON.stringify(styleFormData),
             });
 
             if (res.ok) {
@@ -216,12 +217,12 @@ export default function TracksContent() {
 
     const resetStyleForm = () => {
         setSelectedStyleId("");
-        setStyleFormData({ 
-            name: "", 
-            slug: "", 
-            description: "", 
-            icon: "🎵", 
-            colorTheme: "#a855f7", 
+        setStyleFormData({
+            name: "",
+            slug: "",
+            description: "",
+            icon: "🎵",
+            colorTheme: "#a855f7",
             coverUrl: null
         });
     };
@@ -360,30 +361,28 @@ export default function TracksContent() {
                         <form onSubmit={handleStyleSubmit}>
                             <div className={styles.formLeft}>
                                 {/* Cover Upload Section */}
-                                {selectedStyleId && (
-                                    <div className={styles.coverSection}>
-                                        <label>Pochette</label>
-                                        <div className={styles.coverUpload}>
-                                            {styleFormData.coverUrl ? (
-                                                <div className={styles.coverPreview}>
-                                                    <img src={styleFormData.coverUrl} alt="Cover" />
-                                                    <button type="button" onClick={handleDeleteCover} className={styles.coverDeleteBtn}><Trash2 size={14} /></button>
-                                                </div>
-                                            ) : (
-                                                <div className={styles.coverPlaceholder} onClick={() => coverInputRef.current?.click()}>
-                                                    <Image size={24} />
-                                                    <span>{uploadingCover ? "Upload..." : "Ajouter"}</span>
-                                                </div>
-                                            )}
-                                            <input ref={coverInputRef} type="file" accept="image/*" onChange={handleCoverUpload} style={{ display: 'none' }} />
-                                            {styleFormData.coverUrl && (
-                                                <button type="button" onClick={() => coverInputRef.current?.click()} className={styles.changeCoverBtn}>
-                                                    {uploadingCover ? "Upload..." : "Changer"}
-                                                </button>
-                                            )}
-                                        </div>
+                                <div className={styles.coverSection}>
+                                    <label>Pochette</label>
+                                    <div className={styles.coverUpload}>
+                                        {styleFormData.coverUrl ? (
+                                            <div className={styles.coverPreview}>
+                                                <img src={styleFormData.coverUrl} alt="Cover" />
+                                                <button type="button" onClick={handleDeleteCover} className={styles.coverDeleteBtn}><Trash2 size={14} /></button>
+                                            </div>
+                                        ) : (
+                                            <div className={styles.coverPlaceholder} onClick={() => coverInputRef.current?.click()}>
+                                                <Image size={24} />
+                                                <span>{uploadingCover ? "Upload..." : "Ajouter"}</span>
+                                            </div>
+                                        )}
+                                        <input ref={coverInputRef} type="file" accept="image/*" onChange={handleCoverUpload} style={{ display: 'none' }} />
+                                        {styleFormData.coverUrl && (
+                                            <button type="button" onClick={() => coverInputRef.current?.click()} className={styles.changeCoverBtn}>
+                                                {uploadingCover ? "Upload..." : "Changer"}
+                                            </button>
+                                        )}
                                     </div>
-                                )}
+                                </div>
 
                                 <div className={styles.formRow}>
                                     <div className={styles.formGroup}>
@@ -416,7 +415,7 @@ export default function TracksContent() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowStyleModal(false)} className="btn-secondary">Annuler</button>
                                 <button type="submit" className="btn-primary" disabled={saving}>{saving ? "..." : selectedStyleId ? "Enregistrer" : "Créer"}</button>

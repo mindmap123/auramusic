@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const { name, slug, description, icon, colorTheme } = body;
+        const { name, slug, description, icon, colorTheme, coverUrl, mixUrl } = body;
 
         const newStyle = await prisma.musicStyle.create({
             data: {
@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
                 description,
                 icon,
                 colorTheme,
-                mixUrl: null,
+                coverUrl: coverUrl || null,
+                mixUrl: mixUrl || null,
                 duration: 3600
             }
         });

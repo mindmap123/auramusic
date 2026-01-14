@@ -15,10 +15,10 @@ export async function POST(req: NextRequest) {
     try {
         const formData = await req.formData();
         const file = formData.get("file") as File;
-        const styleId = formData.get("styleId") as string;
+        const styleId = formData.get("styleId") as string | null;
 
-        if (!file || !styleId) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        if (!file) {
+            return NextResponse.json({ error: "Missing file" }, { status: 400 });
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
@@ -43,10 +43,12 @@ export async function POST(req: NextRequest) {
 
         const result = (await uploadPromise) as any;
 
-        await prisma.musicStyle.update({
-            where: { id: styleId },
-            data: { coverUrl: result.secure_url },
-        });
+        if (styleId) {
+            await prisma.musicStyle.update({
+                where: { id: styleId },
+                data: { coverUrl: result.secure_url },
+            });
+        }
 
         return NextResponse.json({ success: true, url: result.secure_url });
     } catch (error: any) {
