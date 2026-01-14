@@ -181,17 +181,17 @@ export default function DashboardContent() {
         };
     }, [isPlaying]);
 
-    // Scroll listener for header
+    // Intersection Observer for header
     useEffect(() => {
-        const content = contentRef.current;
-        if (!content) return;
+        const watcher = document.querySelector(`.${styles.scrollWatcher}`);
+        if (!watcher) return;
 
-        const handleScroll = () => {
-            setScrolled(content.scrollTop > 20);
-        };
+        const observer = new IntersectionObserver((entries) => {
+            setScrolled(!entries[0].isIntersecting);
+        }, { threshold: 0.1 });
 
-        content.addEventListener("scroll", handleScroll);
-        return () => content.removeEventListener("scroll", handleScroll);
+        observer.observe(watcher);
+        return () => observer.disconnect();
     }, [currentView]);
 
     // Cleanup
@@ -304,6 +304,7 @@ export default function DashboardContent() {
         >
             {/* Main Content */}
             <div className={styles.content} ref={contentRef}>
+                <div className={styles.scrollWatcher} />
                 {/* Header Section */}
                 <header className={clsx(styles.header, scrolled && styles.headerScrolled)}>
                     <div className={styles.headerSpacer} />

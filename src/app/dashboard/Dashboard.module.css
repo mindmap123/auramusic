@@ -36,10 +36,22 @@
     overflow-x: hidden;
     height: 100%;
     /* Optimized scroll performance */
-    scroll-behavior: auto;
+    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     contain: layout style;
+    /* Hardware acceleration */
+    transform: translateZ(0);
+    will-change: scroll-position;
+}
+
+.scrollWatcher {
+    height: 1px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* === HEADER === */
@@ -52,7 +64,9 @@
     position: sticky;
     top: 0;
     z-index: 40;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        backdrop-filter 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.3s ease;
     background: transparent;
     margin-left: calc(-1 * var(--spacing-24));
     margin-right: calc(-1 * var(--spacing-24));
@@ -60,6 +74,7 @@
     padding-top: var(--spacing-24);
     /* Optimize for scroll performance */
     contain: layout style paint;
+    will-change: background-color, backdrop-filter;
 }
 
 .headerScrolled {
