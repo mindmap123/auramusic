@@ -46,12 +46,15 @@
     z-index: 10;
     padding: var(--spacing-16) 0;
     background: linear-gradient(to bottom, var(--bg-surface), transparent);
-    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.headerHidden {
-    transform: translateY(-100%);
+.greeting {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.greetingHidden {
     opacity: 0;
+    transform: translateY(-10px);
     pointer-events: none;
 }
 

@@ -49,17 +49,14 @@ export default function DashboardContent() {
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
 
-    // Handle scroll to hide/show header
+    // Handle scroll to hide/show greeting
     useEffect(() => {
         const handleScroll = (e: Event) => {
             const target = e.target as HTMLElement;
             const currentScrollY = target.scrollTop;
             
-            if (currentScrollY > lastScrollY.current && currentScrollY > 50) {
-                setHeaderVisible(false);
-            } else {
-                setHeaderVisible(true);
-            }
+            // Hide greeting when scrolled past 50px
+            setHeaderVisible(currentScrollY < 50);
             lastScrollY.current = currentScrollY;
         };
 
@@ -294,7 +291,7 @@ export default function DashboardContent() {
             {/* Main Content */}
             <div className={styles.content} data-scroll-container>
                 {/* Header Section */}
-                <header className={clsx(styles.header, !headerVisible && styles.headerHidden)}>
+                <header className={styles.header}>
                     <div className={styles.headerActions}>
                         <button
                             className={clsx(
@@ -307,7 +304,7 @@ export default function DashboardContent() {
                             <span>{isAutoMode ? "Auto ON" : "Auto OFF"}</span>
                         </button>
                     </div>
-                    <div className={styles.greeting}>
+                    <div className={clsx(styles.greeting, !headerVisible && styles.greetingHidden)}>
                         <h1>
                             {currentView === "home" && "Bonjour"}
                             {currentView === "styles" && "Tous les styles"}
