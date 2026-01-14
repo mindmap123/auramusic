@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
             .jpeg({ quality: 90 })
             .toBuffer();
 
-        return new NextResponse(processedImage, {
+        return new Response(processedImage, {
             headers: {
                 'Content-Type': 'image/jpeg',
                 'Cache-Control': 'public, max-age=31536000',
