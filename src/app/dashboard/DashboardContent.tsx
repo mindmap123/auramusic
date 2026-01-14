@@ -349,7 +349,7 @@ export default function DashboardContent() {
                                     onClick={handleAutoModeToggle}
                                 >
                                     <Zap size={16} fill={isAutoMode ? "currentColor" : "none"} />
-                                    <span>{isAutoMode ? "Mode " + (isAutoMode ? "Auto" : "Manuel")}</span>
+                                    <span>Mode {isAutoMode ? "Auto" : "Manuel"}</span>
                                 </button>
                             </div>
                             <StyleGrid
