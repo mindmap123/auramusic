@@ -36,15 +36,13 @@ export default function DashboardContent() {
         initPlayer,
         volume,
         setVolume,
+        currentStyleId,
         setStyle,
         isAutoMode,
         setAutoMode,
         stop,
         progress,
     } = usePlayerStore();
-
-    // Fix hydration issue
-    const currentStyleId = usePlayerStore((state) => state.currentStyleId) ?? null;
 
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
