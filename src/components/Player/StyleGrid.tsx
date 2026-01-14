@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Play, Heart, Music } from "lucide-react";
 import { clsx } from "clsx";
+import { motion } from "framer-motion";
 import { preloadMultipleAudio, initAudioContext } from "@/lib/audioManager";
 import styles from "./StyleGrid.module.css";
 
@@ -64,6 +65,29 @@ export default function StyleGrid({
         return aFav - bFav;
     });
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring" as const,
+                stiffness: 260,
+                damping: 20
+            }
+        }
+    };
+
     if (loading) {
         return (
             <div className={styles.grid}>
@@ -83,7 +107,12 @@ export default function StyleGrid({
     }
 
     return (
-        <div className={styles.grid}>
+        <motion.div
+            className={styles.grid}
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+        >
             {sortedStyles.map((style) => {
                 const isActive = activeStyleId === style.id;
                 const hasMix = !!style.mixUrl;
@@ -91,8 +120,10 @@ export default function StyleGrid({
                 const isHovered = hoveredId === style.id;
 
                 return (
-                    <div
+                    <motion.div
                         key={style.id}
+                        variants={itemVariants}
+                        layout
                         className={clsx(
                             styles.card,
                             isActive && styles.active,
@@ -101,6 +132,8 @@ export default function StyleGrid({
                         onClick={() => handleCardClick(style)}
                         onMouseEnter={() => setHoveredId(style.id)}
                         onMouseLeave={() => setHoveredId(null)}
+                        whileHover={{ scale: 1.02, y: -4 }}
+                        whileTap={{ scale: 0.98 }}
                         role="button"
                         tabIndex={hasMix ? 0 : -1}
                     >
@@ -171,9 +204,9 @@ export default function StyleGrid({
                                 />
                             </button>
                         )}
-                    </div>
+                    </motion.div>
                 );
             })}
-        </div>
+        </motion.div>
     );
 }

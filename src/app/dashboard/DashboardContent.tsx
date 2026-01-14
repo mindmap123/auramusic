@@ -31,7 +31,6 @@ export default function DashboardContent() {
     const [loading, setLoading] = useState(true);
     const [currentView, setCurrentView] = useState<"home" | "styles" | "favorites" | "settings">("home");
     const [favorites, setFavorites] = useState<string[]>([]);
-    const [scrolled, setScrolled] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
 
     const {
@@ -182,18 +181,6 @@ export default function DashboardContent() {
         };
     }, [isPlaying]);
 
-    // Intersection Observer for header
-    useEffect(() => {
-        const watcher = document.querySelector(`.${styles.scrollWatcher}`);
-        if (!watcher) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            setScrolled(!entries[0].isIntersecting);
-        }, { threshold: 0.1 });
-
-        observer.observe(watcher);
-        return () => observer.disconnect();
-    }, [currentView]);
 
     // Cleanup
     useEffect(() => {
@@ -283,9 +270,6 @@ export default function DashboardContent() {
 
     if (!store) return null;
 
-    // Filter styles for favorites view
-    const filteredFavorites = favorites;
-
     return (
         <AppLayout
             accentColor={store.accentColor || "green"}
@@ -305,9 +289,8 @@ export default function DashboardContent() {
         >
             {/* Main Content */}
             <div className={styles.content} ref={contentRef}>
-                <div className={styles.scrollWatcher} />
                 {/* Header Section */}
-                <header className={clsx(styles.header, scrolled && styles.headerScrolled)}>
+                <header className={styles.header}>
                     <div className={styles.greeting}>
                         <h1>
                             {currentView === "home" && `Bonjour ${store.name}`}
@@ -318,7 +301,6 @@ export default function DashboardContent() {
                     </div>
                 </header>
 
-                {/* Content based on view */}
                 <AnimatePresence mode="wait">
                     {currentView === "home" && (
                         <motion.div
@@ -329,51 +311,87 @@ export default function DashboardContent() {
                             transition={{ duration: 0.3, ease: "easeOut" }}
                             className={styles.viewContainer}
                         >
-                            <>
-                                {/* Currently Playing Hero */}
-                                {store.style && (
-                                    <section className={styles.heroSection}>
-                                        <div className={styles.heroBg}>
-                                            {store.style.coverUrl && (
-                                                <img src={store.style.coverUrl} alt="" />
-                                            )}
-                                            <div className={styles.heroOverlay} />
-                                        </div>
-                                        <div className={styles.heroContent}>
-                                            <span className={styles.heroLabel}>EN LECTURE</span>
-                                            <h2 className={styles.heroTitle}>{store.style.name}</h2>
-                                            <p className={styles.heroDesc}>{store.style.description}</p>
-                                        </div>
-                                    </section>
-                                )}
-
-                                <section className={styles.section}>
-                                    <div className={styles.sectionHeader}>
-                                        <h2>Ambiances disponibles</h2>
-                                        <button
-                                            className={clsx(
-                                                styles.autoModeBtn,
-                                                isAutoMode && styles.active
-                                            )}
-                                            onClick={handleAutoModeToggle}
-                                        >
-                                            <Zap size={16} fill={isAutoMode ? "currentColor" : "none"} />
-                                            <span>Mode {isAutoMode ? "Auto" : "Manuel"}</span>
-                                        </button>
+                            {/* Currently Playing Hero */}
+                            {store.style && (
+                                <section className={styles.heroSection}>
+                                    <div className={styles.heroBg}>
+                                        {store.style.coverUrl && (
+                                            <img src={store.style.coverUrl} alt="" />
+                                        )}
+                                        <div className={styles.heroOverlay} />
                                     </div>
-                                    <StyleGrid
-                                        activeStyleId={currentStyleId}
-                                        onSelect={handleStyleChange}
-                                        favorites={favorites}
-                                        onToggleFavorite={handleToggleFavorite}
-                                        isPlaying={isPlaying}
-                                    />
+                                    <div className={styles.heroContent}>
+                                        <span className={styles.heroLabel}>EN LECTURE</span>
+                                        <h2 className={styles.heroTitle}>{store.style.name}</h2>
+                                        <p className={styles.heroDesc}>{store.style.description}</p>
+                                    </div>
                                 </section>
-                            </motion.div>
+                            )}
+
+                            {/* Quick Picks */}
+                            <section className={styles.section}>
+                                <div className={styles.sectionHeader}>
+                                    <h2>Ambiances disponibles</h2>
+                                    <button
+                                        className={clsx(
+                                            styles.autoModeBtn,
+                                            isAutoMode && styles.active
+                                        )}
+                                        onClick={handleAutoModeToggle}
+                                    >
+                                        <Zap size={16} fill={isAutoMode ? "currentColor" : "none"} />
+                                        <span>Mode {isAutoMode ? "Auto" : "Manuel"}</span>
+                                    </button>
+                                </div>
+                                <StyleGrid
+                                    activeStyleId={currentStyleId}
+                                    onSelect={handleStyleChange}
+                                    favorites={favorites}
+                                    onToggleFavorite={handleToggleFavorite}
+                                    isPlaying={isPlaying}
+                                />
+                            </section>
+                        </motion.div>
                     )}
 
-                            {currentView === "styles" && (
-                                <section className={styles.section}>
+                    {currentView === "styles" && (
+                        <motion.div
+                            key="styles"
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.98 }}
+                            transition={{ duration: 0.3 }}
+                            className={styles.viewContainer}
+                        >
+                            <section className={styles.section}>
+                                <div className={styles.sectionHeader}>
+                                    <h2>Tous les styles</h2>
+                                </div>
+                                <StyleGrid
+                                    activeStyleId={currentStyleId}
+                                    onSelect={handleStyleChange}
+                                    favorites={favorites}
+                                    onToggleFavorite={handleToggleFavorite}
+                                    isPlaying={isPlaying}
+                                />
+                            </section>
+                        </motion.div>
+                    )}
+
+                    {currentView === "favorites" && (
+                        <motion.div
+                            key="favorites"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className={styles.viewContainer}
+                        >
+                            <section className={styles.section}>
+                                <div className={styles.sectionHeader}>
+                                    <h2>Vos favoris</h2>
+                                </div>
+                                {favorites.length > 0 ? (
                                     <StyleGrid
                                         activeStyleId={currentStyleId}
                                         onSelect={handleStyleChange}
@@ -381,68 +399,70 @@ export default function DashboardContent() {
                                         onToggleFavorite={handleToggleFavorite}
                                         isPlaying={isPlaying}
                                     />
-                                </section>
-                            )}
-
-                            {currentView === "favorites" && (
-                                <section className={styles.section}>
-                                    {favorites.length === 0 ? (
-                                        <div className={styles.emptyState}>
-                                            <p>Aucun favori pour le moment</p>
-                                            <span>Cliquez sur le coeur d'une ambiance pour l'ajouter</span>
-                                        </div>
-                                    ) : (
-                                        <StyleGrid
-                                            activeStyleId={currentStyleId}
-                                            onSelect={handleStyleChange}
-                                            favorites={favorites}
-                                            onToggleFavorite={handleToggleFavorite}
-                                            isPlaying={isPlaying}
-                                        />
-                                    )}
-                                </section>
-                            )}
-
-                            {currentView === "settings" && (
-                                <section className={styles.section}>
-                                    <div className={styles.settingsCard}>
-                                        <h3>Personnalisation</h3>
-                                        <p>Choisissez la couleur d'accent de votre interface</p>
-                                        <div className={styles.colorPicker}>
-                                            {["green", "violet", "blue", "orange", "pink", "red", "cyan"].map(
-                                                (color) => (
-                                                    <button
-                                                        key={color}
-                                                        className={clsx(
-                                                            styles.colorOption,
-                                                            store.accentColor === color && styles.selected
-                                                        )}
-                                                        data-color={color}
-                                                        onClick={async () => {
-                                                            setStore((prev: any) => ({
-                                                                ...prev,
-                                                                accentColor: color,
-                                                            }));
-                                                            await fetch("/api/stores/me", {
-                                                                method: "PATCH",
-                                                                headers: { "Content-Type": "application/json" },
-                                                                body: JSON.stringify({ accentColor: color }),
-                                                            });
-                                                        }}
-                                                    />
-                                                )
-                                            )}
-                                        </div>
+                                ) : (
+                                    <div className={styles.emptyState}>
+                                        <Heart size={48} />
+                                        <h3>Aucun favori</h3>
+                                        <p>Vos styles préférés apparaîtront ici.</p>
                                     </div>
-                                </section>
-                            )}
-                        </div>
+                                )}
+                            </section>
+                        </motion.div>
+                    )}
+
+                    {currentView === "settings" && (
+                        <motion.div
+                            key="settings"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className={styles.viewContainer}
+                        >
+                            <section className={styles.section}>
+                                <div className={styles.sectionHeader}>
+                                    <h2>Paramètres</h2>
+                                </div>
+                                <div className={styles.settingsCard}>
+                                    <h3>Personnalisation</h3>
+                                    <p>Choisissez la couleur d'accent de votre interface</p>
+                                    <div className={styles.colorPicker}>
+                                        {["green", "violet", "blue", "orange", "pink", "red", "cyan"].map(
+                                            (color) => (
+                                                <button
+                                                    key={color}
+                                                    className={clsx(
+                                                        styles.colorOption,
+                                                        store.accentColor === color && styles.selected
+                                                    )}
+                                                    data-color={color}
+                                                    onClick={async () => {
+                                                        setStore((prev: any) => ({
+                                                            ...prev,
+                                                            accentColor: color,
+                                                        }));
+                                                        await fetch("/api/stores/me", {
+                                                            method: "PATCH",
+                                                            headers: { "Content-Type": "application/json" },
+                                                            body: JSON.stringify({ accentColor: color }),
+                                                        });
+                                                    }}
+                                                />
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
 
             {/* Mobile Player */}
-                    <MobilePlayer
-                        currentStyle={store.style}
-                        onVolumeChange={handleVolumeChange}
-                    />
-                </AppLayout>
-                );
+            <MobilePlayer
+                currentStyle={store.style}
+                onVolumeChange={handleVolumeChange}
+            />
+        </AppLayout>
+    );
 }
