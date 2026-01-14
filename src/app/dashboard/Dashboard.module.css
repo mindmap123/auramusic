@@ -36,12 +36,9 @@
     overflow-x: hidden;
     height: 100%;
     /* Optimized scroll performance */
-    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     contain: layout style;
-    /* Hardware acceleration */
-    transform: translateZ(0);
 }
 
 .viewContainer {
@@ -56,17 +53,13 @@
     justify-content: space-between;
     margin-bottom: var(--spacing-24);
     padding: var(--spacing-16) var(--spacing-24);
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 40;
-    background: color-mix(in srgb, var(--bg-base) 85%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: transparent;
     margin-left: calc(-1 * var(--spacing-24));
     margin-right: calc(-1 * var(--spacing-24));
     margin-top: calc(-1 * var(--spacing-24));
     padding-top: var(--spacing-24);
-    border-bottom: 1px solid color-mix(in srgb, var(--accent-base) 5%, transparent);
 }
 
 .header::before {
