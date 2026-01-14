@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Play, Pause, ChevronDown, Music, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useShallow } from "zustand/react/shallow";
 import { clsx } from "clsx";
 import styles from "./MobilePlayer.module.css";
 
@@ -29,7 +30,15 @@ export default function MobilePlayer({ currentStyle, onVolumeChange }: MobilePla
         progress,
         seekRelative,
         mixUrl,
-    } = usePlayerStore();
+    } = usePlayerStore(useShallow((state) => ({
+        isPlaying: state.isPlaying,
+        togglePlay: state.togglePlay,
+        volume: state.volume,
+        setVolume: state.setVolume,
+        progress: state.progress,
+        seekRelative: state.seekRelative,
+        mixUrl: state.mixUrl,
+    })));
 
     const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newVolume = parseFloat(e.target.value);

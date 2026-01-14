@@ -2,6 +2,7 @@
 
 import { Play, Pause, SkipBack, SkipForward, Volume2, Volume1, VolumeX, Music } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useShallow } from "zustand/react/shallow";
 import { clsx } from "clsx";
 import { useState, useRef, useCallback, useEffect } from "react";
 import styles from "./PlayerBar.module.css";
@@ -32,7 +33,16 @@ export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarPro
         seekRelative,
         mixUrl,
         isAutoMode,
-    } = usePlayerStore();
+    } = usePlayerStore(useShallow((state) => ({
+        isPlaying: state.isPlaying,
+        togglePlay: state.togglePlay,
+        volume: state.volume,
+        setVolume: state.setVolume,
+        progress: state.progress,
+        seekRelative: state.seekRelative,
+        mixUrl: state.mixUrl,
+        isAutoMode: state.isAutoMode,
+    })));
 
     const [isDragging, setIsDragging] = useState(false);
     const volumeRef = useRef<HTMLDivElement>(null);
@@ -157,7 +167,7 @@ export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarPro
                     <span className={styles.autoModeBadge}>AUTO</span>
                 )}
 
-                <div 
+                <div
                     ref={volumeRef}
                     className={clsx(styles.volumeControl, isDragging && styles.dragging)}
                     onMouseDown={handleMouseDown}
@@ -168,7 +178,7 @@ export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarPro
                     >
                         <VolumeIcon size={20} />
                     </button>
-                    
+
                     <svg viewBox="0 0 120 24" className={styles.volumeSvg} preserveAspectRatio="none">
                         <defs>
                             {/* Gradient froid → chaud basé sur le volume */}
@@ -178,17 +188,17 @@ export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarPro
                                 <stop offset="100%" stopColor="hsl(0, 80%, 55%)" />
                             </linearGradient>
                         </defs>
-                        
+
                         {/* Track background */}
-                        <line x1={TRACK_PADDING} y1="12" x2={120 - TRACK_PADDING} y2="12" 
-                              stroke="var(--bg-highlight)" strokeWidth="4" strokeLinecap="round" />
-                        
+                        <line x1={TRACK_PADDING} y1="12" x2={120 - TRACK_PADDING} y2="12"
+                            stroke="var(--bg-highlight)" strokeWidth="4" strokeLinecap="round" />
+
                         {/* Track fill */}
                         <line x1={TRACK_PADDING} y1="12" x2={TRACK_PADDING + volume * (120 - TRACK_PADDING * 2)} y2="12"
-                              stroke="url(#volGrad)" strokeWidth="4" strokeLinecap="round" 
-                              className={styles.volumeFill}
-                              style={{ filter: `drop-shadow(0 0 6px hsl(${200 - volume * 200}, 80%, 50%))` }} />
-                        
+                            stroke="url(#volGrad)" strokeWidth="4" strokeLinecap="round"
+                            className={styles.volumeFill}
+                            style={{ filter: `drop-shadow(0 0 6px hsl(${200 - volume * 200}, 80%, 50%))` }} />
+
                         {/* Graduation marks - couleur froid→chaud */}
                         {Array.from({ length: STEPS + 1 }, (_, i) => {
                             const progress = i / STEPS;
@@ -198,19 +208,19 @@ export default function PlayerBar({ currentStyle, onVolumeChange }: PlayerBarPro
                             const hue = 200 - progress * 200;
                             return (
                                 <line key={i} x1={x} y1="4" x2={x} y2="8"
-                                      stroke={isActive ? `hsl(${hue}, 80%, 55%)` : "var(--text-subdued)"}
-                                      strokeWidth="1.5" strokeLinecap="round"
-                                      opacity={isActive ? 1 : 0.3}
-                                      style={isActive ? { filter: `drop-shadow(0 0 3px hsl(${hue}, 80%, 55%))` } : {}}
-                                      className={styles.gradMark} />
+                                    stroke={isActive ? `hsl(${hue}, 80%, 55%)` : "var(--text-subdued)"}
+                                    strokeWidth="1.5" strokeLinecap="round"
+                                    opacity={isActive ? 1 : 0.3}
+                                    style={isActive ? { filter: `drop-shadow(0 0 3px hsl(${hue}, 80%, 55%))` } : {}}
+                                    className={styles.gradMark} />
                             );
                         })}
-                        
+
                         {/* Thumb - couleur basée sur le volume */}
                         <circle cx={TRACK_PADDING + volume * (120 - TRACK_PADDING * 2)} cy="12" r="6"
-                                fill={`hsl(${200 - volume * 200}, 80%, 60%)`} 
-                                className={styles.volumeThumb}
-                                style={{ filter: `drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 0 8px hsl(${200 - volume * 200}, 80%, 50%))` }} />
+                            fill={`hsl(${200 - volume * 200}, 80%, 60%)`}
+                            className={styles.volumeThumb}
+                            style={{ filter: `drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 0 8px hsl(${200 - volume * 200}, 80%, 50%))` }} />
                     </svg>
                 </div>
             </div>

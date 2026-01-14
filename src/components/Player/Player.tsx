@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useShallow } from "zustand/react/shallow";
 import { Play, Pause, Music, Zap, SkipBack, SkipForward, ChevronDown, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import styles from "./Player.module.css";
@@ -27,10 +28,9 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         isAutoMode,
         setAutoMode,
         stop,
-        progress,
         mixUrl,
         seekRelative
-    } = usePlayerStore((state) => ({
+    } = usePlayerStore(useShallow((state) => ({
         isPlaying: state.isPlaying,
         togglePlay: state.togglePlay,
         initPlayer: state.initPlayer,
@@ -40,16 +40,24 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         isAutoMode: state.isAutoMode,
         setAutoMode: state.setAutoMode,
         stop: state.stop,
-        progress: state.progress,
         mixUrl: state.mixUrl,
         seekRelative: state.seekRelative
-    }));
+    })));
+
+    // Separate progress selector to prevent whole-component re-renders
+    const progress = usePlayerStore(state => state.progress);
 
     const [localStore, setLocalStore] = useState(store);
     const [isMobile, setIsMobile] = useState(false);
     const [isTablet, setIsTablet] = useState(false);
     const [isMobileFullScreen, setIsMobileFullScreen] = useState(false);
     const [favorites, setFavorites] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (store) {
+            setLocalStore(store);
+        }
+    }, [store]);
 
     // Activity & Save Logic
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -132,20 +140,26 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         return () => clearInterval(programInterval);
     }, [isAutoMode, currentStyleId]);
 
+    const progressRef = useRef(progress);
     useEffect(() => {
+        progressRef.current = progress;
+    }, [progress]);
+
+    useEffect(() => {
+        if (!isPlaying) return;
+
         saveIntervalRef.current = setInterval(async () => {
-            if (isPlaying) {
-                await fetch("/api/store/save-position", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ position: progress, isPlaying: true })
-                });
-            }
+            await fetch("/api/store/save-position", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ position: progressRef.current, isPlaying: true })
+            });
         }, 10000);
+
         return () => {
             if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
         };
-    }, [isPlaying, progress]);
+    }, [isPlaying]);
 
     useEffect(() => {
         return () => stop();

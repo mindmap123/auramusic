@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { Zap } from "lucide-react";
 import { clsx } from "clsx";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useShallow } from "zustand/react/shallow";
 import { initAudioContext } from "@/lib/audioManager";
 import { AppLayout, Sidebar, PlayerBar, MobilePlayer } from "@/components/Layout";
 import StyleGrid from "@/components/Player/StyleGrid";
@@ -41,8 +42,7 @@ export default function DashboardContent() {
         isAutoMode,
         setAutoMode,
         stop,
-        progress,
-    } = usePlayerStore((state) => ({
+    } = usePlayerStore(useShallow((state) => ({
         isPlaying: state.isPlaying,
         togglePlay: state.togglePlay,
         initPlayer: state.initPlayer,
@@ -53,8 +53,9 @@ export default function DashboardContent() {
         isAutoMode: state.isAutoMode,
         setAutoMode: state.setAutoMode,
         stop: state.stop,
-        progress: state.progress,
-    }));
+    })));
+
+    const progress = usePlayerStore(state => state.progress);
 
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
@@ -80,7 +81,7 @@ export default function DashboardContent() {
                         );
                         const posData = await posRes.json();
                         currentPosition = posData.position || 0;
-                    } catch (e) {}
+                    } catch (e) { }
                 }
                 setStore({ ...storeData, currentPosition });
             })
@@ -157,21 +158,26 @@ export default function DashboardContent() {
     }, [isAutoMode, currentStyleId]);
 
     // Save position periodically
+    const progressRef = useRef(progress);
     useEffect(() => {
+        progressRef.current = progress;
+    }, [progress]);
+
+    useEffect(() => {
+        if (!isPlaying) return;
+
         saveIntervalRef.current = setInterval(async () => {
-            if (isPlaying) {
-                await fetch("/api/store/save-position", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ position: progress, isPlaying: true }),
-                });
-            }
+            await fetch("/api/store/save-position", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ position: progressRef.current, isPlaying: true }),
+            });
         }, 10000);
 
         return () => {
             if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
         };
-    }, [isPlaying, progress]);
+    }, [isPlaying]);
 
     // Cleanup
     useEffect(() => {
