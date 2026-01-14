@@ -102,15 +102,28 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-8);
-    padding: var(--spacing-8) var(--spacing-16);
+    padding: var(--spacing-8) var(--spacing-20);
     border-radius: var(--radius-full);
-    background: var(--bg-elevated);
-    color: var(--text-subdued);
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: var(--transition-fast);
-    border: 1px solid var(--decorative-base);
-    box-shadow: var(--shadow-sm);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-base);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+}
+
+.autoModeBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+}
+
+.autoModeBtn.active {
+    background: var(--accent-base);
+    color: #ffffff;
+    border-color: var(--accent-bright);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent-base) 40%, transparent);
 }
 
 .autoModeBtn:hover {
