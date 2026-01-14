@@ -44,6 +44,11 @@ export default function DashboardContent() {
         progress,
     } = usePlayerStore();
 
+    // Add guard for currentStyleId
+    if (currentStyleId === undefined) {
+        return null;
+    }
+
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
 
@@ -321,7 +326,7 @@ export default function DashboardContent() {
                                 <h2>Ambiances disponibles</h2>
                             </div>
                             <StyleGrid
-                                activeStyleId={currentStyleId}
+                                activeStyleId={currentStyleId ?? undefined}
                                 onSelect={handleStyleChange}
                                 favorites={favorites}
                                 onToggleFavorite={handleToggleFavorite}
@@ -334,7 +339,7 @@ export default function DashboardContent() {
                 {currentView === "styles" && (
                     <section className={styles.section}>
                         <StyleGrid
-                            activeStyleId={currentStyleId}
+                            activeStyleId={currentStyleId ?? undefined}
                             onSelect={handleStyleChange}
                             favorites={favorites}
                             onToggleFavorite={handleToggleFavorite}
@@ -352,7 +357,7 @@ export default function DashboardContent() {
                             </div>
                         ) : (
                             <StyleGrid
-                                activeStyleId={currentStyleId}
+                                activeStyleId={currentStyleId ?? undefined}
                                 onSelect={handleStyleChange}
                                 favorites={favorites}
                                 onToggleFavorite={handleToggleFavorite}
