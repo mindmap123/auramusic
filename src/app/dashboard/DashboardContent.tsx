@@ -326,7 +326,7 @@ export default function DashboardContent() {
                                 <h2>Ambiances disponibles</h2>
                             </div>
                             <StyleGrid
-                                activeStyleId={currentStyleId ?? undefined}
+                                activeStyleId={currentStyleId || null}
                                 onSelect={handleStyleChange}
                                 favorites={favorites}
                                 onToggleFavorite={handleToggleFavorite}
@@ -339,7 +339,7 @@ export default function DashboardContent() {
                 {currentView === "styles" && (
                     <section className={styles.section}>
                         <StyleGrid
-                            activeStyleId={currentStyleId ?? undefined}
+                            activeStyleId={currentStyleId || null}
                             onSelect={handleStyleChange}
                             favorites={favorites}
                             onToggleFavorite={handleToggleFavorite}
@@ -357,7 +357,7 @@ export default function DashboardContent() {
                             </div>
                         ) : (
                             <StyleGrid
-                                activeStyleId={currentStyleId ?? undefined}
+                                activeStyleId={currentStyleId || null}
                                 onSelect={handleStyleChange}
                                 favorites={favorites}
                                 onToggleFavorite={handleToggleFavorite}
