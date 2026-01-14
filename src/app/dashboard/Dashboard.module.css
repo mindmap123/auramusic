@@ -45,6 +45,10 @@
     will-change: scroll-position;
 }
 
+.viewContainer {
+    width: 100%;
+}
+
 .scrollWatcher {
     height: 1px;
     width: 100%;
