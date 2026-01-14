@@ -30,7 +30,20 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         progress,
         mixUrl,
         seekRelative
-    } = usePlayerStore();
+    } = usePlayerStore((state) => ({
+        isPlaying: state.isPlaying,
+        togglePlay: state.togglePlay,
+        initPlayer: state.initPlayer,
+        volume: state.volume,
+        currentStyleId: state.currentStyleId,
+        setStyle: state.setStyle,
+        isAutoMode: state.isAutoMode,
+        setAutoMode: state.setAutoMode,
+        stop: state.stop,
+        progress: state.progress,
+        mixUrl: state.mixUrl,
+        seekRelative: state.seekRelative
+    }));
 
     const [localStore, setLocalStore] = useState(store);
     const [isMobile, setIsMobile] = useState(false);
@@ -90,18 +103,19 @@ export default function Player({ store, isPreview = false }: PlayerProps) {
         }
     }, []);
 
+    // Activity logging
     useEffect(() => {
         if (lastPlayState.current !== null && lastPlayState.current !== isPlaying) {
             logActivity(isPlaying ? "PLAY" : "PAUSE", {
-                styleId: currentStyleId,
-                styleName: localStore.style?.name
+                styleId: currentStyleId || null,
+                styleName: localStore?.style?.name || null
             });
         }
         lastPlayState.current = isPlaying;
-    }, [isPlaying]);
+    }, [isPlaying, currentStyleId, localStore?.style?.name]);
 
     useEffect(() => {
-        if (!isAutoMode) return;
+        if (!isAutoMode || !currentStyleId) return;
         const checkProgram = async () => {
             try {
                 const res = await fetch("/api/store/current-program");

@@ -70,7 +70,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         };
         audio.addEventListener('loadedmetadata', onLoaded, { once: true } as any);
 
-        set({ mixUrl, volume, currentStyleId: get().currentStyleId });
+        const currentState = get();
+        set({ mixUrl, volume, currentStyleId: currentState?.currentStyleId || null });
     },
 
     togglePlay: () => {

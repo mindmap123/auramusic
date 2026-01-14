@@ -42,7 +42,19 @@ export default function DashboardContent() {
         setAutoMode,
         stop,
         progress,
-    } = usePlayerStore();
+    } = usePlayerStore((state) => ({
+        isPlaying: state.isPlaying,
+        togglePlay: state.togglePlay,
+        initPlayer: state.initPlayer,
+        volume: state.volume,
+        setVolume: state.setVolume,
+        currentStyleId: state.currentStyleId,
+        setStyle: state.setStyle,
+        isAutoMode: state.isAutoMode,
+        setAutoMode: state.setAutoMode,
+        stop: state.stop,
+        progress: state.progress,
+    }));
 
     const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const lastPlayState = useRef<boolean | null>(null);
@@ -112,6 +124,7 @@ export default function DashboardContent() {
         }
     };
 
+    // Activity logging
     useEffect(() => {
         if (lastPlayState.current !== null && lastPlayState.current !== isPlaying) {
             logActivity(isPlaying ? "PLAY" : "PAUSE", {
@@ -120,11 +133,11 @@ export default function DashboardContent() {
             });
         }
         lastPlayState.current = isPlaying;
-    }, [isPlaying]);
+    }, [isPlaying, currentStyleId, store?.style?.name]);
 
     // Auto-mode check
     useEffect(() => {
-        if (!isAutoMode) return;
+        if (!isAutoMode || !currentStyleId) return;
 
         const checkProgram = async () => {
             try {
