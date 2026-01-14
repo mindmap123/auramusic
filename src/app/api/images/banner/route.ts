@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         );
 
         // Générer la bannière
-        const processedImage = await sharp(buffer)
+        const processedImageBuffer = await sharp(buffer)
             .extract({
                 left: cropPositions.left,
                 top: cropPositions.top,
@@ -44,10 +44,10 @@ export async function POST(request: NextRequest) {
                 fit: 'cover',
                 position: 'center'
             })
-            .jpeg({ quality: 90 })
+            .jpeg({ quality: 85 })
             .toBuffer();
 
-        return new Response(processedImage, {
+        return new Response(Buffer.from(processedImageBuffer), {
             headers: {
                 'Content-Type': 'image/jpeg',
                 'Cache-Control': 'public, max-age=31536000',
