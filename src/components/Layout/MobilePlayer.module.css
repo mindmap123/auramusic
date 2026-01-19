@@ -40,19 +40,25 @@
             rgba(5, 5, 5, 1) 60%);
     z-index: 9999;
     /* Ensure it's above everything */
-    display: none;
+    display: flex;
+    /* Toujours flex, pas none */
+    visibility: hidden;
+    /* Utiliser visibility au lieu de display */
     flex-direction: column;
     padding: var(--spacing-24);
     padding-top: max(var(--spacing-24), env(safe-area-inset-top));
     padding-bottom: max(var(--spacing-32), calc(env(safe-area-inset-bottom) + var(--spacing-16)));
     transform: translateY(100%);
     opacity: 0;
+    pointer-events: none;
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
     overflow-y: auto;
     /* Allow scrolling if content is too tall */
 }
 
 .fullPlayer.open {
+    visibility: visible;
+    pointer-events: auto;
     transform: translateY(0);
     opacity: 1;
 }
@@ -89,10 +95,11 @@
 /* Cover Art */
 .fullCover {
     width: 100%;
-    max-width: 320px;
-    /* Reduced from 360px */
-    max-height: 45vh;
-    /* Limit height on small screens */
+    max-width: min(320px, 80vw);
+    /* Plus restrictif */
+    height: auto;
+    max-height: 40vh;
+    /* Réduit de 45vh */
     aspect-ratio: 1;
     margin: 0 auto var(--spacing-24);
     border-radius: var(--radius-lg);
@@ -290,8 +297,16 @@
 /* === SHOW ON MOBILE === */
 @media (max-width: 768px) {
 
-    .miniPlayer,
+    .miniPlayer {
+        display: flex;
+    }
+
     .fullPlayer {
         display: flex;
+        visibility: hidden;
+    }
+
+    .fullPlayer.open {
+        visibility: visible;
     }
 }
