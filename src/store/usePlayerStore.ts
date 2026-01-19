@@ -22,7 +22,7 @@ interface PlayerState {
     stop: () => void;
 }
 
-export const usePlayerStore = create<PlayerState>((persist((set, get) => ({
+export const usePlayerStore = create<PlayerState>((persist<PlayerState>((set, get) => ({
     isPlaying: false,
     volume: 0.7,
     progress: 0,
