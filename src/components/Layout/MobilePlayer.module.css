@@ -7,13 +7,10 @@
     left: 0;
     right: 0;
     min-height: 72px;
-    background: linear-gradient(
-        0deg,
-        color-mix(in srgb, var(--accent-base) 15%, var(--bg-elevated)) 0%,
-        color-mix(in srgb, var(--accent-base) 8%, var(--bg-elevated)) 50%,
-        var(--bg-elevated) 100%
-    );
-    border-top: 1px solid color-mix(in srgb, var(--accent-base) 25%, var(--decorative-base));
+    background: linear-gradient(to top,
+            var(--bg-elevated) 0%,
+            color-mix(in srgb, var(--bg-elevated) 95%, var(--accent-base)) 100%);
+    border-top: 1px solid var(--decorative-base);
     display: none;
     align-items: center;
     padding: var(--spacing-12) var(--spacing-16);
@@ -21,6 +18,7 @@
     z-index: 1000;
     transition: transform var(--transition-normal), opacity var(--transition-normal);
     padding-bottom: calc(var(--spacing-12) + env(safe-area-inset-bottom, 0));
+    backdrop-filter: blur(12px);
 }
 
 .miniPlayer.hidden {
@@ -29,82 +27,25 @@
     pointer-events: none;
 }
 
-.miniCover {
-    width: 44px;
-    height: 44px;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    flex-shrink: 0;
-    background: var(--bg-surface);
-}
-
-.miniCover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.miniPlaceholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-highlight);
-    color: var(--text-subdued);
-}
-
-.miniInfo {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.miniTitle {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-base);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.miniSubtitle {
-    font-size: 0.75rem;
-    color: var(--text-subdued);
-}
-
-.miniPlayBtn {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-base);
-    flex-shrink: 0;
-}
+/* ... (middle content same) ... */
 
 /* === FULLSCREEN PLAYER === */
 .fullPlayer {
     position: fixed;
     inset: 0;
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--accent-base) 20%, var(--bg-surface)) 0%,
-        color-mix(in srgb, var(--accent-base) 10%, var(--bg-surface)) 30%,
-        var(--bg-base) 100%
-    );
+    /* Deep dark background with a top-center neon glow */
+    background: radial-gradient(circle at 50% -10%,
+            rgba(6, 182, 212, 0.15) 0%,
+            rgba(5, 5, 5, 1) 50%), #050505;
     z-index: 2000;
     display: none;
     flex-direction: column;
-    padding: var(--spacing-32);
-    padding-top: max(var(--spacing-32), env(safe-area-inset-top));
-    padding-bottom: max(var(--spacing-48), calc(env(safe-area-inset-bottom) + var(--spacing-24)));
+    padding: var(--spacing-24);
+    padding-top: max(var(--spacing-24), env(safe-area-inset-top));
+    padding-bottom: max(var(--spacing-32), calc(env(safe-area-inset-bottom) + var(--spacing-16)));
     transform: translateY(100%);
     opacity: 0;
-    transition: transform 0.4s var(--ease-spring), opacity 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
 }
 
 .fullPlayer.open {
@@ -178,19 +119,24 @@
 /* Track Info */
 .fullInfo {
     text-align: center;
-    margin-bottom: var(--spacing-24);
+    margin-bottom: var(--spacing-32);
+    margin-top: var(--spacing-16);
 }
 
 .trackTitle {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-base);
-    margin-bottom: var(--spacing-4);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: var(--spacing-8);
+    letter-spacing: -0.02em;
+    /* Text glow effect */
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
 .trackSubtitle {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     color: var(--text-subdued);
+    font-weight: 500;
 }
 
 /* Progress */
@@ -297,13 +243,11 @@
 }
 
 .volumeSlider::-webkit-slider-runnable-track {
-    background: linear-gradient(
-        to right,
-        var(--accent-base) 0%,
-        var(--accent-base) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) 100%
-    );
+    background: linear-gradient(to right,
+            var(--accent-base) 0%,
+            var(--accent-base) calc(var(--volume-percent, 70) * 1%),
+            var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
+            var(--bg-highlight) 100%);
     border-radius: var(--radius-full);
     height: 6px;
 }
@@ -320,19 +264,18 @@
 }
 
 .volumeSlider::-moz-range-track {
-    background: linear-gradient(
-        to right,
-        var(--accent-base) 0%,
-        var(--accent-base) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
-        var(--bg-highlight) 100%
-    );
+    background: linear-gradient(to right,
+            var(--accent-base) 0%,
+            var(--accent-base) calc(var(--volume-percent, 70) * 1%),
+            var(--bg-highlight) calc(var(--volume-percent, 70) * 1%),
+            var(--bg-highlight) 100%);
     border-radius: var(--radius-full);
     height: 6px;
 }
 
 /* === SHOW ON MOBILE === */
 @media (max-width: 768px) {
+
     .miniPlayer,
     .fullPlayer {
         display: flex;

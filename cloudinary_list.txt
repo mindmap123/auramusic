@@ -1,0 +1,387 @@
+🔍 Recherche des fichiers sur Cloudinary...
+
+📷 IMAGES (Covers):
+==================
+- music-streaming/covers/zddmmw5i65fyjhrifn5j
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1768401459/music-streaming/covers/zddmmw5i65fyjhrifn5j.jpg
+  Créé: 2026-01-14T14:37:39Z
+
+- music-streaming/covers/eckimlgr6wdwxbruiekd
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1768401365/music-streaming/covers/eckimlgr6wdwxbruiekd.jpg
+  Créé: 2026-01-14T14:36:05Z
+
+- music-streaming/covers/rzeb5lymmvbxllzeospe
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1768400392/music-streaming/covers/rzeb5lymmvbxllzeospe.jpg
+  Créé: 2026-01-14T14:19:52Z
+
+- music-streaming/covers/dj0cwutiafeiczcgcpht
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767694635/music-streaming/covers/dj0cwutiafeiczcgcpht.jpg
+  Créé: 2026-01-06T10:17:15Z
+
+- music-streaming/covers/mpaaizcmamqbvt4vknlf
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767683381/music-streaming/covers/mpaaizcmamqbvt4vknlf.jpg
+  Créé: 2026-01-06T07:09:41Z
+
+- music-streaming/covers/ae0pq5slwyspnbbwbwxo
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767653762/music-streaming/covers/ae0pq5slwyspnbbwbwxo.jpg
+  Créé: 2026-01-05T22:56:02Z
+
+- music-streaming/covers/vlvfgor7d8ldgqo2yvpj
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767639755/music-streaming/covers/vlvfgor7d8ldgqo2yvpj.png
+  Créé: 2026-01-05T19:02:35Z
+
+- music-streaming/covers/uiiity2rvyamkkcxi7vk
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767381143/music-streaming/covers/uiiity2rvyamkkcxi7vk.png
+  Créé: 2026-01-02T19:12:23Z
+
+- music-streaming/covers/syxxzvwijq8yjzqnzdsg
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767381043/music-streaming/covers/syxxzvwijq8yjzqnzdsg.png
+  Créé: 2026-01-02T19:10:43Z
+
+- music-streaming/covers/nemrzyc7hzdbellcu6tn
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767380883/music-streaming/covers/nemrzyc7hzdbellcu6tn.png
+  Créé: 2026-01-02T19:08:03Z
+
+- main-sample
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319282/main-sample.png
+  Créé: 2026-01-02T02:01:22Z
+
+- cld-sample-5
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319282/cld-sample-5.jpg
+  Créé: 2026-01-02T02:01:22Z
+
+- cld-sample-4
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319282/cld-sample-4.jpg
+  Créé: 2026-01-02T02:01:22Z
+
+- cld-sample
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319281/cld-sample.jpg
+  Créé: 2026-01-02T02:01:21Z
+
+- cld-sample-3
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319282/cld-sample-3.jpg
+  Créé: 2026-01-02T02:01:22Z
+
+- cld-sample-2
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319281/cld-sample-2.jpg
+  Créé: 2026-01-02T02:01:21Z
+
+- samples/paper
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319281/samples/paper.png
+  Créé: 2026-01-02T02:01:21Z
+
+- samples/waves
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319281/samples/waves.png
+  Créé: 2026-01-02T02:01:21Z
+
+- samples/radial_02
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319281/samples/radial_02.png
+  Créé: 2026-01-02T02:01:21Z
+
+- samples/zoom
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319281/samples/zoom.avif
+  Créé: 2026-01-02T02:01:21Z
+
+- samples/radial
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319281/samples/radial.avif
+  Créé: 2026-01-02T02:01:21Z
+
+- samples/canvas
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319280/samples/canvas.jpg
+  Créé: 2026-01-02T02:01:20Z
+
+- samples/upscale-face-1
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319280/samples/upscale-face-1.jpg
+  Créé: 2026-01-02T02:01:20Z
+
+- samples/woman-on-a-football-field
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319280/samples/woman-on-a-football-field.jpg
+  Créé: 2026-01-02T02:01:20Z
+
+- samples/logo
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319280/samples/logo.png
+  Créé: 2026-01-02T02:01:20Z
+
+- samples/dessert-on-a-plate
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319279/samples/dessert-on-a-plate.jpg
+  Créé: 2026-01-02T02:01:19Z
+
+- samples/cup-on-a-table
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319279/samples/cup-on-a-table.jpg
+  Créé: 2026-01-02T02:01:19Z
+
+- samples/coffee
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319279/samples/coffee.jpg
+  Créé: 2026-01-02T02:01:19Z
+
+- samples/chair
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319279/samples/chair.png
+  Créé: 2026-01-02T02:01:19Z
+
+- samples/chair-and-coffee-table
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319279/samples/chair-and-coffee-table.jpg
+  Créé: 2026-01-02T02:01:19Z
+
+- samples/man-portrait
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319279/samples/man-portrait.jpg
+  Créé: 2026-01-02T02:01:19Z
+
+- samples/man-on-a-street
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319278/samples/man-on-a-street.jpg
+  Créé: 2026-01-02T02:01:18Z
+
+- samples/man-on-a-escalator
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319278/samples/man-on-a-escalator.jpg
+  Créé: 2026-01-02T02:01:18Z
+
+- samples/breakfast
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319277/samples/breakfast.jpg
+  Créé: 2026-01-02T02:01:17Z
+
+- samples/outdoor-woman
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319278/samples/outdoor-woman.jpg
+  Créé: 2026-01-02T02:01:18Z
+
+- samples/look-up
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319277/samples/look-up.jpg
+  Créé: 2026-01-02T02:01:17Z
+
+- samples/smile
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319277/samples/smile.jpg
+  Créé: 2026-01-02T02:01:17Z
+
+- samples/balloons
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319276/samples/balloons.jpg
+  Créé: 2026-01-02T02:01:16Z
+
+- samples/shoe
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319275/samples/shoe.jpg
+  Créé: 2026-01-02T02:01:15Z
+
+- samples/two-ladies
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319275/samples/two-ladies.jpg
+  Créé: 2026-01-02T02:01:15Z
+
+- samples/landscapes/landscape-panorama
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319273/samples/landscapes/landscape-panorama.jpg
+  Créé: 2026-01-02T02:01:13Z
+
+- samples/animals/kitten-playing
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319273/samples/animals/kitten-playing.gif
+  Créé: 2026-01-02T02:01:13Z
+
+- samples/landscapes/nature-mountains
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319272/samples/landscapes/nature-mountains.jpg
+  Créé: 2026-01-02T02:01:12Z
+
+- samples/ecommerce/accessories-bag
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319272/samples/ecommerce/accessories-bag.jpg
+  Créé: 2026-01-02T02:01:12Z
+
+- samples/cloudinary-group
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319272/samples/cloudinary-group.jpg
+  Créé: 2026-01-02T02:01:12Z
+
+- samples/food/spices
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319272/samples/food/spices.jpg
+  Créé: 2026-01-02T02:01:12Z
+
+- samples/imagecon-group
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319272/samples/imagecon-group.jpg
+  Créé: 2026-01-02T02:01:12Z
+
+- samples/ecommerce/leather-bag-gray
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319271/samples/ecommerce/leather-bag-gray.jpg
+  Créé: 2026-01-02T02:01:11Z
+
+- samples/ecommerce/car-interior-design
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319271/samples/ecommerce/car-interior-design.jpg
+  Créé: 2026-01-02T02:01:11Z
+
+- samples/landscapes/beach-boat
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319271/samples/landscapes/beach-boat.jpg
+  Créé: 2026-01-02T02:01:11Z
+
+- samples/people/bicycle
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319271/samples/people/bicycle.jpg
+  Créé: 2026-01-02T02:01:11Z
+
+- samples/landscapes/architecture-signs
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319271/samples/landscapes/architecture-signs.jpg
+  Créé: 2026-01-02T02:01:11Z
+
+- samples/animals/three-dogs
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319270/samples/animals/three-dogs.jpg
+  Créé: 2026-01-02T02:01:10Z
+
+- samples/people/jazz
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319270/samples/people/jazz.jpg
+  Créé: 2026-01-02T02:01:10Z
+
+- samples/people/boy-snow-hoodie
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319270/samples/people/boy-snow-hoodie.jpg
+  Créé: 2026-01-02T02:01:10Z
+
+- samples/bike
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319270/samples/bike.jpg
+  Créé: 2026-01-02T02:01:10Z
+
+- samples/ecommerce/shoes
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319270/samples/ecommerce/shoes.png
+  Créé: 2026-01-02T02:01:10Z
+
+- samples/landscapes/girl-urban-view
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319269/samples/landscapes/girl-urban-view.jpg
+  Créé: 2026-01-02T02:01:09Z
+
+- samples/people/smiling-man
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319269/samples/people/smiling-man.jpg
+  Créé: 2026-01-02T02:01:09Z
+
+- samples/sheep
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319269/samples/sheep.jpg
+  Créé: 2026-01-02T02:01:09Z
+
+- samples/food/pot-mussels
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319269/samples/food/pot-mussels.jpg
+  Créé: 2026-01-02T02:01:09Z
+
+- samples/animals/reindeer
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319268/samples/animals/reindeer.jpg
+  Créé: 2026-01-02T02:01:08Z
+
+- samples/cloudinary-logo-vector
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319268/samples/cloudinary-logo-vector.svg
+  Créé: 2026-01-02T02:01:08Z
+
+- samples/food/fish-vegetables
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319269/samples/food/fish-vegetables.jpg
+  Créé: 2026-01-02T02:01:09Z
+
+- samples/food/dessert
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319268/samples/food/dessert.jpg
+  Créé: 2026-01-02T02:01:08Z
+
+- samples/people/kitchen-bar
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319268/samples/people/kitchen-bar.jpg
+  Créé: 2026-01-02T02:01:08Z
+
+- samples/animals/cat
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319268/samples/animals/cat.jpg
+  Créé: 2026-01-02T02:01:08Z
+
+- samples/cloudinary-icon
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319268/samples/cloudinary-icon.png
+  Créé: 2026-01-02T02:01:08Z
+
+- samples/ecommerce/analog-classic
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319268/samples/ecommerce/analog-classic.jpg
+  Créé: 2026-01-02T02:01:08Z
+
+- sample
+  URL: https://res.cloudinary.com/dx31tv94m/image/upload/v1767319267/sample.jpg
+  Créé: 2026-01-02T02:01:07Z
+
+
+🎵 AUDIO/VIDEO (Mixes):
+=======================
+- music-streaming/mixes/smiqe0dnmdjxsixv68xf
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1768401523/music-streaming/mixes/smiqe0dnmdjxsixv68xf.mp3
+  Durée: N/As
+  Créé: 2026-01-14T14:38:43Z
+
+- music-streaming/mixes/qeajabklftnmimmslhuj
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1768401058/music-streaming/mixes/qeajabklftnmimmslhuj.mp3
+  Durée: N/As
+  Créé: 2026-01-14T14:30:58Z
+
+- music-streaming/mixes/esrzoypeylxqpyfjs3ca
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1768399336/music-streaming/mixes/esrzoypeylxqpyfjs3ca.mp3
+  Durée: N/As
+  Créé: 2026-01-14T14:02:16Z
+
+- music-streaming/mixes/xwckafrj3k8hv5oykuw7
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1768399291/music-streaming/mixes/xwckafrj3k8hv5oykuw7.mp3
+  Durée: N/As
+  Créé: 2026-01-14T14:01:31Z
+
+- music-streaming/mixes/qbjp5mguzo2osxqi3sgo
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1768399236/music-streaming/mixes/qbjp5mguzo2osxqi3sgo.mp3
+  Durée: N/As
+  Créé: 2026-01-14T14:00:36Z
+
+- music-streaming/mixes/bs3asbfiayqq2aui59bd
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767694800/music-streaming/mixes/bs3asbfiayqq2aui59bd.mp3
+  Durée: N/As
+  Créé: 2026-01-06T10:20:00Z
+
+- music-streaming/mixes/lp86uc7xmmuj8rswn86r
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767653476/music-streaming/mixes/lp86uc7xmmuj8rswn86r.mp3
+  Durée: N/As
+  Créé: 2026-01-05T22:51:16Z
+
+- music-streaming/mixes/rbgh9wmbldta0mkdmpuy
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767638314/music-streaming/mixes/rbgh9wmbldta0mkdmpuy.mp3
+  Durée: N/As
+  Créé: 2026-01-05T18:38:34Z
+
+- music-streaming/mixes/i9avbnzx5jtboz86o8yj
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767395561/music-streaming/mixes/i9avbnzx5jtboz86o8yj.mp3
+  Durée: N/As
+  Créé: 2026-01-02T23:12:41Z
+
+- music-streaming/mixes/xa7fbylfxkj4yohgvfnx
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767395522/music-streaming/mixes/xa7fbylfxkj4yohgvfnx.mp3
+  Durée: N/As
+  Créé: 2026-01-02T23:12:02Z
+
+- music-streaming/mixes/mthncrmmmqlyvllnchfi
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767395462/music-streaming/mixes/mthncrmmmqlyvllnchfi.mp3
+  Durée: N/As
+  Créé: 2026-01-02T23:11:02Z
+
+- music-streaming/mixes/nnz54rggsf6l98wnlxwc
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767380117/music-streaming/mixes/nnz54rggsf6l98wnlxwc.mp3
+  Durée: N/As
+  Créé: 2026-01-02T18:55:17Z
+
+- music-streaming/mixes/aq2qbpnwxqhs5gnqvhsc
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767379827/music-streaming/mixes/aq2qbpnwxqhs5gnqvhsc.mp3
+  Durée: N/As
+  Créé: 2026-01-02T18:50:27Z
+
+- music-streaming/mixes/rxieialejyhshwwlfmaa
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767379489/music-streaming/mixes/rxieialejyhshwwlfmaa.mp3
+  Durée: N/As
+  Créé: 2026-01-02T18:44:49Z
+
+- music-streaming/mixes/bxvidhjzq5y0yjwaqbzg
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767342284/music-streaming/mixes/bxvidhjzq5y0yjwaqbzg.mp3
+  Durée: N/As
+  Créé: 2026-01-02T08:24:44Z
+
+- samples/cld-sample-video
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767319273/samples/cld-sample-video.mp4
+  Durée: N/As
+  Créé: 2026-01-02T02:01:13Z
+
+- samples/elephants
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767319273/samples/elephants.mp4
+  Durée: N/As
+  Créé: 2026-01-02T02:01:13Z
+
+- samples/dance-2
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767319274/samples/dance-2.mp4
+  Durée: N/As
+  Créé: 2026-01-02T02:01:14Z
+
+- samples/sea-turtle
+  URL: https://res.cloudinary.com/dx31tv94m/video/upload/v1767319273/samples/sea-turtle.mp4
+  Durée: N/As
+  Créé: 2026-01-02T02:01:13Z
+
+
+📊 RÉSUMÉ:
+==========
+Images: 70
+Audio/Video: 19

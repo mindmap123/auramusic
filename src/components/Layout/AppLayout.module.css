@@ -3,11 +3,12 @@
 .appLayout {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     width: 100%;
     background: var(--bg-base);
     overflow: hidden;
+    position: relative;
+    /* Ensure it's a positioning context */
 }
 
 /* Main area: Sidebar + Content side by side */
@@ -24,8 +25,7 @@
     display: flex;
     flex-direction: column;
     margin-left: var(--sidebar-width);
-    height: calc(100vh - var(--playerbar-height));
-    height: calc(100dvh - var(--playerbar-height));
+    height: calc(100% - var(--playerbar-height));
     overflow: hidden;
     transition: margin-left var(--transition-slow);
 }

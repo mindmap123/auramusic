@@ -1,18 +1,42 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Player from "@/components/Player/Player";
-import styles from "./Preview.module.css";
+import { AppLayout, Sidebar, PlayerBar } from "@/components/Layout";
+import StyleGrid from "@/components/Player/StyleGrid";
+import { usePlayerStore } from "@/store/usePlayerStore";
+import { useShallow } from "zustand/react/shallow";
 import { Monitor, RefreshCcw } from "lucide-react";
+import styles from "./Preview.module.css";
+import dashboardStyles from "@/app/dashboard/Dashboard.module.css";
 
 export default function PreviewContent() {
     const [stores, setStores] = useState<any[]>([]);
     const [selectedStoreId, setSelectedStoreId] = useState<string>("");
-    const [previewData, setPreviewData] = useState<any>(null);
+    const [previewStore, setPreviewStore] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
+    // Preview state simulation
+    const [currentView, setCurrentView] = useState<"home" | "styles" | "favorites" | "settings">("home");
+
+    const {
+        isPlaying,
+        currentStyleId,
+        setStyle,
+        stop,
+    } = usePlayerStore(useShallow((state) => ({
+        isPlaying: state.isPlaying,
+        currentStyleId: state.currentStyleId,
+        setStyle: state.setStyle,
+        stop: state.stop,
+    })));
+
     useEffect(() => { fetchStores(); }, []);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => stop();
+    }, []);
 
     const fetchStores = async () => {
         try {
@@ -35,7 +59,13 @@ export default function PreviewContent() {
         setRefreshing(true);
         try {
             const res = await fetch(`/api/admin/preview/store?storeId=${storeId}`);
-            setPreviewData(await res.json());
+            const data = await res.json();
+            setPreviewStore(data);
+
+            // Init player state if needed
+            if (data.style?.mixUrl) {
+                setStyle(data.currentStyleId || data.style.id, data.style.mixUrl);
+            }
         } catch (err) { console.error(err); }
         finally { setRefreshing(false); setLoading(false); }
     };
@@ -57,7 +87,7 @@ export default function PreviewContent() {
             <header className={styles.header}>
                 <div className={styles.info}>
                     <h1 className={styles.title}>Aperçu Magasin</h1>
-                    <p className={styles.subtitle}>Interface client</p>
+                    <p className={styles.subtitle}>Interface client telle qu'elle apparaît en magasin</p>
                 </div>
                 <div className={styles.actions}>
                     <select value={selectedStoreId} onChange={(e) => { setSelectedStoreId(e.target.value); loadPreview(e.target.value); }} className={styles.storeSelect}>
@@ -68,8 +98,64 @@ export default function PreviewContent() {
                     </button>
                 </div>
             </header>
+
             <div className={styles.previewFrame}>
-                {previewData && <div key={selectedStoreId} style={{ height: '100%' }}><Player store={previewData} isPreview={true} /></div>}
+                {previewStore && (
+                    <div className={styles.deviceContainer}>
+                        <AppLayout
+                            accentColor={previewStore.accentColor || "green"}
+                            sidebar={
+                                <Sidebar
+                                    storeName={previewStore.name}
+                                    currentView={currentView}
+                                    onViewChange={setCurrentView}
+                                />
+                            }
+                            playerBar={
+                                <PlayerBar
+                                    currentStyle={previewStore.style}
+                                    onVolumeChange={() => { }}
+                                />
+                            }
+                        >
+                            <div className={dashboardStyles.content}>
+                                <header className={dashboardStyles.header}>
+                                    <div className={dashboardStyles.greeting}>
+                                        <h1>
+                                            {currentView === "home" && `Bonjour ${previewStore.name}`}
+                                            {currentView === "styles" && "Tous les styles"}
+                                        </h1>
+                                    </div>
+                                </header>
+
+                                {currentView === "home" && previewStore.style && (
+                                    <section className={dashboardStyles.heroSection}>
+                                        <div className={dashboardStyles.heroBg}>
+                                            {previewStore.style.coverUrl && <img src={previewStore.style.coverUrl} alt="" />}
+                                            <div className={dashboardStyles.heroOverlay} />
+                                        </div>
+                                        <div className={dashboardStyles.heroContent}>
+                                            <span className={dashboardStyles.heroLabel}>EN LECTURE</span>
+                                            <h2 className={dashboardStyles.heroTitle}>{previewStore.style.name}</h2>
+                                            <p className={dashboardStyles.heroDesc}>{previewStore.style.description}</p>
+                                        </div>
+                                    </section>
+                                )}
+
+                                <section className={dashboardStyles.section}>
+                                    <div className={dashboardStyles.sectionHeader}>
+                                        <h2>Ambiances</h2>
+                                    </div>
+                                    <StyleGrid
+                                        activeStyleId={currentStyleId}
+                                        onSelect={() => { }} // Read only in preview
+                                        isPlaying={isPlaying}
+                                    />
+                                </section>
+                            </div>
+                        </AppLayout>
+                    </div>
+                )}
             </div>
         </div>
     );

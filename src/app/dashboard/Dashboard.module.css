@@ -91,44 +91,31 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-8);
-    padding: var(--spacing-6) var(--spacing-16);
+    padding: var(--spacing-8) var(--spacing-16);
     border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-surface);
     color: var(--text-subdued);
     font-size: 0.75rem;
     font-weight: 700;
-    transition: all 0.2s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-fast);
+    border: 1px solid var(--decorative-base);
     white-space: nowrap;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .autoModeBtn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-highlight);
     color: var(--text-base);
     transform: translateY(-1px);
-}
-
-.autoModeBtn.active {
-    background: var(--accent-base);
-    color: #ffffff;
-    border-color: var(--accent-bright);
-    box-shadow: 0 0 20px color-mix(in srgb, var(--accent-base) 40%, transparent);
-}
-
-.autoModeBtn:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-base);
-    border-color: var(--text-subdued);
+    border-color: var(--decorative-subdued);
 }
 
 .autoModeBtn.active {
     background: var(--bg-elevated);
     color: var(--accent-base);
     border-color: var(--accent-base);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--accent-base) 30%, transparent),
-        var(--shadow-sm);
+    box-shadow: 0 0 16px var(--accent-subtle);
 }
 
 /* === HERO SECTION === */

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { getAudioInstance, initAudioContext } from '@/lib/audioManager';
 
 interface PlayerState {
@@ -167,4 +168,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             set({ isPlaying: false, progress: 0 });
         }
     }
+}), {
+    name: 'player-storage',
+    partialize: (state) => ({
+        volume: state.volume,
+        currentStyleId: state.currentStyleId,
+        mixUrl: state.mixUrl,
+        isAutoMode: state.isAutoMode
+    }),
 }));
