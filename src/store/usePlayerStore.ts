@@ -22,7 +22,7 @@ interface PlayerState {
     stop: () => void;
 }
 
-export const usePlayerStore = create<PlayerState>((persist<PlayerState, any>((set, get) => ({
+export const usePlayerStore = create<PlayerState>()(persist((set, get) => ({
     isPlaying: false,
     volume: 0.7,
     progress: 0,
@@ -176,4 +176,4 @@ export const usePlayerStore = create<PlayerState>((persist<PlayerState, any>((se
         mixUrl: state.mixUrl,
         isAutoMode: state.isAutoMode
     }),
-})) as any);
+}));
