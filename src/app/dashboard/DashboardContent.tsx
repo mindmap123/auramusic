@@ -462,6 +462,10 @@ export default function DashboardContent() {
             <MobilePlayer
                 currentStyle={store.style}
                 onVolumeChange={handleVolumeChange}
+                onNavigateToStyles={() => {
+                    setCurrentView("styles");
+                    contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                }}
             />
         </AppLayout>
     );
