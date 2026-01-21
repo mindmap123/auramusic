@@ -153,15 +153,6 @@ export default function DashboardContent() {
                     <p className={styles.welcome}>Bienvenue</p>
                     <h1 className={styles.title}>Tableau de Bord</h1>
                 </div>
-                <div className={styles.headerActions}>
-                    <Link href="/admin/tracks" className={styles.headerBtnOutline}>
-                        Ajouter des pistes
-                    </Link>
-                    <Link href="/admin/stores" className={styles.headerBtnPrimary}>
-                        <Play size={16} />
-                        Lecture
-                    </Link>
-                </div>
             </div>
 
             {/* KPI Cards */}

@@ -137,7 +137,8 @@
 
 .navItem:hover {
     color: var(--text-base);
-    background: var(--bg-highlight);
+    background: rgba(139, 92, 246, 0.15);
+    text-decoration: none;
 }
 
 .navItem.active {
