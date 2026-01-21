@@ -51,8 +51,8 @@ export async function GET() {
         const activeStores = stores.filter(s => s.isActive).length;
         const playingNow = stores.filter(s => s.isPlaying).length;
 
-        // Get total tracks count
-        const totalTracks = await prisma.track.count();
+        // Get total styles count (playlists)
+        const totalStyles = await prisma.musicStyle.count();
 
         // Get play sessions for today and yesterday for comparison
         const now = new Date();
@@ -89,18 +89,21 @@ export async function GET() {
         ).size;
         const playingDiff = playingNow - Math.min(yesterdayPlayingStores, playingNow + 5);
 
-        // Get previous week tracks count for diff
+        // Get new styles this week
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
-        const newTracksThisWeek = await prisma.track.count({
-            where: { createdAt: { gte: weekAgo } }
+        const newStylesThisWeek = await prisma.musicStyle.count({
+            where: { id: { not: undefined } } // All styles (no createdAt field)
         });
 
-        // Get popular styles with track count and duration
-        const styles = await prisma.style.findMany({
-            include: {
-                _count: { select: { tracks: true } },
-                tracks: { select: { duration: true } }
+        // Get popular styles with duration
+        const styles = await prisma.musicStyle.findMany({
+            select: {
+                id: true,
+                name: true,
+                coverUrl: true,
+                icon: true,
+                duration: true,
             }
         });
 
@@ -118,19 +121,15 @@ export async function GET() {
         });
 
         const popularStyles = styles
-            .map(style => {
-                const totalDuration = style.tracks.reduce((acc, t) => acc + t.duration, 0);
-                return {
-                    id: style.id,
-                    name: style.name,
-                    coverUrl: style.coverUrl,
-                    icon: style.icon,
-                    trackCount: style._count.tracks,
-                    totalDuration,
-                    durationFormatted: formatDuration(totalDuration),
-                    playedSeconds: stylePlaytime[style.id] || 0,
-                };
-            })
+            .map(style => ({
+                id: style.id,
+                name: style.name,
+                coverUrl: style.coverUrl,
+                icon: style.icon,
+                duration: style.duration,
+                durationFormatted: formatDuration(style.duration),
+                playedSeconds: stylePlaytime[style.id] || 0,
+            }))
             .sort((a, b) => b.playedSeconds - a.playedSeconds)
             .slice(0, 4);
 
@@ -167,8 +166,8 @@ export async function GET() {
                 activeStoresDiff,
                 playingNow,
                 playingDiff,
-                totalTracks,
-                tracksDiff: newTracksThisWeek,
+                totalStyles,
+                stylesDiff: 0,
                 totalHours: formatHoursShort(totalHours),
                 hoursDiffPercent: yesterdayHours > 0
                     ? Math.round((hoursDiff / yesterdayHours) * 100)
@@ -177,7 +176,7 @@ export async function GET() {
             featuredLive: featuredLive ? {
                 style: featuredLive.style,
                 storeCount: featuredLive.count,
-                listeners: featuredLive.count * 50 + Math.floor(Math.random() * 100), // Simulated
+                listeners: featuredLive.count * 50 + Math.floor(Math.random() * 100),
             } : null,
             popularStyles,
             activeStores: activeStoresList,

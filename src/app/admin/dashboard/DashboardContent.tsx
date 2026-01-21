@@ -30,7 +30,7 @@ interface PopularStyle {
     name: string;
     coverUrl: string | null;
     icon: string | null;
-    trackCount: number;
+    duration: number;
     durationFormatted: string;
 }
 
@@ -54,8 +54,8 @@ interface DashboardData {
         activeStoresDiff: number;
         playingNow: number;
         playingDiff: number;
-        totalTracks: number;
-        tracksDiff: number;
+        totalStyles: number;
+        stylesDiff: number;
         totalHours: string;
         hoursDiffPercent: number;
     };
@@ -192,10 +192,10 @@ export default function DashboardContent() {
                     <div className={clsx(styles.kpiIcon, styles.purple)}>
                         <Music size={20} />
                     </div>
-                    <div className={styles.kpiValue}>{stats.totalTracks.toLocaleString()}</div>
+                    <div className={styles.kpiValue}>{stats.totalStyles}</div>
                     <div className={styles.kpiFooter}>
-                        <span className={styles.kpiLabel}>Pistes</span>
-                        {renderDiff(stats.tracksDiff)}
+                        <span className={styles.kpiLabel}>Playlists</span>
+                        {renderDiff(stats.stylesDiff)}
                     </div>
                 </div>
 
@@ -311,7 +311,7 @@ export default function DashboardContent() {
                                     <div className={styles.playlistInfo}>
                                         <span className={styles.playlistName}>{style.name}</span>
                                         <span className={styles.playlistMeta}>
-                                            {style.trackCount} pistes • {style.durationFormatted}
+                                            {style.durationFormatted}
                                         </span>
                                     </div>
                                 </div>
