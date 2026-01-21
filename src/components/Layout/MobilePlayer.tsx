@@ -25,7 +25,9 @@ interface MobilePlayerProps {
 export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateToStyles }: MobilePlayerProps) {
     const [expanded, setExpanded] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [dragY, setDragY] = useState(0);
     const volumeRef = useRef<HTMLDivElement>(null);
+    const dragStartY = useRef(0);
 
     const {
         isPlaying,
@@ -82,7 +84,29 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
 
     const handleClose = () => {
         setExpanded(false);
+        setDragY(0);
     };
+
+    // Swipe down to close handlers
+    const handleSwipeStart = useCallback((e: React.TouchEvent) => {
+        dragStartY.current = e.touches[0].clientY;
+    }, []);
+
+    const handleSwipeMove = useCallback((e: React.TouchEvent) => {
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - dragStartY.current;
+        if (diff > 0) {
+            setDragY(diff);
+        }
+    }, []);
+
+    const handleSwipeEnd = useCallback(() => {
+        if (dragY > 100) {
+            handleClose();
+        } else {
+            setDragY(0);
+        }
+    }, [dragY]);
 
     return (
         <>
@@ -132,9 +156,13 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
                     <motion.div
                         className={styles.expandedPlayer}
                         initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
+                        animate={{ y: dragY }}
                         exit={{ y: "100%" }}
-                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                        transition={dragY === 0 ? { type: "spring", damping: 30, stiffness: 300 } : { duration: 0 }}
+                        onTouchStart={handleSwipeStart}
+                        onTouchMove={handleSwipeMove}
+                        onTouchEnd={handleSwipeEnd}
+                        style={{ opacity: 1 - (dragY / 400) }}
                     >
                         {/* Background gradient based on cover */}
                         <div
@@ -145,6 +173,11 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
                                     : undefined,
                             }}
                         />
+
+                        {/* Drag handle */}
+                        <div className={styles.dragHandle}>
+                            <div className={styles.dragBar} />
+                        </div>
 
                         {/* Close button */}
                         <button className={styles.closeBtn} onClick={handleClose}>
