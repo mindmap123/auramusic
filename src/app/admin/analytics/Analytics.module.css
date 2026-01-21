@@ -1,84 +1,307 @@
-.container {
-    padding: 20px;
+.page {
+    padding: 0;
 }
 
 .header {
-    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
 }
 
 .title {
-    font-size: 2rem;
-    font-weight: 800;
-    margin-bottom: 8px;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
 .subtitle {
     color: var(--muted-foreground);
+    font-size: 0.9375rem;
+    margin-top: 4px;
 }
 
-.grid {
+/* KPIs */
+.kpiGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
 }
 
-.card {
-    background: rgba(255, 255, 255, 0.03);
+.kpiCard {
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 24px;
-    transition: transform 0.2s, background 0.2s;
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
 }
 
-.card:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-4px);
-}
-
-.storeHeader {
+.kpiIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.kpiIcon.purple {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
+}
+
+.kpiIcon.blue {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.kpiIcon.green {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.kpiIcon.orange {
+    background: rgba(251, 146, 60, 0.15);
+    color: #fb923c;
+}
+
+.kpiContent {
+    flex: 1;
+}
+
+.kpiLabel {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    margin-bottom: 4px;
+}
+
+.kpiValue {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.kpiSub {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin-top: 4px;
+}
+
+/* Charts grid */
+.chartsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chartCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 24px;
 }
 
-.storeHeader h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
+.chartTitle {
+    font-size: 1rem;
+    font-weight: 600;
 }
 
-.icon {
-    color: var(--primary);
+.chartSubtitle {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
 }
 
-.metrics {
+.chartContainer {
+    width: 100%;
+    height: 280px;
+}
+
+.pieChartContainer {
+    width: 100%;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Legend for pie chart */
+.legend {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: 8px;
+    margin-top: 16px;
 }
 
-.metric {
+.legendItem {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    font-size: 0.8125rem;
+}
+
+.legendDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legendLabel {
+    flex: 1;
     color: var(--muted-foreground);
-    font-size: 0.95rem;
 }
 
-.metric strong {
-    color: white;
+.legendValue {
+    font-weight: 600;
 }
 
-.progressContainer {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+/* Stores table */
+.storesSection {
+    margin-top: 8px;
+}
+
+.tableCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     overflow: hidden;
 }
 
+.tableHeader {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.tableTitle {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 14px 24px;
+    background: var(--background-subtle);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+}
+
+.table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9375rem;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover td {
+    background: var(--background-subtle);
+}
+
+.storeName {
+    font-weight: 600;
+}
+
+.progressCell {
+    width: 200px;
+}
+
+.progressWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .progressBar {
+    flex: 1;
+    height: 8px;
+    background: var(--secondary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progressFill {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
-    border-radius: 3px;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progressValue {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    min-width: 50px;
+    text-align: right;
+}
+
+.styleBadge {
+    display: inline-flex;
+    background: rgba(168, 85, 247, 0.1);
+    color: var(--primary);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: var(--muted-foreground);
+}
+
+.emptyState {
+    text-align: center;
+    padding: 48px;
+    color: var(--muted-foreground);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .kpiGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chartsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpiGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .progressCell {
+        display: none;
+    }
+
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        display: none;
+    }
 }

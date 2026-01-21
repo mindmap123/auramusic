@@ -16,6 +16,7 @@ import {
     Activity,
     Radio,
     Users,
+    UserCog,
     Zap,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
@@ -26,6 +27,7 @@ const menuItems = [
     { name: "Live", href: "/admin/dashboard", icon: Radio, badge: "LIVE" },
     { name: "Magasins", href: "/admin/stores", icon: Store },
     { name: "Groupes", href: "/admin/groups", icon: Users },
+    { name: "Équipe", href: "/admin/team", icon: UserCog },
     { name: "Styles", href: "/admin/tracks", icon: Music },
     { name: "Programmation", href: "/admin/scheduling", icon: Clock },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
@@ -73,7 +75,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <nav className={styles.nav}>
                     <div className={styles.navSection}>
                         <span className={styles.navLabel}>Menu</span>
-                        {menuItems.slice(0, 4).map((item) => (
+                        {menuItems.slice(0, 5).map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
@@ -94,7 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                     <div className={styles.navSection}>
                         <span className={styles.navLabel}>Insights</span>
-                        {menuItems.slice(4).map((item) => (
+                        {menuItems.slice(5).map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}

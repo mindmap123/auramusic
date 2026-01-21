@@ -184,12 +184,47 @@ export default function DashboardContent() {
                         <p>Aucun magasin n'est en lecture</p>
                     </div>
                 ) : (
-                    <div className={styles.storeGrid}>
+                    <div className={styles.playingGrid}>
                         {stores.playing.map((store) => (
-                            <div key={store.id} className={clsx(styles.storeCard, styles.playing)}>
-                                <div className={styles.storeHeader}>
-                                    <div className={styles.storeInfo}>
-                                        <span className={styles.storeName}>{store.name}</span>
+                            <div key={store.id} className={styles.playingCard}>
+                                {/* Large cover with glow effect */}
+                                <div className={styles.coverSection}>
+                                    {store.style?.coverUrl ? (
+                                        <>
+                                            <div
+                                                className={styles.coverGlow}
+                                                style={{ backgroundImage: `url(${store.style.coverUrl})` }}
+                                            />
+                                            <img
+                                                src={store.style.coverUrl}
+                                                alt={store.style.name}
+                                                className={styles.coverLarge}
+                                            />
+                                        </>
+                                    ) : (
+                                        <div className={styles.coverLargePlaceholder}>
+                                            {store.style?.icon || <Music size={32} />}
+                                        </div>
+                                    )}
+                                    {/* Playing animation overlay */}
+                                    <div className={styles.playingOverlay}>
+                                        <span className={styles.playingBars}>
+                                            <span /><span /><span /><span />
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Store & Style info */}
+                                <div className={styles.cardContent}>
+                                    <div className={styles.styleNameLarge}>
+                                        {store.style?.name || "Aucun style"}
+                                    </div>
+                                    <div className={styles.storeNameSub}>
+                                        {store.name}
+                                        {store.city && <span> • {store.city}</span>}
+                                    </div>
+
+                                    <div className={styles.cardMeta}>
                                         {store.group && (
                                             <span
                                                 className={styles.groupBadge}
@@ -198,42 +233,16 @@ export default function DashboardContent() {
                                                 {store.group.name}
                                             </span>
                                         )}
-                                    </div>
-                                    <div className={styles.storeStatus}>
-                                        <span className={styles.playingIndicator}>
-                                            <span /><span /><span />
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className={styles.nowPlaying}>
-                                    {store.style?.coverUrl ? (
-                                        <img src={store.style.coverUrl} alt="" className={styles.coverThumb} />
-                                    ) : (
-                                        <div className={styles.coverPlaceholder}>
-                                            {store.style?.icon || <Music size={16} />}
+                                        <div className={styles.volumeInfo}>
+                                            <Volume2 size={14} />
+                                            <span>{store.volume}%</span>
                                         </div>
-                                    )}
-                                    <div className={styles.trackInfo}>
-                                        <span className={styles.styleName}>
-                                            {store.style?.name || "Aucun style"}
-                                        </span>
-                                        <span className={styles.cityInfo}>
-                                            {store.city || store.storeType || "—"}
-                                        </span>
+                                        {store.isAutoMode && (
+                                            <span className={styles.autoBadge}>
+                                                <Zap size={12} /> Auto
+                                            </span>
+                                        )}
                                     </div>
-                                </div>
-
-                                <div className={styles.storeMeta}>
-                                    <div className={styles.volumeInfo}>
-                                        <Volume2 size={14} />
-                                        <span>{store.volume}%</span>
-                                    </div>
-                                    {store.isAutoMode && (
-                                        <span className={styles.autoBadge}>
-                                            <Zap size={12} /> Auto
-                                        </span>
-                                    )}
                                 </div>
                             </div>
                         ))}

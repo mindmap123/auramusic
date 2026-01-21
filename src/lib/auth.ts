@@ -25,10 +25,44 @@ export const authOptions: NextAuthOptions = {
                         email: store.email,
                         name: store.name,
                         role: "STORE",
+                        userRole: null,
                     };
                 }
 
-                // Check Admin
+                // Check Team User (new system)
+                const user = await prisma.user.findUnique({
+                    where: { email: credentials.email },
+                    include: {
+                        storeAccess: {
+                            include: { store: true }
+                        }
+                    }
+                });
+
+                if (user && user.isActive && await bcrypt.compare(credentials.password, user.password)) {
+                    // Update last login
+                    await prisma.user.update({
+                        where: { id: user.id },
+                        data: { lastLoginAt: new Date() }
+                    });
+
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: "USER",
+                        userRole: user.role,
+                        storeAccess: user.storeAccess.map(sa => ({
+                            storeId: sa.storeId,
+                            storeName: sa.store.name,
+                            canEdit: sa.canEdit,
+                            canPlay: sa.canPlay,
+                            canSchedule: sa.canSchedule,
+                        })),
+                    };
+                }
+
+                // Check Admin (legacy)
                 const admin = await prisma.admin.findUnique({
                     where: { email: credentials.email },
                 });
@@ -39,6 +73,7 @@ export const authOptions: NextAuthOptions = {
                         email: admin.email,
                         name: admin.name,
                         role: "ADMIN",
+                        userRole: "OWNER",
                     };
                 }
 
@@ -51,6 +86,8 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.role = (user as any).role;
                 token.id = user.id;
+                token.userRole = (user as any).userRole;
+                token.storeAccess = (user as any).storeAccess;
             }
             return token;
         },
@@ -58,6 +95,8 @@ export const authOptions: NextAuthOptions = {
             if (session.user) {
                 (session.user as any).role = token.role;
                 (session.user as any).id = token.id;
+                (session.user as any).userRole = token.userRole;
+                (session.user as any).storeAccess = token.storeAccess;
             }
             return session;
         },

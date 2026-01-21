@@ -168,7 +168,129 @@
     gap: var(--spacing-8);
 }
 
-/* === STORE GRID (Playing) === */
+/* === PLAYING GRID - Enhanced "Who plays what" === */
+.playingGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--spacing-20);
+}
+
+.playingCard {
+    background: var(--bg-highlight);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition-fast);
+}
+
+.playingCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Cover section with glow */
+.coverSection {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+}
+
+.coverGlow {
+    position: absolute;
+    inset: -20%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px) saturate(1.5);
+    opacity: 0.5;
+    transform: scale(1.2);
+}
+
+.coverLarge {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.coverLargePlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent-base), var(--essential-positive));
+    color: white;
+}
+
+/* Playing overlay with animated bars */
+.playingOverlay {
+    position: absolute;
+    bottom: var(--spacing-12);
+    right: var(--spacing-12);
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+}
+
+.playingBars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 18px;
+}
+
+.playingBars span {
+    width: 4px;
+    background: var(--essential-positive);
+    border-radius: 2px;
+    animation: bars 0.8s ease-in-out infinite;
+}
+
+.playingBars span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.playingBars span:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+.playingBars span:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+.playingBars span:nth-child(4) { height: 16px; animation-delay: 0.45s; }
+
+@keyframes bars {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.4); }
+}
+
+/* Card content */
+.cardContent {
+    padding: var(--spacing-16);
+}
+
+.styleNameLarge {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: var(--spacing-4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.storeNameSub {
+    font-size: 0.8125rem;
+    color: var(--text-subdued);
+    margin-bottom: var(--spacing-12);
+}
+
+.storeNameSub span {
+    opacity: 0.7;
+}
+
+.cardMeta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    flex-wrap: wrap;
+}
+
+/* Legacy styles kept for paused section */
 .storeGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -386,6 +508,10 @@
     .statsGrid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .playingGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 640px) {
@@ -399,6 +525,10 @@
     }
 
     .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .playingGrid {
         grid-template-columns: 1fr;
     }
 

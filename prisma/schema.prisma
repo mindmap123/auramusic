@@ -33,6 +33,7 @@ model Store {
   favorites      StoreFavorite[]
   schedules      StoreSchedule[]
   styleProgress  StoreStyleProgress[]
+  userAccess     UserStoreAccess[]
 
   @@index([groupId])
   @@index([city])
@@ -59,6 +60,65 @@ model Admin {
   role      String   @default("ADMIN")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Système de gestion d'équipe
+model User {
+  id           String            @id @default(uuid())
+  name         String
+  email        String            @unique
+  password     String
+  avatar       String?
+  role         UserRole          @default(VIEWER)
+  isActive     Boolean           @default(true)
+  lastLoginAt  DateTime?
+  invitedBy    String?
+  invitedAt    DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  storeAccess  UserStoreAccess[]
+  activityLogs UserActivityLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MANAGER
+  EDITOR
+  VIEWER
+}
+
+// Permissions par magasin pour chaque utilisateur
+model UserStoreAccess {
+  id        String   @id @default(uuid())
+  userId    String
+  storeId   String
+  canEdit   Boolean  @default(false)
+  canPlay   Boolean  @default(true)
+  canSchedule Boolean @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storeId])
+  @@index([userId])
+  @@index([storeId])
+}
+
+// Logs d'activité des utilisateurs Team
+model UserActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  target    String?
+  details   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model MusicStyle {
