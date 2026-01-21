@@ -216,8 +216,8 @@ export default function DashboardContent() {
                 </div>
             </div>
 
-            {/* Middle Section */}
-            <div className={styles.middleGrid}>
+            {/* Main Content */}
+            <div className={styles.mainGrid}>
                 {/* Featured Live */}
                 <div className={styles.featuredCard}>
                     {featuredLive ? (
