@@ -112,7 +112,8 @@
     background: var(--accent-bright);
 }
 
-.playButton.visible {
+.card:hover .playButton,
+.card.active .playButton {
     opacity: 1;
     transform: translateY(0);
 }
@@ -208,14 +209,13 @@
     width: 32px;
     height: 32px;
     border-radius: var(--radius-full);
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     color: var(--text-base);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: all var(--transition-fast);
-    backdrop-filter: blur(4px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .card:hover .favoriteBtn {

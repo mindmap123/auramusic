@@ -130,48 +130,23 @@
     overflow: hidden;
 }
 
-.heroBg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg,
-            var(--accent-base) 0%,
-            var(--accent-dark) 100%);
-    mix-blend-mode: multiply;
-    z-index: 2;
-}
-
-.heroBg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(45deg,
-            rgba(0, 0, 0, 0.8) 0%,
-            var(--accent-base) 100%);
-    mix-blend-mode: screen;
-    z-index: 3;
-}
-
 .heroBg img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Position dynamique basée sur les paramètres admin */
     object-position: var(--banner-position, center center);
-    /* Filtre duotone simplifié */
-    filter: grayscale(100%) contrast(1.1) brightness(0.7);
-    transform: scale(1.05);
-    z-index: 1;
+    opacity: 0.4;
 }
 
 .heroOverlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right,
-            rgba(0, 0, 0, 0.6) 0%,
-            rgba(0, 0, 0, 0.3) 50%,
-            rgba(0, 0, 0, 0.1) 100%);
-    z-index: 4;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.7) 0%,
+        color-mix(in srgb, var(--accent-dark) 60%, transparent) 100%
+    );
+    z-index: 1;
 }
 
 .heroContent {

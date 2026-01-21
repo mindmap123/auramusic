@@ -3,6 +3,7 @@
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
+    will-change: auto;
 }
 
 /* Sizes */
@@ -54,7 +55,7 @@
     inset: 25%;
 }
 
-/* Cover wrapper - rotates */
+/* Cover wrapper */
 .coverWrapper {
     position: relative;
     width: 100%;
@@ -62,9 +63,7 @@
     border-radius: 50%;
     overflow: hidden;
     z-index: 1;
-    box-shadow:
-        0 4px 20px rgba(0, 0, 0, 0.4),
-        inset 0 0 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .coverImage {
@@ -80,7 +79,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, var(--accent-base), var(--accent-dark));
     border-radius: 50%;
 }
 
@@ -104,9 +103,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow:
-        inset 0 2px 4px rgba(0, 0, 0, 0.5),
-        0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .centerDot {
@@ -116,23 +112,23 @@
     border-radius: 50%;
 }
 
-/* Reflection/shine effect */
-.reflection {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.15) 0%,
-        transparent 40%,
-        transparent 60%,
-        rgba(255, 255, 255, 0.05) 100%
-    );
-    pointer-events: none;
-    z-index: 2;
+/* CSS Animation - GPU accelerated */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spinning {
+    animation: spin 8s linear infinite;
+    will-change: transform;
+}
+
+.vinylDisc.spinning {
+    animation-duration: 3s;
 }
 
 /* Small size adjustments */
@@ -161,4 +157,11 @@
 
 .lg .groove:nth-child(3) {
     inset: 17%;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .spinning {
+        animation: none;
+    }
 }

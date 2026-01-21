@@ -39,9 +39,6 @@
     color: var(--accent-base);
 }
 
-.navItem.active svg {
-    filter: drop-shadow(0 0 6px var(--accent-glow));
-}
 
 /* Show only on mobile */
 @media (max-width: 768px) {

@@ -222,8 +222,7 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-8);
-    width: 160px;
-    margin-right: var(--spacing-8);
+    width: 140px;
     cursor: pointer;
     user-select: none;
 }
@@ -237,46 +236,54 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition-fast);
+    transition: color var(--transition-fast);
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .volumeBtn:hover {
     color: var(--text-base);
 }
 
-.volumeSvg {
+.volumeTrack {
     flex: 1;
-    height: 24px;
-    overflow: visible;
+    height: 4px;
+    background: var(--bg-highlight);
+    border-radius: var(--radius-full);
+    position: relative;
+}
+
+.volumeControl:hover .volumeTrack {
+    height: 6px;
 }
 
 .volumeFill {
-    filter: drop-shadow(0 0 6px var(--accent-base));
-    transition: filter 0.2s ease;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--text-base);
+    border-radius: var(--radius-full);
 }
 
-.volumeControl:hover .volumeFill,
-.volumeControl.dragging .volumeFill {
-    filter: drop-shadow(0 0 10px var(--accent-base));
-}
-
-.gradMark {
-    transition: opacity 0.15s ease, stroke 0.15s ease;
+.volumeControl:hover .volumeFill {
+    background: var(--accent-base);
 }
 
 .volumeThumb {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    transition: transform 0.15s ease, filter 0.15s ease;
-    transform-origin: center;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: var(--text-base);
+    border-radius: var(--radius-full);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
 }
 
 .volumeControl:hover .volumeThumb {
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 8px var(--accent-base));
-}
-
-.volumeControl.dragging .volumeThumb {
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 12px var(--accent-base));
+    opacity: 1;
 }
 
 /* === MOBILE === */
