@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Play, Pause, ChevronUp, ChevronDown, SkipBack, SkipForward } from "lucide-react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Play, Pause, ChevronUp, ChevronDown, SkipBack, SkipForward, Volume2, Volume1, VolumeX } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/react/shallow";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,19 +22,59 @@ interface MobilePlayerProps {
     onNavigateToStyles?: () => void;
 }
 
-export default function MobilePlayer({ currentStyle, onNavigateToStyles }: MobilePlayerProps) {
+export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateToStyles }: MobilePlayerProps) {
     const [expanded, setExpanded] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const volumeRef = useRef<HTMLDivElement>(null);
+
     const {
         isPlaying,
         togglePlay,
         mixUrl,
         seekRelative,
+        volume,
+        setVolume,
     } = usePlayerStore(useShallow((state) => ({
         isPlaying: state.isPlaying,
         togglePlay: state.togglePlay,
         mixUrl: state.mixUrl,
         seekRelative: state.seekRelative,
+        volume: state.volume,
+        setVolume: state.setVolume,
     })));
+
+    const handleVolumeChange = useCallback((newVolume: number) => {
+        const clamped = Math.max(0, Math.min(1, newVolume));
+        setVolume(clamped);
+        onVolumeChange(clamped);
+    }, [setVolume, onVolumeChange]);
+
+    const setVolumeByTouch = useCallback((clientX: number) => {
+        if (!volumeRef.current) return;
+        const rect = volumeRef.current.getBoundingClientRect();
+        const x = clientX - rect.left;
+        handleVolumeChange(x / rect.width);
+    }, [handleVolumeChange]);
+
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        e.stopPropagation();
+        setIsDragging(true);
+        setVolumeByTouch(e.touches[0].clientX);
+    }, [setVolumeByTouch]);
+
+    useEffect(() => {
+        if (!isDragging) return;
+        const handleTouchMove = (e: TouchEvent) => setVolumeByTouch(e.touches[0].clientX);
+        const handleEnd = () => setIsDragging(false);
+        document.addEventListener('touchmove', handleTouchMove);
+        document.addEventListener('touchend', handleEnd);
+        return () => {
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleEnd);
+        };
+    }, [isDragging, setVolumeByTouch]);
+
+    const VolumeIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
     const handleBarClick = () => {
         setExpanded(true);
@@ -161,6 +201,30 @@ export default function MobilePlayer({ currentStyle, onNavigateToStyles }: Mobil
                                 >
                                     <SkipForward size={28} />
                                 </button>
+                            </div>
+
+                            {/* Volume Control */}
+                            <div className={styles.volumeSection}>
+                                <button
+                                    className={styles.volumeBtn}
+                                    onClick={(e) => { e.stopPropagation(); setVolume(volume > 0 ? 0 : 0.7); }}
+                                >
+                                    <VolumeIcon size={22} />
+                                </button>
+                                <div
+                                    ref={volumeRef}
+                                    className={styles.volumeTrack}
+                                    onTouchStart={handleTouchStart}
+                                >
+                                    <div
+                                        className={styles.volumeFill}
+                                        style={{ width: `${volume * 100}%` }}
+                                    />
+                                    <div
+                                        className={styles.volumeThumb}
+                                        style={{ left: `${volume * 100}%` }}
+                                    />
+                                </div>
                             </div>
 
                             {/* Browse styles button */}

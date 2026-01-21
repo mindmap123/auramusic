@@ -65,15 +65,17 @@
 
     .mainWrapper {
         margin-left: 0;
-        height: calc(100vh - 72px);
-        /* Mini player height */
-        height: calc(100dvh - 72px);
+        height: calc(100vh - 120px);
+        height: calc(100dvh - 120px);
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .mainContent {
         padding: var(--spacing-16);
-        padding-bottom: 80px;
-        /* Space for mini player */
+        padding-bottom: 24px;
+        min-height: 100%;
+        overflow: visible;
     }
 
     .playerBarWrapper {

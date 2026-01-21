@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/react/shallow";
 import { initAudioContext } from "@/lib/audioManager";
-import { AppLayout, Sidebar, PlayerBar, MobilePlayer } from "@/components/Layout";
+import { AppLayout, Sidebar, PlayerBar, MobilePlayer, MobileNav } from "@/components/Layout";
 import StyleGrid from "@/components/Player/StyleGrid";
 import styles from "./Dashboard.module.css";
 
@@ -457,6 +457,15 @@ export default function DashboardContent() {
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* Mobile Navigation */}
+            <MobileNav
+                currentView={currentView}
+                onViewChange={(view) => {
+                    setCurrentView(view);
+                    contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+            />
 
             {/* Mobile Player */}
             <MobilePlayer

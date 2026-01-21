@@ -238,6 +238,69 @@
     opacity: 0.4;
 }
 
+/* Volume Control */
+.volumeSection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 280px;
+    padding: 0 16px;
+}
+
+.volumeBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.volumeBtn:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.volumeTrack {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    position: relative;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.volumeFill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--accent-base);
+    border-radius: var(--radius-full);
+    transition: width 0.05s ease;
+}
+
+.volumeThumb {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: var(--text-base);
+    border-radius: var(--radius-full);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s ease;
+}
+
+.volumeThumb:active {
+    transform: translate(-50%, -50%) scale(1.15);
+}
+
 .browseBtn {
     padding: 14px 28px;
     border-radius: var(--radius-full);
