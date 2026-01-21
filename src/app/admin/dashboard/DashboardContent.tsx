@@ -5,29 +5,24 @@ import Link from "next/link";
 import {
     Store,
     Music,
-    Play,
+    Headphones,
+    Clock,
     Plus,
     Calendar,
-    RefreshCw,
     TrendingUp,
-    TrendingDown,
-    Clock,
-    Zap,
+    RefreshCw,
     ChevronRight,
-    Volume2,
+    Play,
+    Radio,
 } from "lucide-react";
 import { clsx } from "clsx";
 import styles from "./Dashboard.module.css";
 
-interface StoreStatus {
+interface StyleInfo {
     id: string;
     name: string;
-    isPlaying: boolean;
-    isAutoMode: boolean;
-    volume: number;
-    city: string | null;
-    group: { name: string; color: string } | null;
-    style: { id: string; name: string; icon: string | null; coverUrl: string | null } | null;
+    icon: string | null;
+    coverUrl: string | null;
 }
 
 interface PopularStyle {
@@ -35,7 +30,22 @@ interface PopularStyle {
     name: string;
     coverUrl: string | null;
     icon: string | null;
-    hours: number;
+    trackCount: number;
+    durationFormatted: string;
+}
+
+interface ActiveStore {
+    id: string;
+    name: string;
+    isPlaying: boolean;
+    group: { name: string; color: string } | null;
+    style: StyleInfo | null;
+}
+
+interface FeaturedLive {
+    style: StyleInfo;
+    storeCount: number;
+    listeners: number;
 }
 
 interface DashboardData {
@@ -43,26 +53,44 @@ interface DashboardData {
         activeStores: number;
         activeStoresDiff: number;
         playingNow: number;
-        todayHours: number;
-        hoursDiff: number;
-        autoModeCount: number;
+        playingDiff: number;
+        totalTracks: number;
+        tracksDiff: number;
+        totalHours: string;
+        hoursDiffPercent: number;
     };
-    stores: {
-        playing: StoreStatus[];
-    };
+    featuredLive: FeaturedLive | null;
     popularStyles: PopularStyle[];
+    activeStores: ActiveStore[];
 }
 
 const quickActions = [
-    { label: "Ajouter magasin", icon: Store, href: "/admin/stores", color: "blue" },
-    { label: "Nouveau style", icon: Music, href: "/admin/tracks", color: "purple" },
-    { label: "Programmer", icon: Calendar, href: "/admin/scheduling", color: "green" },
+    {
+        label: "Ajouter un magasin",
+        description: "Nouveau point de diffusion",
+        icon: Store,
+        href: "/admin/stores",
+        color: "blue",
+    },
+    {
+        label: "Créer une playlist",
+        description: "Nouvelle ambiance",
+        icon: Music,
+        href: "/admin/tracks",
+        color: "pink",
+    },
+    {
+        label: "Programmer",
+        description: "Automatiser la diffusion",
+        icon: Calendar,
+        href: "/admin/scheduling",
+        color: "green",
+    },
 ];
 
 export default function DashboardContent() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
     const fetchData = async () => {
         try {
@@ -70,7 +98,6 @@ export default function DashboardContent() {
             if (res.ok) {
                 const json = await res.json();
                 setData(json);
-                setLastUpdate(new Date());
             }
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
@@ -98,7 +125,7 @@ export default function DashboardContent() {
         return (
             <div className={styles.loadingContainer}>
                 <p>Impossible de charger les données.</p>
-                <button className={styles.refreshBtn} onClick={fetchData}>
+                <button className={styles.retryBtn} onClick={fetchData}>
                     <RefreshCw size={18} />
                     Réessayer
                 </button>
@@ -106,15 +133,14 @@ export default function DashboardContent() {
         );
     }
 
-    const { stats, stores, popularStyles } = data;
+    const { stats, featuredLive, popularStyles, activeStores } = data;
 
-    const renderDiff = (diff: number, suffix: string = "") => {
-        if (diff === 0) return null;
-        const isPositive = diff > 0;
+    const renderDiff = (value: number, suffix: string = "") => {
+        if (value === 0) return null;
         return (
-            <span className={clsx(styles.diff, isPositive ? styles.positive : styles.negative)}>
-                {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                {isPositive ? "+" : ""}{diff}{suffix}
+            <span className={styles.diff}>
+                <TrendingUp size={14} />
+                +{value}{suffix}
             </span>
         );
     };
@@ -124,172 +150,210 @@ export default function DashboardContent() {
             {/* Header */}
             <div className={styles.header}>
                 <div>
+                    <p className={styles.welcome}>Bienvenue</p>
                     <h1 className={styles.title}>Tableau de Bord</h1>
-                    <p className={styles.subtitle}>
-                        Mis à jour à {lastUpdate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-                    </p>
                 </div>
-                <button className={styles.refreshBtn} onClick={fetchData}>
-                    <RefreshCw size={18} />
-                    Actualiser
-                </button>
+                <div className={styles.headerActions}>
+                    <Link href="/admin/tracks" className={styles.headerBtnOutline}>
+                        Ajouter des pistes
+                    </Link>
+                    <Link href="/admin/stores" className={styles.headerBtnPrimary}>
+                        <Play size={16} />
+                        Lecture
+                    </Link>
+                </div>
             </div>
 
             {/* KPI Cards */}
             <div className={styles.kpiGrid}>
                 <div className={styles.kpiCard}>
                     <div className={clsx(styles.kpiIcon, styles.blue)}>
-                        <Store size={22} />
+                        <Store size={20} />
                     </div>
-                    <div className={styles.kpiContent}>
-                        <span className={styles.kpiValue}>{stats.activeStores}</span>
+                    <div className={styles.kpiValue}>{stats.activeStores}</div>
+                    <div className={styles.kpiFooter}>
                         <span className={styles.kpiLabel}>Magasins Actifs</span>
-                        {renderDiff(stats.activeStoresDiff, " vs hier")}
+                        {renderDiff(stats.activeStoresDiff)}
                     </div>
                 </div>
 
                 <div className={styles.kpiCard}>
-                    <div className={clsx(styles.kpiIcon, styles.green)}>
-                        <Play size={22} />
+                    <div className={clsx(styles.kpiIcon, styles.pink)}>
+                        <Headphones size={20} />
                     </div>
-                    <div className={styles.kpiContent}>
-                        <span className={styles.kpiValue}>{stats.playingNow}</span>
-                        <span className={styles.kpiLabel}>En Lecture</span>
-                        <span className={styles.liveBadge}>
-                            <span className={styles.liveDot} />
-                            Live
-                        </span>
+                    <div className={styles.kpiValue}>{stats.playingNow}</div>
+                    <div className={styles.kpiFooter}>
+                        <span className={styles.kpiLabel}>En Écoute</span>
+                        {renderDiff(stats.playingDiff)}
                     </div>
                 </div>
 
                 <div className={styles.kpiCard}>
                     <div className={clsx(styles.kpiIcon, styles.purple)}>
-                        <Clock size={22} />
+                        <Music size={20} />
                     </div>
-                    <div className={styles.kpiContent}>
-                        <span className={styles.kpiValue}>{stats.todayHours}h</span>
-                        <span className={styles.kpiLabel}>Heures Streamées</span>
-                        {renderDiff(stats.hoursDiff, "h")}
+                    <div className={styles.kpiValue}>{stats.totalTracks.toLocaleString()}</div>
+                    <div className={styles.kpiFooter}>
+                        <span className={styles.kpiLabel}>Pistes</span>
+                        {renderDiff(stats.tracksDiff)}
                     </div>
                 </div>
 
                 <div className={styles.kpiCard}>
                     <div className={clsx(styles.kpiIcon, styles.orange)}>
-                        <Zap size={22} />
+                        <Clock size={20} />
                     </div>
-                    <div className={styles.kpiContent}>
-                        <span className={styles.kpiValue}>{stats.autoModeCount}</span>
-                        <span className={styles.kpiLabel}>Mode Auto</span>
+                    <div className={styles.kpiValue}>{stats.totalHours}</div>
+                    <div className={styles.kpiFooter}>
+                        <span className={styles.kpiLabel}>Heures Streamées</span>
+                        {stats.hoursDiffPercent > 0 && (
+                            <span className={styles.diff}>
+                                <TrendingUp size={14} />
+                                +{stats.hoursDiffPercent}%
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Middle Section: Actions + Playing Now */}
+            {/* Middle Section */}
             <div className={styles.middleGrid}>
+                {/* Featured Live */}
+                <div className={styles.featuredCard}>
+                    {featuredLive ? (
+                        <>
+                            <div className={styles.featuredCover}>
+                                {featuredLive.style.coverUrl ? (
+                                    <img src={featuredLive.style.coverUrl} alt="" />
+                                ) : (
+                                    <div className={styles.featuredPlaceholder}>
+                                        <Radio size={48} />
+                                    </div>
+                                )}
+                            </div>
+                            <div className={styles.featuredInfo}>
+                                <span className={styles.liveBadge}>EN DIRECT</span>
+                                <h2 className={styles.featuredTitle}>{featuredLive.style.name}</h2>
+                                <p className={styles.featuredMeta}>
+                                    Diffusé sur {featuredLive.storeCount} magasin{featuredLive.storeCount > 1 ? "s" : ""} • {featuredLive.listeners} auditeurs
+                                </p>
+                                <div className={styles.featuredActions}>
+                                    <button className={styles.listenBtn}>
+                                        <Headphones size={18} />
+                                        Écouter
+                                    </button>
+                                    <Link href="/admin/tracks" className={styles.playlistBtn}>
+                                        Voir la playlist
+                                    </Link>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className={styles.noLive}>
+                            <Radio size={48} />
+                            <h3>Aucune diffusion en cours</h3>
+                            <p>Démarrez la lecture sur un magasin</p>
+                        </div>
+                    )}
+                </div>
+
                 {/* Quick Actions */}
-                <div className={styles.card}>
-                    <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>Actions Rapides</h2>
-                    </div>
-                    <div className={styles.actionsGrid}>
+                <div className={styles.actionsCard}>
+                    <h2 className={styles.cardTitle}>Actions Rapides</h2>
+                    <div className={styles.actionsList}>
                         {quickActions.map((action) => (
                             <Link
                                 key={action.label}
                                 href={action.href}
-                                className={clsx(styles.actionBtn, styles[action.color])}
+                                className={styles.actionItem}
                             >
-                                <action.icon size={20} />
-                                <span>{action.label}</span>
+                                <div className={clsx(styles.actionIcon, styles[action.color])}>
+                                    <action.icon size={20} />
+                                </div>
+                                <div className={styles.actionText}>
+                                    <span className={styles.actionLabel}>{action.label}</span>
+                                    <span className={styles.actionDesc}>{action.description}</span>
+                                </div>
+                                <ChevronRight size={20} className={styles.actionArrow} />
                             </Link>
                         ))}
                     </div>
                 </div>
+            </div>
 
-                {/* Playing Now */}
+            {/* Bottom Section */}
+            <div className={styles.bottomGrid}>
+                {/* Popular Playlists */}
                 <div className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>
-                            <span className={styles.liveDot} />
-                            En Lecture
-                        </h2>
-                        <Link href="/admin/stores" className={styles.viewAll}>
-                            Voir tout <ChevronRight size={16} />
+                        <h2 className={styles.cardTitle}>Playlists Populaires</h2>
+                        <Link href="/admin/tracks" className={styles.viewAll}>
+                            Voir tout
                         </Link>
                     </div>
-                    <div className={styles.playingList}>
-                        {stores.playing.length === 0 ? (
+                    <div className={styles.playlistList}>
+                        {popularStyles.length === 0 ? (
                             <div className={styles.emptyState}>
                                 <Music size={24} />
-                                <p>Aucun magasin en lecture</p>
+                                <p>Aucune playlist</p>
                             </div>
                         ) : (
-                            stores.playing.map((store) => (
-                                <div key={store.id} className={styles.playingItem}>
-                                    <div className={styles.playingCover}>
-                                        {store.style?.coverUrl ? (
-                                            <img src={store.style.coverUrl} alt="" />
-                                        ) : (
-                                            <div className={styles.coverPlaceholder}>
-                                                {store.style?.icon || <Music size={16} />}
-                                            </div>
-                                        )}
-                                        <span className={styles.playingBars}>
-                                            <span /><span /><span />
-                                        </span>
+                            popularStyles.map((style, index) => (
+                                <div key={style.id} className={styles.playlistItem}>
+                                    <div className={clsx(
+                                        styles.playlistIcon,
+                                        index === 0 ? styles.pink :
+                                        index === 1 ? styles.orange :
+                                        index === 2 ? styles.purple : styles.blue
+                                    )}>
+                                        <Music size={18} />
                                     </div>
-                                    <div className={styles.playingInfo}>
-                                        <span className={styles.playingStyle}>
-                                            {store.style?.name || "—"}
+                                    <div className={styles.playlistInfo}>
+                                        <span className={styles.playlistName}>{style.name}</span>
+                                        <span className={styles.playlistMeta}>
+                                            {style.trackCount} pistes • {style.durationFormatted}
                                         </span>
-                                        <span className={styles.playingStore}>
-                                            {store.name}
-                                            {store.city && <span> • {store.city}</span>}
-                                        </span>
-                                    </div>
-                                    <div className={styles.playingMeta}>
-                                        <Volume2 size={14} />
-                                        <span>{store.volume}%</span>
                                     </div>
                                 </div>
                             ))
                         )}
                     </div>
                 </div>
-            </div>
 
-            {/* Popular Styles */}
-            <div className={styles.card}>
-                <div className={styles.cardHeader}>
-                    <h2 className={styles.cardTitle}>Styles Populaires</h2>
-                    <Link href="/admin/tracks" className={styles.viewAll}>
-                        Voir tout <ChevronRight size={16} />
-                    </Link>
-                </div>
-                <div className={styles.stylesGrid}>
-                    {popularStyles.length === 0 ? (
-                        <div className={styles.emptyState}>
-                            <Music size={24} />
-                            <p>Aucune donnée cette semaine</p>
-                        </div>
-                    ) : (
-                        popularStyles.map((style) => (
-                            <div key={style.id} className={styles.styleCard}>
-                                <div className={styles.styleCover}>
-                                    {style.coverUrl ? (
-                                        <img src={style.coverUrl} alt={style.name} />
-                                    ) : (
-                                        <div className={styles.stylePlaceholder}>
-                                            {style.icon || <Music size={24} />}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className={styles.styleInfo}>
-                                    <span className={styles.styleName}>{style.name}</span>
-                                    <span className={styles.styleHours}>{style.hours}h cette semaine</span>
-                                </div>
+                {/* Active Stores */}
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>Magasins Actifs</h2>
+                        <Link href="/admin/stores" className={styles.viewAll}>
+                            Voir tout
+                        </Link>
+                    </div>
+                    <div className={styles.storesList}>
+                        {activeStores.length === 0 ? (
+                            <div className={styles.emptyState}>
+                                <Store size={24} />
+                                <p>Aucun magasin actif</p>
                             </div>
-                        ))
-                    )}
+                        ) : (
+                            activeStores.map((store) => (
+                                <div key={store.id} className={styles.storeItem}>
+                                    <div className={styles.storeIcon}>
+                                        <Store size={18} />
+                                    </div>
+                                    <div className={styles.storeInfo}>
+                                        <span className={styles.storeName}>{store.name}</span>
+                                        <span className={styles.storeMeta}>
+                                            {store.group?.name || "—"} • {store.style?.name || "—"}
+                                        </span>
+                                    </div>
+                                    <div className={clsx(
+                                        styles.statusDot,
+                                        store.isPlaying ? styles.playing : styles.paused
+                                    )} />
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

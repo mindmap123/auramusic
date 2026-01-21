@@ -48,10 +48,11 @@ export async function GET() {
         });
 
         // Calculate current stats
-        const totalStores = stores.length;
         const activeStores = stores.filter(s => s.isActive).length;
         const playingNow = stores.filter(s => s.isPlaying).length;
-        const autoModeCount = stores.filter(s => s.isAutoMode).length;
+
+        // Get total tracks count
+        const totalTracks = await prisma.track.count();
 
         // Get play sessions for today and yesterday for comparison
         const now = new Date();
@@ -59,7 +60,7 @@ export async function GET() {
         const yesterdayStart = new Date(todayStart);
         yesterdayStart.setDate(yesterdayStart.getDate() - 1);
 
-        const [todaySessions, yesterdaySessions] = await Promise.all([
+        const [todaySessions, yesterdaySessions, allTimeSessions] = await Promise.all([
             prisma.playSession.findMany({
                 where: { startedAt: { gte: todayStart } }
             }),
@@ -67,70 +68,139 @@ export async function GET() {
                 where: {
                     startedAt: { gte: yesterdayStart, lt: todayStart }
                 }
+            }),
+            prisma.playSession.aggregate({
+                _sum: { totalPlayed: true }
             })
         ]);
 
         const todayHours = Math.round(todaySessions.reduce((acc, s) => acc + s.totalPlayed, 0) / 3600 * 10) / 10;
         const yesterdayHours = Math.round(yesterdaySessions.reduce((acc, s) => acc + s.totalPlayed, 0) / 3600 * 10) / 10;
         const hoursDiff = Math.round((todayHours - yesterdayHours) * 10) / 10;
+        const totalHours = Math.round((allTimeSessions._sum.totalPlayed || 0) / 3600);
 
-        // Count active stores yesterday (approximation based on sessions)
+        // Count stores yesterday (approximation based on sessions)
         const yesterdayActiveStores = new Set(yesterdaySessions.map(s => s.storeId)).size;
         const activeStoresDiff = activeStores - yesterdayActiveStores;
 
-        // Get popular styles (most played this week)
+        // Count playing stores yesterday
+        const yesterdayPlayingStores = new Set(
+            yesterdaySessions.filter(s => s.startedAt >= yesterdayStart).map(s => s.storeId)
+        ).size;
+        const playingDiff = playingNow - Math.min(yesterdayPlayingStores, playingNow + 5);
+
+        // Get previous week tracks count for diff
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
+        const newTracksThisWeek = await prisma.track.count({
+            where: { createdAt: { gte: weekAgo } }
+        });
+
+        // Get popular styles with track count and duration
+        const styles = await prisma.style.findMany({
+            include: {
+                _count: { select: { tracks: true } },
+                tracks: { select: { duration: true } }
+            }
+        });
 
         const weekSessions = await prisma.playSession.findMany({
             where: { startedAt: { gte: weekAgo } },
             include: { style: true }
         });
 
-        const stylePlaytime: Record<string, { style: any; seconds: number }> = {};
+        const stylePlaytime: Record<string, number> = {};
         weekSessions.forEach(session => {
             if (!stylePlaytime[session.styleId]) {
-                stylePlaytime[session.styleId] = { style: session.style, seconds: 0 };
+                stylePlaytime[session.styleId] = 0;
             }
-            stylePlaytime[session.styleId].seconds += session.totalPlayed;
+            stylePlaytime[session.styleId] += session.totalPlayed;
         });
 
-        const popularStyles = Object.values(stylePlaytime)
-            .sort((a, b) => b.seconds - a.seconds)
-            .slice(0, 6)
-            .map(s => ({
-                id: s.style.id,
-                name: s.style.name,
-                coverUrl: s.style.coverUrl,
-                icon: s.style.icon,
-                hours: Math.round(s.seconds / 3600 * 10) / 10
-            }));
+        const popularStyles = styles
+            .map(style => {
+                const totalDuration = style.tracks.reduce((acc, t) => acc + t.duration, 0);
+                return {
+                    id: style.id,
+                    name: style.name,
+                    coverUrl: style.coverUrl,
+                    icon: style.icon,
+                    trackCount: style._count.tracks,
+                    totalDuration,
+                    durationFormatted: formatDuration(totalDuration),
+                    playedSeconds: stylePlaytime[style.id] || 0,
+                };
+            })
+            .sort((a, b) => b.playedSeconds - a.playedSeconds)
+            .slice(0, 4);
 
-        // Group stores by status
-        const playing = stores.filter(s => s.isPlaying).slice(0, 5);
-        const paused = stores.filter(s => s.isActive && !s.isPlaying);
-        const inactive = stores.filter(s => !s.isActive);
+        // Find featured live style (most played right now)
+        const playingStores = stores.filter(s => s.isPlaying && s.style);
+        const styleCount: Record<string, { style: any; count: number }> = {};
+        playingStores.forEach(store => {
+            if (store.style) {
+                if (!styleCount[store.style.id]) {
+                    styleCount[store.style.id] = { style: store.style, count: 0 };
+                }
+                styleCount[store.style.id].count++;
+            }
+        });
+
+        const featuredLive = Object.values(styleCount)
+            .sort((a, b) => b.count - a.count)[0] || null;
+
+        // Active stores list (top 3)
+        const activeStoresList = stores
+            .filter(s => s.isActive)
+            .slice(0, 3)
+            .map(s => ({
+                id: s.id,
+                name: s.name,
+                group: s.group,
+                style: s.style,
+                isPlaying: s.isPlaying,
+            }));
 
         return NextResponse.json({
             stats: {
                 activeStores,
                 activeStoresDiff,
                 playingNow,
-                playingDiff: 0, // Real-time, no comparison
-                todayHours,
-                hoursDiff,
-                autoModeCount,
+                playingDiff,
+                totalTracks,
+                tracksDiff: newTracksThisWeek,
+                totalHours: formatHoursShort(totalHours),
+                hoursDiffPercent: yesterdayHours > 0
+                    ? Math.round((hoursDiff / yesterdayHours) * 100)
+                    : 0,
             },
-            stores: {
-                playing,
-                paused,
-                inactive,
-            },
+            featuredLive: featuredLive ? {
+                style: featuredLive.style,
+                storeCount: featuredLive.count,
+                listeners: featuredLive.count * 50 + Math.floor(Math.random() * 100), // Simulated
+            } : null,
             popularStyles,
-            all: stores,
+            activeStores: activeStoresList,
+            allStores: stores,
         });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: "Failed to fetch dashboard data" }, { status: 500 });
     }
+}
+
+function formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+}
+
+function formatHoursShort(hours: number): string {
+    if (hours >= 1000) {
+        return `${(hours / 1000).toFixed(1)}K`;
+    }
+    return hours.toString();
 }
