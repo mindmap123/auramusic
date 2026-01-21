@@ -1,103 +1,104 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Store, Music, Play, Pause, Volume2, Zap, RefreshCw, Users } from "lucide-react";
+import Link from "next/link";
+import {
+    Store,
+    Music,
+    Play,
+    Plus,
+    Calendar,
+    RefreshCw,
+    TrendingUp,
+    TrendingDown,
+    Clock,
+    Zap,
+    ChevronRight,
+    Volume2,
+} from "lucide-react";
 import { clsx } from "clsx";
 import styles from "./Dashboard.module.css";
 
 interface StoreStatus {
     id: string;
     name: string;
-    email: string;
-    isActive: boolean;
     isPlaying: boolean;
     isAutoMode: boolean;
     volume: number;
     city: string | null;
-    storeType: string | null;
-    lastPlayedAt: string | null;
-    group: {
-        id: string;
-        name: string;
-        color: string;
-    } | null;
-    style: {
-        id: string;
-        name: string;
-        icon: string | null;
-        coverUrl: string | null;
-    } | null;
+    group: { name: string; color: string } | null;
+    style: { id: string; name: string; icon: string | null; coverUrl: string | null } | null;
 }
 
-interface LiveData {
+interface PopularStyle {
+    id: string;
+    name: string;
+    coverUrl: string | null;
+    icon: string | null;
+    hours: number;
+}
+
+interface DashboardData {
     stats: {
-        totalStores: number;
         activeStores: number;
+        activeStoresDiff: number;
         playingNow: number;
+        todayHours: number;
+        hoursDiff: number;
         autoModeCount: number;
     };
     stores: {
         playing: StoreStatus[];
-        paused: StoreStatus[];
-        inactive: StoreStatus[];
     };
-    all: StoreStatus[];
+    popularStyles: PopularStyle[];
 }
 
+const quickActions = [
+    { label: "Ajouter magasin", icon: Store, href: "/admin/stores", color: "blue" },
+    { label: "Nouveau style", icon: Music, href: "/admin/tracks", color: "purple" },
+    { label: "Programmer", icon: Calendar, href: "/admin/scheduling", color: "green" },
+];
+
 export default function DashboardContent() {
-    const [liveData, setLiveData] = useState<LiveData | null>(null);
+    const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-    const fetchLiveData = async () => {
+    const fetchData = async () => {
         try {
             const res = await fetch("/api/admin/live");
-            if (!res.ok) {
-                console.error("Failed to fetch live data:", res.status);
-                return;
-            }
-            const data = await res.json();
-            // Vérifier que les données sont valides
-            if (data.stats && data.stores) {
-                setLiveData(data);
+            if (res.ok) {
+                const json = await res.json();
+                setData(json);
                 setLastUpdate(new Date());
-            } else {
-                console.error("Invalid live data format:", data);
             }
         } catch (error) {
-            console.error("Failed to fetch live data:", error);
+            console.error("Failed to fetch dashboard data:", error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchLiveData();
-        // Auto refresh every 30 seconds
-        const interval = setInterval(fetchLiveData, 30000);
+        fetchData();
+        const interval = setInterval(fetchData, 30000);
         return () => clearInterval(interval);
     }, []);
-
-    const formatTime = (dateString: string | null) => {
-        if (!dateString) return "Jamais";
-        const date = new Date(dateString);
-        return date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-    };
 
     if (loading) {
         return (
             <div className={styles.loadingContainer}>
                 <RefreshCw className={styles.spinner} size={32} />
-                <p>Chargement des données en direct...</p>
+                <p>Chargement du tableau de bord...</p>
             </div>
         );
     }
 
-    if (!liveData) {
+    if (!data) {
         return (
             <div className={styles.loadingContainer}>
                 <p>Impossible de charger les données.</p>
-                <button className={styles.refreshBtn} onClick={fetchLiveData}>
+                <button className={styles.refreshBtn} onClick={fetchData}>
                     <RefreshCw size={18} />
                     Réessayer
                 </button>
@@ -105,212 +106,192 @@ export default function DashboardContent() {
         );
     }
 
-    const { stats, stores } = liveData;
+    const { stats, stores, popularStyles } = data;
+
+    const renderDiff = (diff: number, suffix: string = "") => {
+        if (diff === 0) return null;
+        const isPositive = diff > 0;
+        return (
+            <span className={clsx(styles.diff, isPositive ? styles.positive : styles.negative)}>
+                {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {isPositive ? "+" : ""}{diff}{suffix}
+            </span>
+        );
+    };
 
     return (
         <div className={styles.dashboard}>
             {/* Header */}
             <div className={styles.header}>
                 <div>
-                    <h1 className={styles.title}>
-                        <span className={styles.liveDot} />
-                        Tableau de bord Live
-                    </h1>
+                    <h1 className={styles.title}>Tableau de Bord</h1>
                     <p className={styles.subtitle}>
-                        Dernière mise à jour: {lastUpdate.toLocaleTimeString("fr-FR")}
+                        Mis à jour à {lastUpdate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                     </p>
                 </div>
-                <button className={styles.refreshBtn} onClick={fetchLiveData}>
+                <button className={styles.refreshBtn} onClick={fetchData}>
                     <RefreshCw size={18} />
                     Actualiser
                 </button>
             </div>
 
-            {/* Stats Cards */}
-            <div className={styles.statsGrid}>
-                <div className={clsx(styles.statCard, styles.primary)}>
-                    <div className={styles.statIcon}>
-                        <Store size={24} />
+            {/* KPI Cards */}
+            <div className={styles.kpiGrid}>
+                <div className={styles.kpiCard}>
+                    <div className={clsx(styles.kpiIcon, styles.blue)}>
+                        <Store size={22} />
                     </div>
-                    <div className={styles.statInfo}>
-                        <span className={styles.statValue}>{stats.totalStores}</span>
-                        <span className={styles.statLabel}>Magasins total</span>
-                    </div>
-                </div>
-
-                <div className={clsx(styles.statCard, styles.success)}>
-                    <div className={styles.statIcon}>
-                        <Play size={24} />
-                    </div>
-                    <div className={styles.statInfo}>
-                        <span className={styles.statValue}>{stats.playingNow}</span>
-                        <span className={styles.statLabel}>En lecture</span>
+                    <div className={styles.kpiContent}>
+                        <span className={styles.kpiValue}>{stats.activeStores}</span>
+                        <span className={styles.kpiLabel}>Magasins Actifs</span>
+                        {renderDiff(stats.activeStoresDiff, " vs hier")}
                     </div>
                 </div>
 
-                <div className={clsx(styles.statCard, styles.warning)}>
-                    <div className={styles.statIcon}>
-                        <Pause size={24} />
+                <div className={styles.kpiCard}>
+                    <div className={clsx(styles.kpiIcon, styles.green)}>
+                        <Play size={22} />
                     </div>
-                    <div className={styles.statInfo}>
-                        <span className={styles.statValue}>{stats.activeStores - stats.playingNow}</span>
-                        <span className={styles.statLabel}>En pause</span>
+                    <div className={styles.kpiContent}>
+                        <span className={styles.kpiValue}>{stats.playingNow}</span>
+                        <span className={styles.kpiLabel}>En Lecture</span>
+                        <span className={styles.liveBadge}>
+                            <span className={styles.liveDot} />
+                            Live
+                        </span>
                     </div>
                 </div>
 
-                <div className={clsx(styles.statCard, styles.info)}>
-                    <div className={styles.statIcon}>
-                        <Zap size={24} />
+                <div className={styles.kpiCard}>
+                    <div className={clsx(styles.kpiIcon, styles.purple)}>
+                        <Clock size={22} />
                     </div>
-                    <div className={styles.statInfo}>
-                        <span className={styles.statValue}>{stats.autoModeCount}</span>
-                        <span className={styles.statLabel}>Mode Auto</span>
+                    <div className={styles.kpiContent}>
+                        <span className={styles.kpiValue}>{stats.todayHours}h</span>
+                        <span className={styles.kpiLabel}>Heures Streamées</span>
+                        {renderDiff(stats.hoursDiff, "h")}
+                    </div>
+                </div>
+
+                <div className={styles.kpiCard}>
+                    <div className={clsx(styles.kpiIcon, styles.orange)}>
+                        <Zap size={22} />
+                    </div>
+                    <div className={styles.kpiContent}>
+                        <span className={styles.kpiValue}>{stats.autoModeCount}</span>
+                        <span className={styles.kpiLabel}>Mode Auto</span>
                     </div>
                 </div>
             </div>
 
-            {/* Playing Now Section */}
-            <section className={styles.section}>
-                <div className={styles.sectionHeader}>
-                    <h2>
-                        <Play size={20} className={styles.sectionIcon} />
-                        En lecture maintenant ({stores.playing.length})
-                    </h2>
-                </div>
-
-                {stores.playing.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        <Music size={32} />
-                        <p>Aucun magasin n'est en lecture</p>
+            {/* Middle Section: Actions + Playing Now */}
+            <div className={styles.middleGrid}>
+                {/* Quick Actions */}
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>Actions Rapides</h2>
                     </div>
-                ) : (
-                    <div className={styles.playingGrid}>
-                        {stores.playing.map((store) => (
-                            <div key={store.id} className={styles.playingCard}>
-                                {/* Large cover with glow effect */}
-                                <div className={styles.coverSection}>
-                                    {store.style?.coverUrl ? (
-                                        <>
-                                            <div
-                                                className={styles.coverGlow}
-                                                style={{ backgroundImage: `url(${store.style.coverUrl})` }}
-                                            />
-                                            <img
-                                                src={store.style.coverUrl}
-                                                alt={store.style.name}
-                                                className={styles.coverLarge}
-                                            />
-                                        </>
-                                    ) : (
-                                        <div className={styles.coverLargePlaceholder}>
-                                            {store.style?.icon || <Music size={32} />}
-                                        </div>
-                                    )}
-                                    {/* Playing animation overlay */}
-                                    <div className={styles.playingOverlay}>
-                                        <span className={styles.playingBars}>
-                                            <span /><span /><span /><span />
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Store & Style info */}
-                                <div className={styles.cardContent}>
-                                    <div className={styles.styleNameLarge}>
-                                        {store.style?.name || "Aucun style"}
-                                    </div>
-                                    <div className={styles.storeNameSub}>
-                                        {store.name}
-                                        {store.city && <span> • {store.city}</span>}
-                                    </div>
-
-                                    <div className={styles.cardMeta}>
-                                        {store.group && (
-                                            <span
-                                                className={styles.groupBadge}
-                                                style={{ background: store.group.color }}
-                                            >
-                                                {store.group.name}
-                                            </span>
-                                        )}
-                                        <div className={styles.volumeInfo}>
-                                            <Volume2 size={14} />
-                                            <span>{store.volume}%</span>
-                                        </div>
-                                        {store.isAutoMode && (
-                                            <span className={styles.autoBadge}>
-                                                <Zap size={12} /> Auto
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                    <div className={styles.actionsGrid}>
+                        {quickActions.map((action) => (
+                            <Link
+                                key={action.label}
+                                href={action.href}
+                                className={clsx(styles.actionBtn, styles[action.color])}
+                            >
+                                <action.icon size={20} />
+                                <span>{action.label}</span>
+                            </Link>
                         ))}
                     </div>
-                )}
-            </section>
-
-            {/* Paused Section */}
-            <section className={styles.section}>
-                <div className={styles.sectionHeader}>
-                    <h2>
-                        <Pause size={20} className={styles.sectionIcon} />
-                        En pause ({stores.paused.length})
-                    </h2>
                 </div>
 
-                {stores.paused.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        <p>Aucun magasin en pause</p>
-                    </div>
-                ) : (
-                    <div className={styles.storeList}>
-                        {stores.paused.map((store) => (
-                            <div key={store.id} className={clsx(styles.storeRow, styles.paused)}>
-                                <div className={styles.storeRowInfo}>
-                                    <span className={styles.storeName}>{store.name}</span>
-                                    {store.group && (
-                                        <span
-                                            className={styles.groupBadge}
-                                            style={{ background: store.group.color }}
-                                        >
-                                            {store.group.name}
-                                        </span>
-                                    )}
-                                </div>
-                                <div className={styles.storeRowMeta}>
-                                    <span className={styles.lastPlayed}>
-                                        Dernière lecture: {formatTime(store.lastPlayedAt)}
-                                    </span>
-                                    <span className={styles.styleTag}>
-                                        {store.style?.icon} {store.style?.name || "—"}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </section>
-
-            {/* Inactive Section */}
-            {stores.inactive.length > 0 && (
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>
-                            <Store size={20} className={styles.sectionIcon} />
-                            Inactifs ({stores.inactive.length})
+                {/* Playing Now */}
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>
+                            <span className={styles.liveDot} />
+                            En Lecture
                         </h2>
+                        <Link href="/admin/stores" className={styles.viewAll}>
+                            Voir tout <ChevronRight size={16} />
+                        </Link>
                     </div>
+                    <div className={styles.playingList}>
+                        {stores.playing.length === 0 ? (
+                            <div className={styles.emptyState}>
+                                <Music size={24} />
+                                <p>Aucun magasin en lecture</p>
+                            </div>
+                        ) : (
+                            stores.playing.map((store) => (
+                                <div key={store.id} className={styles.playingItem}>
+                                    <div className={styles.playingCover}>
+                                        {store.style?.coverUrl ? (
+                                            <img src={store.style.coverUrl} alt="" />
+                                        ) : (
+                                            <div className={styles.coverPlaceholder}>
+                                                {store.style?.icon || <Music size={16} />}
+                                            </div>
+                                        )}
+                                        <span className={styles.playingBars}>
+                                            <span /><span /><span />
+                                        </span>
+                                    </div>
+                                    <div className={styles.playingInfo}>
+                                        <span className={styles.playingStyle}>
+                                            {store.style?.name || "—"}
+                                        </span>
+                                        <span className={styles.playingStore}>
+                                            {store.name}
+                                            {store.city && <span> • {store.city}</span>}
+                                        </span>
+                                    </div>
+                                    <div className={styles.playingMeta}>
+                                        <Volume2 size={14} />
+                                        <span>{store.volume}%</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
 
-                    <div className={styles.inactiveList}>
-                        {stores.inactive.map((store) => (
-                            <span key={store.id} className={styles.inactiveTag}>
-                                {store.name}
-                            </span>
-                        ))}
-                    </div>
-                </section>
-            )}
+            {/* Popular Styles */}
+            <div className={styles.card}>
+                <div className={styles.cardHeader}>
+                    <h2 className={styles.cardTitle}>Styles Populaires</h2>
+                    <Link href="/admin/tracks" className={styles.viewAll}>
+                        Voir tout <ChevronRight size={16} />
+                    </Link>
+                </div>
+                <div className={styles.stylesGrid}>
+                    {popularStyles.length === 0 ? (
+                        <div className={styles.emptyState}>
+                            <Music size={24} />
+                            <p>Aucune donnée cette semaine</p>
+                        </div>
+                    ) : (
+                        popularStyles.map((style) => (
+                            <div key={style.id} className={styles.styleCard}>
+                                <div className={styles.styleCover}>
+                                    {style.coverUrl ? (
+                                        <img src={style.coverUrl} alt={style.name} />
+                                    ) : (
+                                        <div className={styles.stylePlaceholder}>
+                                            {style.icon || <Music size={24} />}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className={styles.styleInfo}>
+                                    <span className={styles.styleName}>{style.name}</span>
+                                    <span className={styles.styleHours}>{style.hours}h cette semaine</span>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
         </div>
     );
 }
