@@ -112,6 +112,19 @@
     background: var(--bg-base);
     display: none;
     flex-direction: column;
+    /* GPU acceleration for smooth drag */
+    will-change: transform, opacity;
+    transform: translateY(100%);
+    opacity: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    touch-action: pan-y;
+}
+
+.expandedPlayer.open {
+    transform: translateY(0);
+    opacity: 1;
 }
 
 .expandedBg {

@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Play, Pause, ChevronUp, ChevronDown, SkipBack, SkipForward, Volume2, Volume1, VolumeX } from "lucide-react";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/react/shallow";
-import { motion, AnimatePresence } from "framer-motion";
+import { clsx } from "clsx";
 import VinylCover from "@/components/Player/VinylCover";
 import styles from "./MobilePlayer.module.css";
 
@@ -22,12 +22,26 @@ interface MobilePlayerProps {
     onNavigateToStyles?: () => void;
 }
 
+// Velocity tracking for momentum-based dismiss
+const VELOCITY_THRESHOLD = 0.5; // px/ms - dismiss if swiping fast enough
+const DISTANCE_THRESHOLD = 150; // px - dismiss if dragged far enough
+
 export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateToStyles }: MobilePlayerProps) {
     const [expanded, setExpanded] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragY, setDragY] = useState(0);
+    const [isVolumeDragging, setIsVolumeDragging] = useState(false);
+
+    // Refs for performant drag tracking (no re-renders during drag)
+    const expandedRef = useRef<HTMLDivElement>(null);
     const volumeRef = useRef<HTMLDivElement>(null);
-    const dragStartY = useRef(0);
+    const dragState = useRef({
+        isDragging: false,
+        startY: 0,
+        currentY: 0,
+        startTime: 0,
+        lastY: 0,
+        lastTime: 0,
+        velocity: 0,
+    });
 
     const {
         isPlaying,
@@ -45,6 +59,7 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
         setVolume: state.setVolume,
     })));
 
+    // Volume control handlers
     const handleVolumeChange = useCallback((newVolume: number) => {
         const clamped = Math.max(0, Math.min(1, newVolume));
         setVolume(clamped);
@@ -58,61 +73,127 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
         handleVolumeChange(x / rect.width);
     }, [handleVolumeChange]);
 
-    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const handleVolumeTouchStart = useCallback((e: React.TouchEvent) => {
         e.stopPropagation();
-        setIsDragging(true);
+        setIsVolumeDragging(true);
         setVolumeByTouch(e.touches[0].clientX);
     }, [setVolumeByTouch]);
 
     useEffect(() => {
-        if (!isDragging) return;
+        if (!isVolumeDragging) return;
         const handleTouchMove = (e: TouchEvent) => setVolumeByTouch(e.touches[0].clientX);
-        const handleEnd = () => setIsDragging(false);
+        const handleEnd = () => setIsVolumeDragging(false);
         document.addEventListener('touchmove', handleTouchMove);
         document.addEventListener('touchend', handleEnd);
         return () => {
             document.removeEventListener('touchmove', handleTouchMove);
             document.removeEventListener('touchend', handleEnd);
         };
-    }, [isDragging, setVolumeByTouch]);
+    }, [isVolumeDragging, setVolumeByTouch]);
 
     const VolumeIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
-    const handleBarClick = () => {
-        setExpanded(true);
-    };
+    // Optimized swipe handlers using refs for performance
+    const updateTransform = useCallback((y: number, animate: boolean) => {
+        if (!expandedRef.current) return;
+        const el = expandedRef.current;
+        el.style.transition = animate ? 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease' : 'none';
+        el.style.transform = `translateY(${y}px)`;
+        el.style.opacity = String(1 - (y / 500));
+    }, []);
 
-    const handleClose = () => {
-        setExpanded(false);
-        setDragY(0);
-    };
-
-    // Swipe down to close handlers
     const handleSwipeStart = useCallback((e: React.TouchEvent) => {
-        dragStartY.current = e.touches[0].clientY;
+        const touch = e.touches[0];
+        const now = Date.now();
+        dragState.current = {
+            isDragging: true,
+            startY: touch.clientY,
+            currentY: touch.clientY,
+            startTime: now,
+            lastY: touch.clientY,
+            lastTime: now,
+            velocity: 0,
+        };
     }, []);
 
     const handleSwipeMove = useCallback((e: React.TouchEvent) => {
-        const currentY = e.touches[0].clientY;
-        const diff = currentY - dragStartY.current;
-        if (diff > 0) {
-            setDragY(diff);
+        const state = dragState.current;
+        if (!state.isDragging) return;
+
+        const touch = e.touches[0];
+        const now = Date.now();
+        const deltaTime = now - state.lastTime;
+
+        // Calculate velocity (px/ms)
+        if (deltaTime > 0) {
+            state.velocity = (touch.clientY - state.lastY) / deltaTime;
         }
-    }, []);
+
+        state.currentY = touch.clientY;
+        state.lastY = touch.clientY;
+        state.lastTime = now;
+
+        // Only allow downward drag
+        const dragDistance = Math.max(0, state.currentY - state.startY);
+
+        // Direct DOM manipulation for smooth 60fps
+        requestAnimationFrame(() => {
+            updateTransform(dragDistance, false);
+        });
+    }, [updateTransform]);
 
     const handleSwipeEnd = useCallback(() => {
-        if (dragY > 100) {
-            handleClose();
+        const state = dragState.current;
+        if (!state.isDragging) return;
+
+        state.isDragging = false;
+        const dragDistance = Math.max(0, state.currentY - state.startY);
+
+        // Dismiss if: dragged far enough OR swiping fast enough downward
+        const shouldDismiss = dragDistance > DISTANCE_THRESHOLD || state.velocity > VELOCITY_THRESHOLD;
+
+        if (shouldDismiss) {
+            // Animate to fully closed
+            requestAnimationFrame(() => {
+                updateTransform(window.innerHeight, true);
+            });
+            // Update React state after animation
+            setTimeout(() => setExpanded(false), 300);
         } else {
-            setDragY(0);
+            // Snap back to open position
+            requestAnimationFrame(() => {
+                updateTransform(0, true);
+            });
         }
-    }, [dragY]);
+    }, [updateTransform]);
+
+    // Reset transform when expanded state changes
+    useEffect(() => {
+        if (!expandedRef.current) return;
+        if (expanded) {
+            expandedRef.current.style.transform = 'translateY(0)';
+            expandedRef.current.style.opacity = '1';
+        } else {
+            expandedRef.current.style.transform = 'translateY(100%)';
+            expandedRef.current.style.opacity = '0';
+        }
+    }, [expanded]);
+
+    const handleBarClick = useCallback(() => {
+        setExpanded(true);
+    }, []);
+
+    const handleClose = useCallback(() => {
+        requestAnimationFrame(() => {
+            updateTransform(window.innerHeight, true);
+        });
+        setTimeout(() => setExpanded(false), 300);
+    }, [updateTransform]);
 
     return (
         <>
             {/* Mini Player Bar */}
             <div className={styles.miniPlayer} onClick={handleBarClick}>
-                {/* Vinyl Cover */}
                 <VinylCover
                     coverUrl={currentStyle?.coverUrl}
                     isPlaying={isPlaying}
@@ -120,7 +201,6 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
                     className={styles.miniVinyl}
                 />
 
-                {/* Info */}
                 <div className={styles.miniInfo}>
                     <span className={styles.miniTitle}>
                         {currentStyle?.name || "Aucune ambiance"}
@@ -130,10 +210,8 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
                     </span>
                 </div>
 
-                {/* Navigate hint */}
                 <ChevronUp size={18} className={styles.navHint} />
 
-                {/* Play/Pause Button */}
                 <button
                     className={styles.miniPlayBtn}
                     onClick={(e) => {
@@ -151,131 +229,118 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
             </div>
 
             {/* Expanded Full Screen Player */}
-            <AnimatePresence>
-                {expanded && (
-                    <motion.div
-                        className={styles.expandedPlayer}
-                        initial={{ y: "100%" }}
-                        animate={{ y: dragY }}
-                        exit={{ y: "100%" }}
-                        transition={dragY === 0 ? { type: "spring", damping: 30, stiffness: 300 } : { duration: 0 }}
-                        onTouchStart={handleSwipeStart}
-                        onTouchMove={handleSwipeMove}
-                        onTouchEnd={handleSwipeEnd}
-                        style={{ opacity: 1 - (dragY / 400) }}
-                    >
-                        {/* Background gradient based on cover */}
-                        <div
-                            className={styles.expandedBg}
-                            style={{
-                                backgroundImage: currentStyle?.coverUrl
-                                    ? `url(${currentStyle.coverUrl})`
-                                    : undefined,
-                            }}
+            <div
+                ref={expandedRef}
+                className={clsx(styles.expandedPlayer, expanded && styles.open)}
+                onTouchStart={handleSwipeStart}
+                onTouchMove={handleSwipeMove}
+                onTouchEnd={handleSwipeEnd}
+            >
+                {/* Background */}
+                <div
+                    className={styles.expandedBg}
+                    style={{
+                        backgroundImage: currentStyle?.coverUrl
+                            ? `url(${currentStyle.coverUrl})`
+                            : undefined,
+                    }}
+                />
+
+                {/* Drag handle */}
+                <div className={styles.dragHandle}>
+                    <div className={styles.dragBar} />
+                </div>
+
+                {/* Close button */}
+                <button className={styles.closeBtn} onClick={handleClose}>
+                    <ChevronDown size={28} />
+                </button>
+
+                {/* Content */}
+                <div className={styles.expandedContent}>
+                    <div className={styles.vinylWrapper}>
+                        <VinylCover
+                            coverUrl={currentStyle?.coverUrl}
+                            isPlaying={isPlaying}
+                            size="lg"
                         />
+                    </div>
 
-                        {/* Drag handle */}
-                        <div className={styles.dragHandle}>
-                            <div className={styles.dragBar} />
-                        </div>
+                    <div className={styles.expandedInfo}>
+                        <h2 className={styles.expandedTitle}>
+                            {currentStyle?.name || "Aucune ambiance"}
+                        </h2>
+                        <p className={styles.expandedSubtitle}>
+                            {currentStyle?.description || "Sélectionnez un style"}
+                        </p>
+                    </div>
 
-                        {/* Close button */}
-                        <button className={styles.closeBtn} onClick={handleClose}>
-                            <ChevronDown size={28} />
+                    <div className={styles.expandedControls}>
+                        <button
+                            className={styles.controlBtn}
+                            onClick={() => seekRelative(-30)}
+                            disabled={!mixUrl}
+                        >
+                            <SkipBack size={28} />
                         </button>
 
-                        {/* Content */}
-                        <div className={styles.expandedContent}>
-                            {/* Vinyl */}
-                            <div className={styles.vinylWrapper}>
-                                <VinylCover
-                                    coverUrl={currentStyle?.coverUrl}
-                                    isPlaying={isPlaying}
-                                    size="lg"
-                                />
-                            </div>
-
-                            {/* Track Info */}
-                            <div className={styles.expandedInfo}>
-                                <h2 className={styles.expandedTitle}>
-                                    {currentStyle?.name || "Aucune ambiance"}
-                                </h2>
-                                <p className={styles.expandedSubtitle}>
-                                    {currentStyle?.description || "Sélectionnez un style"}
-                                </p>
-                            </div>
-
-                            {/* Controls */}
-                            <div className={styles.expandedControls}>
-                                <button
-                                    className={styles.controlBtn}
-                                    onClick={() => seekRelative(-30)}
-                                    disabled={!mixUrl}
-                                >
-                                    <SkipBack size={28} />
-                                </button>
-
-                                <button
-                                    className={styles.playBtnLarge}
-                                    onClick={togglePlay}
-                                    disabled={!mixUrl}
-                                >
-                                    {isPlaying ? (
-                                        <Pause size={32} fill="currentColor" />
-                                    ) : (
-                                        <Play size={32} fill="currentColor" style={{ marginLeft: 4 }} />
-                                    )}
-                                </button>
-
-                                <button
-                                    className={styles.controlBtn}
-                                    onClick={() => seekRelative(30)}
-                                    disabled={!mixUrl}
-                                >
-                                    <SkipForward size={28} />
-                                </button>
-                            </div>
-
-                            {/* Volume Control */}
-                            <div className={styles.volumeSection}>
-                                <button
-                                    className={styles.volumeBtn}
-                                    onClick={(e) => { e.stopPropagation(); setVolume(volume > 0 ? 0 : 0.7); }}
-                                >
-                                    <VolumeIcon size={22} />
-                                </button>
-                                <div
-                                    ref={volumeRef}
-                                    className={styles.volumeTrack}
-                                    onTouchStart={handleTouchStart}
-                                >
-                                    <div
-                                        className={styles.volumeFill}
-                                        style={{ width: `${volume * 100}%` }}
-                                    />
-                                    <div
-                                        className={styles.volumeThumb}
-                                        style={{ left: `${volume * 100}%` }}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Browse styles button */}
-                            {onNavigateToStyles && (
-                                <button
-                                    className={styles.browseBtn}
-                                    onClick={() => {
-                                        handleClose();
-                                        onNavigateToStyles();
-                                    }}
-                                >
-                                    Parcourir les styles
-                                </button>
+                        <button
+                            className={styles.playBtnLarge}
+                            onClick={togglePlay}
+                            disabled={!mixUrl}
+                        >
+                            {isPlaying ? (
+                                <Pause size={32} fill="currentColor" />
+                            ) : (
+                                <Play size={32} fill="currentColor" style={{ marginLeft: 4 }} />
                             )}
+                        </button>
+
+                        <button
+                            className={styles.controlBtn}
+                            onClick={() => seekRelative(30)}
+                            disabled={!mixUrl}
+                        >
+                            <SkipForward size={28} />
+                        </button>
+                    </div>
+
+                    <div className={styles.volumeSection}>
+                        <button
+                            className={styles.volumeBtn}
+                            onClick={(e) => { e.stopPropagation(); setVolume(volume > 0 ? 0 : 0.7); }}
+                        >
+                            <VolumeIcon size={22} />
+                        </button>
+                        <div
+                            ref={volumeRef}
+                            className={styles.volumeTrack}
+                            onTouchStart={handleVolumeTouchStart}
+                        >
+                            <div
+                                className={styles.volumeFill}
+                                style={{ width: `${volume * 100}%` }}
+                            />
+                            <div
+                                className={styles.volumeThumb}
+                                style={{ left: `${volume * 100}%` }}
+                            />
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    </div>
+
+                    {onNavigateToStyles && (
+                        <button
+                            className={styles.browseBtn}
+                            onClick={() => {
+                                handleClose();
+                                onNavigateToStyles();
+                            }}
+                        >
+                            Parcourir les styles
+                        </button>
+                    )}
+                </div>
+            </div>
         </>
     );
 }
