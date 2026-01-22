@@ -22,26 +22,76 @@ interface MobilePlayerProps {
     onNavigateToStyles?: () => void;
 }
 
-// Velocity tracking for momentum-based dismiss
-const VELOCITY_THRESHOLD = 0.5; // px/ms - dismiss if swiping fast enough
-const DISTANCE_THRESHOLD = 150; // px - dismiss if dragged far enough
+// iOS-style pull-to-dismiss hook
+function usePullToDismiss(onDismiss: () => void) {
+    const [dragY, setDragY] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const startY = useRef(0);
+    const startTime = useRef(0);
+    const lastY = useRef(0);
+    const velocity = useRef(0);
+
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        startY.current = e.touches[0].clientY;
+        lastY.current = e.touches[0].clientY;
+        startTime.current = Date.now();
+        setIsDragging(true);
+    }, []);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        if (!isDragging) return;
+
+        const currentY = e.touches[0].clientY;
+        const delta = Math.max(0, currentY - startY.current);
+
+        // Calculate velocity in px/s
+        const now = Date.now();
+        const dt = now - startTime.current;
+        if (dt > 0) {
+            velocity.current = ((currentY - lastY.current) / dt) * 1000;
+        }
+        lastY.current = currentY;
+        startTime.current = now;
+
+        // Elastic resistance after 100px (iOS-style rubber banding)
+        const dampedDelta = delta > 100
+            ? 100 + (delta - 100) * 0.4
+            : delta;
+
+        setDragY(dampedDelta);
+    }, [isDragging]);
+
+    const handleTouchEnd = useCallback(() => {
+        setIsDragging(false);
+
+        const screenHeight = window.innerHeight;
+        const threshold = screenHeight * 0.3; // 30% like iOS
+        const velocityThreshold = 500; // px/s
+
+        // Dismiss if dragged past threshold OR fast enough swipe
+        if (dragY > threshold || velocity.current > velocityThreshold) {
+            onDismiss();
+        }
+
+        setDragY(0);
+        velocity.current = 0;
+    }, [dragY, onDismiss]);
+
+    return {
+        dragY,
+        isDragging,
+        handlers: {
+            onTouchStart: handleTouchStart,
+            onTouchMove: handleTouchMove,
+            onTouchEnd: handleTouchEnd,
+        },
+    };
+}
 
 export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateToStyles }: MobilePlayerProps) {
     const [expanded, setExpanded] = useState(false);
     const [isVolumeDragging, setIsVolumeDragging] = useState(false);
-
-    // Refs for performant drag tracking (no re-renders during drag)
-    const expandedRef = useRef<HTMLDivElement>(null);
     const volumeRef = useRef<HTMLDivElement>(null);
-    const dragState = useRef({
-        isDragging: false,
-        startY: 0,
-        currentY: 0,
-        startTime: 0,
-        lastY: 0,
-        lastTime: 0,
-        velocity: 0,
-    });
 
     const {
         isPlaying,
@@ -93,102 +143,20 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
 
     const VolumeIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
-    // Optimized swipe handlers using refs for performance
-    const updateTransform = useCallback((y: number, animate: boolean) => {
-        if (!expandedRef.current) return;
-        const el = expandedRef.current;
-        el.style.transition = animate ? 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease' : 'none';
-        el.style.transform = `translateY(${y}px)`;
-        el.style.opacity = String(1 - (y / 500));
+    // Pull-to-dismiss hook
+    const handleDismiss = useCallback(() => {
+        setExpanded(false);
     }, []);
 
-    const handleSwipeStart = useCallback((e: React.TouchEvent) => {
-        const touch = e.touches[0];
-        const now = Date.now();
-        dragState.current = {
-            isDragging: true,
-            startY: touch.clientY,
-            currentY: touch.clientY,
-            startTime: now,
-            lastY: touch.clientY,
-            lastTime: now,
-            velocity: 0,
-        };
-    }, []);
-
-    const handleSwipeMove = useCallback((e: React.TouchEvent) => {
-        const state = dragState.current;
-        if (!state.isDragging) return;
-
-        const touch = e.touches[0];
-        const now = Date.now();
-        const deltaTime = now - state.lastTime;
-
-        // Calculate velocity (px/ms)
-        if (deltaTime > 0) {
-            state.velocity = (touch.clientY - state.lastY) / deltaTime;
-        }
-
-        state.currentY = touch.clientY;
-        state.lastY = touch.clientY;
-        state.lastTime = now;
-
-        // Only allow downward drag
-        const dragDistance = Math.max(0, state.currentY - state.startY);
-
-        // Direct DOM manipulation for smooth 60fps
-        requestAnimationFrame(() => {
-            updateTransform(dragDistance, false);
-        });
-    }, [updateTransform]);
-
-    const handleSwipeEnd = useCallback(() => {
-        const state = dragState.current;
-        if (!state.isDragging) return;
-
-        state.isDragging = false;
-        const dragDistance = Math.max(0, state.currentY - state.startY);
-
-        // Dismiss if: dragged far enough OR swiping fast enough downward
-        const shouldDismiss = dragDistance > DISTANCE_THRESHOLD || state.velocity > VELOCITY_THRESHOLD;
-
-        if (shouldDismiss) {
-            // Animate to fully closed
-            requestAnimationFrame(() => {
-                updateTransform(window.innerHeight, true);
-            });
-            // Update React state after animation
-            setTimeout(() => setExpanded(false), 300);
-        } else {
-            // Snap back to open position
-            requestAnimationFrame(() => {
-                updateTransform(0, true);
-            });
-        }
-    }, [updateTransform]);
-
-    // Reset transform when expanded state changes
-    useEffect(() => {
-        if (!expandedRef.current) return;
-        if (expanded) {
-            expandedRef.current.style.transform = 'translateY(0)';
-            expandedRef.current.style.opacity = '1';
-        } else {
-            expandedRef.current.style.transform = 'translateY(100%)';
-            expandedRef.current.style.opacity = '0';
-        }
-    }, [expanded]);
+    const { dragY, isDragging, handlers } = usePullToDismiss(handleDismiss);
 
     const handleBarClick = useCallback(() => {
         setExpanded(true);
     }, []);
 
     const handleClose = useCallback(() => {
-        requestAnimationFrame(() => {
-            updateTransform(window.innerHeight, true);
-        });
-        setTimeout(() => setExpanded(false), 300);
-    }, [updateTransform]);
+        setExpanded(false);
+    }, []);
 
     return (
         <>
@@ -230,11 +198,13 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
 
             {/* Expanded Full Screen Player */}
             <div
-                ref={expandedRef}
                 className={clsx(styles.expandedPlayer, expanded && styles.open)}
-                onTouchStart={handleSwipeStart}
-                onTouchMove={handleSwipeMove}
-                onTouchEnd={handleSwipeEnd}
+                {...handlers}
+                style={{
+                    transform: expanded ? `translateY(${dragY}px)` : 'translateY(100%)',
+                    transition: isDragging ? 'none' : 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.35s ease',
+                    opacity: expanded ? Math.max(0, 1 - (dragY / 400)) : 0,
+                }}
             >
                 {/* Background */}
                 <div
