@@ -112,6 +112,10 @@ function usePullToDismiss(onDismiss: () => void) {
                 if (progress < 1) {
                     animationFrame.current = requestAnimationFrame(animate);
                 } else {
+                    // Complete cleanup after dismiss animation
+                    setDragY(0);
+                    setIsDragging(false);
+                    velocity.current = 0;
                     onDismiss();
                 }
             };
@@ -139,6 +143,7 @@ function usePullToDismiss(onDismiss: () => void) {
                     animationFrame.current = requestAnimationFrame(animate);
                 } else {
                     setDragY(0);
+                    setIsDragging(false);
                 }
             };
             
@@ -148,12 +153,17 @@ function usePullToDismiss(onDismiss: () => void) {
         velocity.current = 0;
     }, [dragY, onDismiss]);
 
-    // Cleanup animation frame on unmount
+    // Cleanup animation frame on unmount and ensure body styles are restored
     useEffect(() => {
         return () => {
             if (animationFrame.current) {
                 cancelAnimationFrame(animationFrame.current);
             }
+            // Force cleanup of body styles on unmount
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.overscrollBehavior = '';
         };
     }, []);
 
@@ -233,6 +243,12 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
     // Prevent body scroll and pull-to-refresh when player is expanded
     useEffect(() => {
         if (expanded) {
+            // Store original body styles to restore them later
+            const originalOverflow = document.body.style.overflow;
+            const originalPosition = document.body.style.position;
+            const originalWidth = document.body.style.width;
+            const originalOverscrollBehavior = document.body.style.overscrollBehavior;
+            
             // Disable body scroll and pull-to-refresh
             document.body.style.overflow = 'hidden';
             document.body.style.position = 'fixed';
@@ -252,11 +268,11 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
             document.addEventListener('touchmove', preventTouch, { passive: false });
             
             return () => {
-                // Restore body scroll
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.width = '';
-                document.body.style.overscrollBehavior = '';
+                // Restore original body styles
+                document.body.style.overflow = originalOverflow;
+                document.body.style.position = originalPosition;
+                document.body.style.width = originalWidth;
+                document.body.style.overscrollBehavior = originalOverscrollBehavior;
                 document.removeEventListener('touchmove', preventTouch);
             };
         }
