@@ -30,7 +30,7 @@ function usePullToDismiss(onDismiss: () => void) {
     const startTime = useRef(0);
     const lastY = useRef(0);
     const velocity = useRef(0);
-    const animationFrame = useRef<number>();
+    const animationFrame = useRef<number | undefined>(undefined);
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
         // Prevent browser pull-to-refresh
