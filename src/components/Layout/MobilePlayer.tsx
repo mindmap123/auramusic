@@ -22,7 +22,7 @@ interface MobilePlayerProps {
     onNavigateToStyles?: () => void;
 }
 
-// iOS-style pull-to-dismiss hook
+// Enhanced iOS-style pull-to-dismiss hook with Spotify-like UX
 function usePullToDismiss(onDismiss: () => void) {
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -30,21 +30,35 @@ function usePullToDismiss(onDismiss: () => void) {
     const startTime = useRef(0);
     const lastY = useRef(0);
     const velocity = useRef(0);
+    const animationFrame = useRef<number>();
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        // Prevent browser pull-to-refresh
+        e.preventDefault();
+        
         startY.current = e.touches[0].clientY;
         lastY.current = e.touches[0].clientY;
         startTime.current = Date.now();
+        velocity.current = 0;
         setIsDragging(true);
+        
+        // Cancel any ongoing animation
+        if (animationFrame.current) {
+            cancelAnimationFrame(animationFrame.current);
+        }
     }, []);
 
     const handleTouchMove = useCallback((e: React.TouchEvent) => {
         if (!isDragging) return;
 
-        const currentY = e.touches[0].clientY;
-        const delta = Math.max(0, currentY - startY.current);
+        // Prevent browser pull-to-refresh and scrolling
+        e.preventDefault();
+        e.stopPropagation();
 
-        // Calculate velocity in px/s
+        const currentY = e.touches[0].clientY;
+        const rawDelta = Math.max(0, currentY - startY.current);
+
+        // Calculate velocity (px/ms then convert to px/s)
         const now = Date.now();
         const dt = now - startTime.current;
         if (dt > 0) {
@@ -53,10 +67,17 @@ function usePullToDismiss(onDismiss: () => void) {
         lastY.current = currentY;
         startTime.current = now;
 
-        // Elastic resistance after 100px (iOS-style rubber banding)
-        const dampedDelta = delta > 100
-            ? 100 + (delta - 100) * 0.4
-            : delta;
+        // Spotify-like friction curve
+        let dampedDelta;
+        if (rawDelta <= 120) {
+            // 1:1 tracking for first 120px
+            dampedDelta = rawDelta;
+        } else {
+            // Progressive friction after 120px
+            const excess = rawDelta - 120;
+            const friction = Math.max(0.1, 1 - (excess / 300)); // Friction decreases with distance
+            dampedDelta = 120 + (excess * friction);
+        }
 
         setDragY(dampedDelta);
     }, [isDragging]);
@@ -65,17 +86,76 @@ function usePullToDismiss(onDismiss: () => void) {
         setIsDragging(false);
 
         const screenHeight = window.innerHeight;
-        const threshold = screenHeight * 0.3; // 30% like iOS
-        const velocityThreshold = 500; // px/s
+        const distanceThreshold = screenHeight * 0.25; // 25% of screen height
+        const velocityThreshold = 800; // px/s for "flick" gesture
 
-        // Dismiss if dragged past threshold OR fast enough swipe
-        if (dragY > threshold || velocity.current > velocityThreshold) {
-            onDismiss();
+        // Dismiss conditions: distance OR velocity (flick)
+        const shouldDismiss = dragY > distanceThreshold || velocity.current > velocityThreshold;
+
+        if (shouldDismiss) {
+            // Animate out with timing
+            const startDragY = dragY;
+            const targetY = screenHeight;
+            const duration = 300;
+            const startTime = Date.now();
+
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease-out cubic for smooth exit
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentY = startDragY + (targetY - startDragY) * easeOut;
+                
+                setDragY(currentY);
+                
+                if (progress < 1) {
+                    animationFrame.current = requestAnimationFrame(animate);
+                } else {
+                    onDismiss();
+                }
+            };
+            
+            animate();
+        } else {
+            // Spring back to 0 with elastic animation
+            const startDragY = dragY;
+            const duration = 400;
+            const startTime = Date.now();
+
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Spring-like easing (elastic back)
+                const spring = progress < 0.5 
+                    ? 2 * progress * progress 
+                    : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                
+                const currentY = startDragY * (1 - spring);
+                setDragY(currentY);
+                
+                if (progress < 1) {
+                    animationFrame.current = requestAnimationFrame(animate);
+                } else {
+                    setDragY(0);
+                }
+            };
+            
+            animate();
         }
 
-        setDragY(0);
         velocity.current = 0;
     }, [dragY, onDismiss]);
+
+    // Cleanup animation frame on unmount
+    useEffect(() => {
+        return () => {
+            if (animationFrame.current) {
+                cancelAnimationFrame(animationFrame.current);
+            }
+        };
+    }, []);
 
     return {
         dragY,
@@ -150,6 +230,38 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
 
     const { dragY, isDragging, handlers } = usePullToDismiss(handleDismiss);
 
+    // Prevent body scroll and pull-to-refresh when player is expanded
+    useEffect(() => {
+        if (expanded) {
+            // Disable body scroll and pull-to-refresh
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.overscrollBehavior = 'none';
+            
+            // Prevent default touch behaviors on the entire document
+            const preventTouch = (e: TouchEvent) => {
+                if (e.touches.length > 1) return; // Allow pinch zoom
+                // Only prevent if we're not interacting with volume control
+                const target = e.target as Element;
+                if (!target.closest(`.${styles.volumeTrack}`)) {
+                    e.preventDefault();
+                }
+            };
+            
+            document.addEventListener('touchmove', preventTouch, { passive: false });
+            
+            return () => {
+                // Restore body scroll
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.width = '';
+                document.body.style.overscrollBehavior = '';
+                document.removeEventListener('touchmove', preventTouch);
+            };
+        }
+    }, [expanded]);
+
     const handleBarClick = useCallback(() => {
         setExpanded(true);
     }, []);
@@ -201,9 +313,12 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
                 className={clsx(styles.expandedPlayer, expanded && styles.open)}
                 {...handlers}
                 style={{
-                    transform: expanded ? `translateY(${dragY}px)` : 'translateY(100%)',
+                    transform: expanded 
+                        ? `translateY(${dragY}px) scale(${Math.max(0.97, 1 - (dragY / 2000))})` 
+                        : 'translateY(100%)',
                     transition: isDragging ? 'none' : 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.35s ease',
-                    opacity: expanded ? Math.max(0, 1 - (dragY / 400)) : 0,
+                    opacity: expanded ? Math.max(0.1, 1 - (dragY / 600)) : 0,
+                    borderRadius: expanded ? `${Math.min(24, dragY / 8)}px ${Math.min(24, dragY / 8)}px 0 0` : '0px',
                 }}
             >
                 {/* Background */}
@@ -213,6 +328,8 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
                         backgroundImage: currentStyle?.coverUrl
                             ? `url(${currentStyle.coverUrl})`
                             : undefined,
+                        opacity: Math.max(0.05, 0.15 - (dragY / 1000)), // Background fades as we drag
+                        transform: `scale(${Math.max(0.95, 1 - (dragY / 3000))})`, // Subtle scale effect
                     }}
                 />
 

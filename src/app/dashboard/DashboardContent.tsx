@@ -139,8 +139,14 @@ export default function DashboardContent() {
             style,
             currentStyleId: style.id,
         }));
+        
+        // Initialize player and start playing
         initPlayer(style.mixUrl, 0, volume);
-        togglePlay();
+        
+        // Small delay to ensure player is ready before toggling play
+        setTimeout(() => {
+            togglePlay();
+        }, 100);
 
         fetch("/api/store/save-position", {
             method: "POST",
