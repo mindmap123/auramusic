@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Zap, Heart } from "lucide-react";
 import { clsx } from "clsx";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -10,6 +10,8 @@ import { useShallow } from "zustand/react/shallow";
 import { initAudioContext } from "@/lib/audioManager";
 import { AppLayout, Sidebar, PlayerBar, MobilePlayer, MobileNav } from "@/components/Layout";
 import StyleGrid from "@/components/Player/StyleGrid";
+import { useGreeting } from "@/hooks/useGreeting";
+import Image from "next/image";
 import styles from "./Dashboard.module.css";
 
 interface Style {
@@ -31,13 +33,13 @@ export default function DashboardContent() {
     const [currentView, setCurrentView] = useState<"home" | "styles" | "favorites" | "settings">("home");
     const [favorites, setFavorites] = useState<string[]>([]);
     const contentRef = useRef<HTMLDivElement>(null);
+    const { greeting, currentTime } = useGreeting();
 
     const {
         isPlaying,
         togglePlay,
         initPlayer,
         volume,
-        setVolume,
         currentStyleId,
         setStyle,
         isAutoMode,
@@ -48,7 +50,6 @@ export default function DashboardContent() {
         togglePlay: state.togglePlay,
         initPlayer: state.initPlayer,
         volume: state.volume,
-        setVolume: state.setVolume,
         currentStyleId: state.currentStyleId,
         setStyle: state.setStyle,
         isAutoMode: state.isAutoMode,
@@ -80,7 +81,9 @@ export default function DashboardContent() {
                         );
                         const posData = await posRes.json();
                         currentPosition = posData.position || 0;
-                    } catch (e) { }
+                    } catch {
+                        // Ignore error
+                    }
                 }
                 setStore({ ...storeData, currentPosition });
             })
@@ -109,10 +112,10 @@ export default function DashboardContent() {
         if (store.isAutoMode) {
             setAutoMode(true);
         }
-    }, [store?.id]);
+    }, [store?.id, store?.style?.mixUrl, store?.currentStyleId, store?.currentPosition, store?.volume, store?.isAutoMode, setStyle, initPlayer, setAutoMode]);
 
     // Activity logging
-    const logActivity = async (action: string, details?: any) => {
+    const logActivity = useCallback(async (action: string, details?: any) => {
         try {
             await fetch("/api/store/activity", {
                 method: "POST",
@@ -122,66 +125,10 @@ export default function DashboardContent() {
         } catch (err) {
             console.error("[Activity Log] Error:", err);
         }
-    };
-
-    // Activity logging
-    useEffect(() => {
-        if (lastPlayState.current !== null && lastPlayState.current !== isPlaying) {
-            logActivity(isPlaying ? "PLAY" : "PAUSE", {
-                styleId: currentStyleId || null,
-                styleName: store?.style?.name || null,
-            });
-        }
-        lastPlayState.current = isPlaying;
-    }, [isPlaying, currentStyleId, store?.style?.name]);
-
-    // Auto-mode check
-    useEffect(() => {
-        if (!isAutoMode || !currentStyleId) return;
-
-        const checkProgram = async () => {
-            try {
-                const res = await fetch("/api/store/current-program");
-                const data = await res.json();
-                if (data.style && data.style.id !== currentStyleId) {
-                    handleStyleChange(data.style);
-                }
-            } catch (err) {
-                console.error("[Auto-Mode] Error:", err);
-            }
-        };
-
-        checkProgram();
-        const interval = setInterval(checkProgram, 30000);
-        return () => clearInterval(interval);
-    }, [isAutoMode, currentStyleId]);
-
-    // Save position periodically
-    useEffect(() => {
-        if (!isPlaying) return;
-
-        saveIntervalRef.current = setInterval(async () => {
-            const currentProgress = usePlayerStore.getState().progress;
-            await fetch("/api/store/save-position", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ position: currentProgress, isPlaying: true }),
-            });
-        }, 10000);
-
-        return () => {
-            if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
-        };
-    }, [isPlaying]);
-
-
-    // Cleanup
-    useEffect(() => {
-        return () => stop();
     }, []);
 
     // Handlers
-    const handleStyleChange = (style: Style) => {
+    const handleStyleChange = useCallback((style: Style) => {
         if (!style || !style.mixUrl) return;
 
         initAudioContext();
@@ -213,7 +160,63 @@ export default function DashboardContent() {
             toStyleId: style.id,
             toStyleName: style.name,
         });
-    };
+    }, [currentStyleId, initPlayer, logActivity, setStyle, stop, store?.style?.name, togglePlay, volume]);
+
+    // Activity logging
+    useEffect(() => {
+        if (lastPlayState.current !== null && lastPlayState.current !== isPlaying) {
+            logActivity(isPlaying ? "PLAY" : "PAUSE", {
+                styleId: currentStyleId || null,
+                styleName: store?.style?.name || null,
+            });
+        }
+        lastPlayState.current = isPlaying;
+    }, [isPlaying, currentStyleId, store?.style?.name]);
+
+    // Auto-mode check
+    useEffect(() => {
+        if (!isAutoMode || !currentStyleId) return;
+
+        const checkProgram = async () => {
+            try {
+                const res = await fetch("/api/store/current-program");
+                const data = await res.json();
+                if (data.style && data.style.id !== currentStyleId) {
+                    handleStyleChange(data.style);
+                }
+            } catch (err) {
+                console.error("[Auto-Mode] Error:", err);
+            }
+        };
+
+        checkProgram();
+        const interval = setInterval(checkProgram, 30000);
+        return () => clearInterval(interval);
+    }, [isAutoMode, currentStyleId, handleStyleChange]);
+
+    // Save position periodically
+    useEffect(() => {
+        if (!isPlaying) return;
+
+        saveIntervalRef.current = setInterval(async () => {
+            const currentProgress = usePlayerStore.getState().progress;
+            await fetch("/api/store/save-position", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ position: currentProgress, isPlaying: true }),
+            });
+        }, 10000);
+
+        return () => {
+            if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
+        };
+    }, [isPlaying]);
+
+
+    // Cleanup
+    useEffect(() => {
+        return () => stop();
+    }, [stop]);
 
     const handleToggleFavorite = async (styleId: string) => {
         try {
@@ -271,6 +274,7 @@ export default function DashboardContent() {
                     storeName={store?.name || ""}
                     currentView={currentView}
                     onViewChange={setCurrentView}
+                    accentColor={store?.accentColor || "green"}
                 />
             }
             playerBar={
@@ -285,12 +289,37 @@ export default function DashboardContent() {
                 {/* Header Section */}
                 <header className={styles.header}>
                     <div className={styles.greeting}>
-                        <h1>
-                            {currentView === "home" && `Bonjour ${store.name}`}
-                            {currentView === "styles" && "Tous les styles"}
-                            {currentView === "favorites" && "Vos favoris"}
-                            {currentView === "settings" && "Paramètres"}
-                        </h1>
+                        {currentView === "home" ? (
+                            <div className={styles.greetingContainer}>
+                                <div className={styles.mobileLogo}>
+                                    <Image
+                                        src={`/images/logos/logo-${store?.accentColor || "green"}.svg`}
+                                        alt="Aura Music"
+                                        width={180}
+                                        height={60}
+                                        style={{
+                                            width: 'auto',
+                                            height: '180px',
+                                            objectFit: 'contain'
+                                        }}
+                                        priority
+                                    />
+                                </div>
+                                <div className={styles.greetingBadge}>
+                                    <span className={styles.greetingText}>
+                                        {greeting} {store.name}
+                                    </span>
+                                    <span className={styles.greetingSeparator}>•</span>
+                                    <span className={styles.greetingTime}>{currentTime}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <h1>
+                                {currentView === "styles" && "Tous les styles"}
+                                {currentView === "favorites" && "Vos favoris"}
+                                {currentView === "settings" && "Paramètres"}
+                            </h1>
+                        )}
                     </div>
                 </header>
 
@@ -301,7 +330,13 @@ export default function DashboardContent() {
                             <section className={styles.heroSection}>
                                 <div className={styles.heroBg}>
                                     {store.style.coverUrl && (
-                                        <img src={store.style.coverUrl} alt="" loading="lazy" />
+                                        <Image 
+                                            src={store.style.coverUrl} 
+                                            alt="" 
+                                            fill
+                                            style={{ objectFit: 'cover', objectPosition: 'var(--banner-position, center center)', opacity: 0.4 }}
+                                            loading="lazy" 
+                                        />
                                     )}
                                     <div className={styles.heroOverlay} />
                                 </div>
@@ -389,7 +424,7 @@ export default function DashboardContent() {
                             </div>
                             <div className={styles.settingsCard}>
                                 <h3>Personnalisation</h3>
-                                <p>Choisissez la couleur d'accent de votre interface</p>
+                                <p>Choisissez la couleur d&apos;accent de votre interface</p>
                                 <div className={styles.colorPicker}>
                                     {["green", "violet", "blue", "orange", "pink", "red", "cyan"].map(
                                         (color) => (

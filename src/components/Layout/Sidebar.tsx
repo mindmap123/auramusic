@@ -1,20 +1,19 @@
 "use client";
 
-import { Home, Radio, Heart, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, Radio, Heart, Settings, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { useState } from "react";
 import { clsx } from "clsx";
+import Image from "next/image";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
     storeName: string;
     currentView: "home" | "styles" | "favorites" | "settings";
     onViewChange: (view: "home" | "styles" | "favorites" | "settings") => void;
+    accentColor?: string;
 }
 
-export default function Sidebar({ storeName, currentView, onViewChange }: SidebarProps) {
-    const [collapsed, setCollapsed] = useState(false);
-
+export default function Sidebar({ storeName, currentView, onViewChange, accentColor = "green" }: SidebarProps) {
     const navItems = [
         { id: "home" as const, icon: Home, label: "Accueil" },
         { id: "styles" as const, icon: Radio, label: "Styles" },
@@ -23,19 +22,27 @@ export default function Sidebar({ storeName, currentView, onViewChange }: Sideba
     ];
 
     return (
-        <aside className={clsx(styles.sidebar, collapsed && styles.collapsed)}>
+        <aside className={styles.sidebar}>
             {/* Logo */}
             <div className={styles.logoSection}>
-                <div className={styles.logo}>
-                    <span className={styles.logoIcon}>A</span>
-                    {!collapsed && <span className={styles.logoText}>Aura</span>}
-                </div>
-                <button
-                    className={styles.collapseBtn}
-                    onClick={() => setCollapsed(!collapsed)}
-                    aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                <button 
+                    className={styles.logo}
+                    onClick={() => onViewChange("home")}
+                    aria-label="Retour à l'accueil"
                 >
-                    {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                    <Image
+                        src={`/images/logos/logo-${accentColor}.svg`}
+                        alt="Aura Music"
+                        width={180}
+                        height={60}
+                        style={{
+                            width: 'auto',
+                            height: '180px',
+                            objectFit: 'contain'
+                        }}
+                        priority
+                        className={styles.logoFull}
+                    />
                 </button>
             </div>
 
@@ -52,7 +59,7 @@ export default function Sidebar({ storeName, currentView, onViewChange }: Sideba
                                 onClick={() => onViewChange(item.id)}
                             >
                                 <item.icon size={24} />
-                                {!collapsed && <span>{item.label}</span>}
+                                <span>{item.label}</span>
                             </button>
                         </li>
                     ))}
@@ -65,12 +72,10 @@ export default function Sidebar({ storeName, currentView, onViewChange }: Sideba
                     <div className={styles.storeAvatar}>
                         {(storeName || 'A').charAt(0).toUpperCase()}
                     </div>
-                    {!collapsed && (
-                        <div className={styles.storeDetails}>
-                            <span className={styles.storeName}>{storeName}</span>
-                            <span className={styles.storeLabel}>Magasin</span>
-                        </div>
-                    )}
+                    <div className={styles.storeDetails}>
+                        <span className={styles.storeName}>{storeName}</span>
+                        <span className={styles.storeLabel}>Magasin</span>
+                    </div>
                 </div>
                 <button
                     className={styles.logoutBtn}
