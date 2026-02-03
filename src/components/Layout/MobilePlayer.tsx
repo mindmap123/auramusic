@@ -153,17 +153,12 @@ function usePullToDismiss(onDismiss: () => void) {
         velocity.current = 0;
     }, [dragY, onDismiss]);
 
-    // Cleanup animation frame on unmount and ensure body styles are restored
+    // Cleanup animation frame on unmount
     useEffect(() => {
         return () => {
             if (animationFrame.current) {
                 cancelAnimationFrame(animationFrame.current);
             }
-            // Force cleanup of body styles on unmount
-            document.body.style.overflow = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
-            document.body.style.overscrollBehavior = '';
         };
     }, []);
 
@@ -240,9 +235,37 @@ export default function MobilePlayer({ currentStyle, onVolumeChange, onNavigateT
 
     const { dragY, isDragging, handlers } = usePullToDismiss(handleDismiss);
 
-    // Prevent body scroll and pull-to-refresh when player is expanded
+    // Handle window resize to close mobile player and cleanup styles on desktop
     useEffect(() => {
-        if (expanded) {
+        const handleResize = () => {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile && expanded) {
+                // Close mobile player when switching to desktop
+                setExpanded(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [expanded]);
+
+    // Force cleanup of body styles on unmount
+    useEffect(() => {
+        return () => {
+            // Force cleanup of body styles on unmount
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.overscrollBehavior = '';
+        };
+    }, []);
+
+    // Prevent body scroll and pull-to-refresh when player is expanded (mobile only)
+    useEffect(() => {
+        // Only apply body styles on mobile screens
+        const isMobile = window.innerWidth <= 768;
+        
+        if (expanded && isMobile) {
             // Store original body styles to restore them later
             const originalOverflow = document.body.style.overflow;
             const originalPosition = document.body.style.position;
