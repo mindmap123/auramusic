@@ -131,7 +131,18 @@ export default function DashboardContent() {
     const handleStyleChange = useCallback((style: Style) => {
         if (!style || !style.mixUrl) return;
 
+        // Don't change if already playing this style
+        if (currentStyleId === style.id) {
+            // Just toggle play/pause if clicking the same style
+            togglePlay();
+            return;
+        }
+
         initAudioContext();
+        
+        // Get audio instance before stopping
+        const audio = getAudioInstance();
+        if (!audio) return;
         
         // Stop current playback
         stop();
@@ -147,9 +158,8 @@ export default function DashboardContent() {
         // Initialize player with new mix
         initPlayer(style.mixUrl, 0, volume);
         
-        // Start playing immediately - the player store handles the audio element properly
-        // Use requestAnimationFrame to ensure DOM is updated before playing
-        requestAnimationFrame(() => {
+        // Start playing immediately after a short delay to ensure initialization is complete
+        setTimeout(() => {
             const audio = getAudioInstance();
             if (audio && audio.src) {
                 audio.play().catch((err) => {
@@ -160,7 +170,7 @@ export default function DashboardContent() {
                     }, 300);
                 });
             }
-        });
+        }, 100);
 
         fetch("/api/store/save-position", {
             method: "POST",
@@ -180,7 +190,7 @@ export default function DashboardContent() {
             toStyleId: style.id,
             toStyleName: style.name,
         });
-    }, [currentStyleId, initPlayer, logActivity, setStyle, stop, store?.style?.name, volume]);
+    }, [currentStyleId, initPlayer, logActivity, setStyle, stop, store?.style?.name, togglePlay, volume]);
 
     // Activity logging
     useEffect(() => {
@@ -232,11 +242,34 @@ export default function DashboardContent() {
         };
     }, [isPlaying]);
 
-
-    // Cleanup
+    // Prevent audio from stopping when page visibility changes
     useEffect(() => {
-        return () => stop();
-    }, [stop]);
+        const handleVisibilityChange = () => {
+            // Don't do anything on visibility change - let audio continue
+            if (document.hidden) {
+                console.log("[Player] Page hidden, audio continues");
+            } else {
+                console.log("[Player] Page visible again");
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+
+    // Cleanup only on unmount, not on every render
+    useEffect(() => {
+        return () => {
+            // Only stop if actually unmounting the component
+            const audio = getAudioInstance();
+            if (audio) {
+                audio.pause();
+            }
+        };
+    }, []);
 
     const handleToggleFavorite = async (styleId: string) => {
         try {
