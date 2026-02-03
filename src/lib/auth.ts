@@ -107,5 +107,5 @@ export const authOptions: NextAuthOptions = {
     session: {
         strategy: "jwt",
     },
-    secret: process.env.NEXTAUTH_SECRET || "aura-secret-fallback-123",
+    secret: process.env.NEXTAUTH_SECRET,
 };
