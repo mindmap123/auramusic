@@ -56,7 +56,7 @@ export default function SchedulingContent() {
             <div className={styles.header}>
                 <div>
                     <h1 className={styles.title}>Programmation Musicale</h1>
-                    <p className={styles.subtitle}>Automatisez le changement de style selon l'heure.</p>
+                    <p className={styles.subtitle}>Automatisez le changement de style selon l&apos;heure.</p>
                 </div>
                 <button onClick={() => setShowModal(true)} className={styles.addButton}>
                     <Plus size={20} /><span>Nouveau Créneau</span>

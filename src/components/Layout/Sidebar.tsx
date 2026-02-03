@@ -28,7 +28,7 @@ export default function Sidebar({ storeName, currentView, onViewChange, accentCo
                 <button 
                     className={styles.logo}
                     onClick={() => onViewChange("home")}
-                    aria-label="Retour à l'accueil"
+                    aria-label="Retour à l&apos;accueil"
                 >
                     <Image
                         src={`/images/logos/logo-${accentColor}.svg`}

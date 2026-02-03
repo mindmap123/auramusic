@@ -40,7 +40,7 @@ interface FormStoreAccess {
 }
 
 const ROLES: { value: UserRole; label: string; desc: string }[] = [
-    { value: "ADMIN", label: "Admin", desc: "Accès complet à l'administration" },
+    { value: "ADMIN", label: "Admin", desc: "Accès complet à l&apos;administration" },
     { value: "MANAGER", label: "Manager", desc: "Gère les magasins assignés" },
     { value: "EDITOR", label: "Éditeur", desc: "Modifie styles et playlists" },
     { value: "VIEWER", label: "Lecteur", desc: "Consultation uniquement" },
@@ -218,7 +218,7 @@ export default function TeamContent() {
     };
 
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Supprimer "${name}" de l'équipe ?`)) return;
+        if (!confirm(`Supprimer "${name}" de l&apos;équipe ?`)) return;
         await fetch(`/api/admin/team/${id}`, { method: "DELETE" });
         fetchMembers();
     };
@@ -297,7 +297,7 @@ export default function TeamContent() {
                         ) : filteredMembers.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className={styles.empty}>
-                                    Aucun membre dans l'équipe
+                                    Aucun membre dans l&apos;équipe
                                 </td>
                             </tr>
                         ) : (

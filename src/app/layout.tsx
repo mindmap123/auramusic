@@ -17,7 +17,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Aura Streaming | Musique d'ambiance pour magasins",
+  title: "Aura Streaming | Musique d&apos;ambiance pour magasins",
   description: "Plateforme de streaming musical intelligente pour espaces commerciaux.",
 };
 

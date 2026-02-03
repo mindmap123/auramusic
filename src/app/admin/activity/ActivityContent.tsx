@@ -117,7 +117,7 @@ export default function ActivityContent() {
                 <div>
                     <h1 className={styles.title}>Activité des magasins</h1>
                     <p className={styles.subtitle}>
-                        Suivez l'utilisation de la radio par vos magasins
+                        Suivez l&apos;utilisation de la radio par vos magasins
                     </p>
                 </div>
             </div>

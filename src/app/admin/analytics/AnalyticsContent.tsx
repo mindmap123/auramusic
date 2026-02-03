@@ -68,7 +68,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             }}>
                 <p style={{ color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}>{label}</p>
                 <p style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>
-                    {payload[0].value}h d'écoute
+                    {payload[0].value}h d&apos;écoute
                 </p>
             </div>
         );
@@ -103,7 +103,7 @@ export default function AnalyticsContent() {
             <div className={styles.header}>
                 <div>
                     <h1 className={styles.title}>Analytics</h1>
-                    <p className={styles.subtitle}>Vue d'ensemble de l'activité de la plateforme</p>
+                    <p className={styles.subtitle}>Vue d&apos;ensemble de l&apos;activité de la plateforme</p>
                 </div>
             </div>
 
@@ -114,7 +114,7 @@ export default function AnalyticsContent() {
                         <Clock size={24} />
                     </div>
                     <div className={styles.kpiContent}>
-                        <div className={styles.kpiLabel}>Heures d'écoute</div>
+                        <div className={styles.kpiLabel}>Heures d&apos;écoute</div>
                         <div className={styles.kpiValue}>{data.kpis.totalHours}h</div>
                         <div className={styles.kpiSub}>Total cumulé</div>
                     </div>

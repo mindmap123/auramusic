@@ -77,7 +77,7 @@ export default function PreviewContent() {
             <div className={styles.empty}>
                 <Monitor size={48} />
                 <h2>Aucun magasin</h2>
-                <p>Créez d'abord un magasin.</p>
+                <p>Créez d&apos;abord un magasin.</p>
             </div>
         );
     }
@@ -87,7 +87,7 @@ export default function PreviewContent() {
             <header className={styles.header}>
                 <div className={styles.info}>
                     <h1 className={styles.title}>Aperçu Magasin</h1>
-                    <p className={styles.subtitle}>Interface client telle qu'elle apparaît en magasin</p>
+                    <p className={styles.subtitle}>Interface client telle qu&apos;elle apparaît en magasin</p>
                 </div>
                 <div className={styles.actions}>
                     <select value={selectedStoreId} onChange={(e) => { setSelectedStoreId(e.target.value); loadPreview(e.target.value); }} className={styles.storeSelect}>
