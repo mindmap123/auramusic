@@ -101,18 +101,21 @@ export default function DashboardContent() {
             .catch(console.error);
     }, [session, status, router]);
 
-    // Initialize player
+    // Initialize player only once when store data is loaded
+    const playerInitialized = useRef(false);
     useEffect(() => {
-        if (!store) return;
+        if (!store || playerInitialized.current) return;
 
         if (store?.style?.mixUrl && store?.currentStyleId) {
+            console.log("[Dashboard] Initializing player once");
             setStyle(store.currentStyleId, store.style.mixUrl);
             initPlayer(store.style.mixUrl, store.currentPosition || 0, (store.volume || 70) / 100);
+            playerInitialized.current = true;
         }
         if (store.isAutoMode) {
             setAutoMode(true);
         }
-    }, [store?.id, store?.style?.mixUrl, store?.currentStyleId, store?.currentPosition, store?.volume, store?.isAutoMode, setStyle, initPlayer, setAutoMode]);
+    }, [store?.id]);
 
     // Activity logging
     const logActivity = useCallback(async (action: string, details?: any) => {

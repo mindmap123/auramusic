@@ -34,6 +34,14 @@ export const usePlayerStore = create<PlayerState>()(persist((set, get) => ({
         const audio = getAudioInstance();
         if (!audio) return;
 
+        // Don't reinitialize if already playing the same mix
+        const currentState = get();
+        if (audio.src.includes(mixUrl) && currentState.mixUrl === mixUrl) {
+            console.log("[PlayerStore] Already initialized with this mix, skipping");
+            return;
+        }
+
+        console.log("[PlayerStore] Initializing player with:", mixUrl);
         audio.pause();
 
         if (!mixUrl) {
@@ -53,11 +61,14 @@ export const usePlayerStore = create<PlayerState>()(persist((set, get) => ({
             // ignore
         }
 
-        audio.onplay = () => set({ isPlaying: true });
-        audio.onpause = () => set({ isPlaying: false });
-        audio.ontimeupdate = () => {
-            set({ progress: Math.floor(audio.currentTime) });
-        };
+        // Only set event handlers once
+        if (!audio.onplay) {
+            audio.onplay = () => set({ isPlaying: true });
+            audio.onpause = () => set({ isPlaying: false });
+            audio.ontimeupdate = () => {
+                set({ progress: Math.floor(audio.currentTime) });
+            };
+        }
 
         const onLoaded = () => {
             if (startPosition > 0) {
@@ -71,7 +82,6 @@ export const usePlayerStore = create<PlayerState>()(persist((set, get) => ({
         };
         audio.addEventListener('loadedmetadata', onLoaded, { once: true } as any);
 
-        const currentState = get();
         set({ mixUrl, volume, currentStyleId: currentState?.currentStyleId || null });
     },
 
@@ -82,14 +92,16 @@ export const usePlayerStore = create<PlayerState>()(persist((set, get) => ({
         const audio = getAudioInstance();
         if (!audio) return;
 
-        const { mixUrl, progress } = get();
+        const { mixUrl, progress, isPlaying } = get();
 
         if (!mixUrl) {
             console.error("[PlayerStore] Cannot play: No mix URL loaded");
             return;
         }
 
-        if (!audio.src || audio.src === window.location.href) {
+        // If audio src is not set or wrong, set it
+        if (!audio.src || audio.src === window.location.href || !audio.src.includes(mixUrl)) {
+            console.log("[PlayerStore] Setting audio src:", mixUrl);
             audio.src = mixUrl;
             audio.loop = true;
 
@@ -115,11 +127,15 @@ export const usePlayerStore = create<PlayerState>()(persist((set, get) => ({
             }
         }
 
-        if (get().isPlaying) {
+        if (isPlaying) {
+            console.log("[PlayerStore] Pausing");
             audio.pause();
         } else {
+            console.log("[PlayerStore] Playing");
             // Play immediately - don't wait
-            audio.play().catch(console.error);
+            audio.play().catch((err) => {
+                console.error("[PlayerStore] Play failed:", err);
+            });
         }
     },
 
