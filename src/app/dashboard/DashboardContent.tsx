@@ -7,7 +7,7 @@ import { Zap, Heart } from "lucide-react";
 import { clsx } from "clsx";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useShallow } from "zustand/react/shallow";
-import { initAudioContext } from "@/lib/audioManager";
+import { initAudioContext, getAudioInstance } from "@/lib/audioManager";
 import { AppLayout, Sidebar, PlayerBar, MobilePlayer, MobileNav } from "@/components/Layout";
 import StyleGrid from "@/components/Player/StyleGrid";
 import { useGreeting } from "@/hooks/useGreeting";
@@ -132,7 +132,11 @@ export default function DashboardContent() {
         if (!style || !style.mixUrl) return;
 
         initAudioContext();
+        
+        // Stop current playback
         stop();
+        
+        // Update style in store
         setStyle(style.id, style.mixUrl);
         setStore((prev: any) => ({
             ...prev,
@@ -140,18 +144,28 @@ export default function DashboardContent() {
             currentStyleId: style.id,
         }));
         
-        // Initialize player and start playing
+        // Initialize player with new mix
         initPlayer(style.mixUrl, 0, volume);
         
-        // Small delay to ensure player is ready before toggling play
-        setTimeout(() => {
-            togglePlay();
-        }, 100);
+        // Start playing immediately - the player store handles the audio element properly
+        // Use requestAnimationFrame to ensure DOM is updated before playing
+        requestAnimationFrame(() => {
+            const audio = getAudioInstance();
+            if (audio && audio.src) {
+                audio.play().catch((err) => {
+                    console.error("[Player] Play failed:", err);
+                    // Retry once after a short delay if autoplay was blocked
+                    setTimeout(() => {
+                        audio.play().catch(console.error);
+                    }, 300);
+                });
+            }
+        });
 
         fetch("/api/store/save-position", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ position: usePlayerStore.getState().progress, isPlaying: false }),
+            body: JSON.stringify({ position: 0, isPlaying: false }),
         }).catch(console.error);
 
         fetch("/api/store/change-style", {
@@ -166,7 +180,7 @@ export default function DashboardContent() {
             toStyleId: style.id,
             toStyleName: style.name,
         });
-    }, [currentStyleId, initPlayer, logActivity, setStyle, stop, store?.style?.name, togglePlay, volume]);
+    }, [currentStyleId, initPlayer, logActivity, setStyle, stop, store?.style?.name, volume]);
 
     // Activity logging
     useEffect(() => {
