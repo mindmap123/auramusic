@@ -166,7 +166,7 @@ model PlaySession {
   startedAt   DateTime   @default(now())
   endedAt     DateTime?
   totalPlayed Int        @default(0)
-  store       Store      @relation(fields: [storeId], references: [id])
+  store       Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
   style       MusicStyle @relation(fields: [styleId], references: [id])
 }
 

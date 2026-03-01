@@ -116,6 +116,27 @@
     font-weight: 500;
 }
 
+.sessionsBadge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(59, 130, 246, 0.1);
+    color: rgb(59, 130, 246);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.concurrent {
+    background: rgba(251, 191, 36, 0.1);
+    color: rgb(251, 191, 36);
+}
+
+.hours {
+    color: var(--foreground);
+    font-weight: 500;
+}
+
 .statusBadge {
     display: inline-flex;
     align-items: center;

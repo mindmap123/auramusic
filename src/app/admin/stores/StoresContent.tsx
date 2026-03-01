@@ -2,8 +2,16 @@
 
 import { useState, useEffect } from "react";
 import styles from "./Stores.module.css";
-import { Plus, Search, Trash2, Edit2, X, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Trash2, Edit2, X, Eye, EyeOff, Activity } from "lucide-react";
 import { clsx } from "clsx";
+import SessionsModal from "./SessionsModal";
+
+interface SessionStats {
+    totalSessions: number;
+    activeSessions: number;
+    totalListeningHours: number;
+    hasConcurrentSessions: boolean;
+}
 
 interface Store {
     id: string;
@@ -12,6 +20,7 @@ interface Store {
     isActive: boolean;
     style?: { name: string } | null;
     createdAt: string;
+    stats?: SessionStats;
 }
 
 interface StoreForm {
@@ -30,15 +39,34 @@ export default function StoresContent() {
     const [showPassword, setShowPassword] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+    const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
-    useEffect(() => { fetchStores(); }, []);
+    useEffect(() => { fetchStoresWithStats(); }, []);
 
-    const fetchStores = async () => {
+    const fetchStoresWithStats = async () => {
         try {
             const res = await fetch("/api/admin/stores");
-            setStores(await res.json());
-        } catch (err) { console.error(err); }
-        finally { setLoading(false); }
+            const stores = await res.json();
+            
+            // Charger les stats pour chaque store
+            const storesWithStats = await Promise.all(
+                stores.map(async (store: Store) => {
+                    try {
+                        const statsRes = await fetch(`/api/admin/stores/${store.id}/stats`);
+                        const stats = await statsRes.json();
+                        return { ...store, stats };
+                    } catch {
+                        return store;
+                    }
+                })
+            );
+            
+            setStores(storesWithStats);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const openCreateModal = () => {
@@ -85,15 +113,36 @@ export default function StoresContent() {
                 if (!res.ok) throw new Error((await res.json()).error || "Erreur");
             }
             closeModal();
-            fetchStores();
+            fetchStoresWithStats();
         } catch (err: any) { setError(err.message); }
         finally { setSaving(false); }
     };
 
+    const openSessionsModal = (store: Store) => {
+        setSelectedStore(store);
+    };
+
+    const closeSessionsModal = () => {
+        setSelectedStore(null);
+    };
+
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Supprimer "${name}" ?`)) return;
-        await fetch(`/api/admin/stores/${id}`, { method: "DELETE" });
-        fetchStores();
+        if (!confirm(`Supprimer "${name}" et toutes ses données associées ?`)) return;
+        
+        try {
+            const res = await fetch(`/api/admin/stores/${id}`, { method: "DELETE" });
+            const data = await res.json();
+            
+            if (!res.ok) {
+                alert(`Erreur: ${data.error}\n${data.details || ''}`);
+                return;
+            }
+            
+            alert(data.message || 'Store supprimé avec succès');
+            fetchStoresWithStats();
+        } catch (err: any) {
+            alert(`Erreur lors de la suppression: ${err.message}`);
+        }
     };
 
     const handleToggleActive = async (store: Store) => {
@@ -102,7 +151,7 @@ export default function StoresContent() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ isActive: !store.isActive }),
         });
-        fetchStores();
+        fetchStoresWithStats();
     };
 
     const filteredStores = stores.filter(s =>
@@ -129,24 +178,73 @@ export default function StoresContent() {
             </div>
             <div className={styles.tableCard}>
                 <table className={styles.table}>
-                    <thead><tr><th>Magasin</th><th>Email</th><th>Style</th><th>Statut</th><th>Actions</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Magasin</th>
+                            <th>Email</th>
+                            <th>Style</th>
+                            <th>Sessions actives</th>
+                            <th>Heures d&apos;écoute</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        {loading ? <tr><td colSpan={5} className={styles.loading}>Chargement...</td></tr>
-                        : filteredStores.length === 0 ? <tr><td colSpan={5} className={styles.empty}>Aucun magasin</td></tr>
+                        {loading ? <tr><td colSpan={7} className={styles.loading}>Chargement...</td></tr>
+                        : filteredStores.length === 0 ? <tr><td colSpan={7} className={styles.empty}>Aucun magasin</td></tr>
                         : filteredStores.map(store => (
                             <tr key={store.id}>
                                 <td><span className={styles.storeName}>{store.name}</span></td>
                                 <td className={styles.email}>{store.email}</td>
                                 <td><span className={styles.styleBadge}>{store.style?.name || "Aucun"}</span></td>
                                 <td>
-                                    <button onClick={() => handleToggleActive(store)} className={clsx(styles.statusBadge, store.isActive ? styles.active : styles.inactive)}>
+                                    <span className={clsx(
+                                        styles.sessionsBadge,
+                                        store.stats?.hasConcurrentSessions && styles.concurrent
+                                    )}>
+                                        {store.stats?.activeSessions || 0}
+                                        {store.stats?.hasConcurrentSessions && " ⚠️"}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span className={styles.hours}>
+                                        {store.stats?.totalListeningHours?.toFixed(1) || "0.0"}h
+                                    </span>
+                                </td>
+                                <td>
+                                    <button 
+                                        onClick={() => handleToggleActive(store)} 
+                                        className={clsx(
+                                            styles.statusBadge, 
+                                            store.isActive ? styles.active : styles.inactive
+                                        )}
+                                    >
                                         {store.isActive ? "Actif" : "Inactif"}
                                     </button>
                                 </td>
                                 <td>
                                     <div className={styles.actions}>
-                                        <button onClick={() => openEditModal(store)} className={styles.actionBtn} title="Modifier"><Edit2 size={16} /></button>
-                                        <button onClick={() => handleDelete(store.id, store.name)} className={clsx(styles.actionBtn, styles.deleteBtn)} title="Supprimer"><Trash2 size={16} /></button>
+                                        <button 
+                                            onClick={() => openSessionsModal(store)} 
+                                            className={styles.actionBtn} 
+                                            title="Voir les sessions"
+                                        >
+                                            <Activity size={16} />
+                                        </button>
+                                        <button 
+                                            onClick={() => openEditModal(store)} 
+                                            className={styles.actionBtn} 
+                                            title="Modifier"
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(store.id, store.name)} 
+                                            className={clsx(styles.actionBtn, styles.deleteBtn)} 
+                                            title="Supprimer"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -187,6 +285,13 @@ export default function StoresContent() {
                         </form>
                     </div>
                 </div>
+            )}
+            {selectedStore && (
+                <SessionsModal
+                    storeId={selectedStore.id}
+                    storeName={selectedStore.name}
+                    onClose={closeSessionsModal}
+                />
             )}
         </div>
     );

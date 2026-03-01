@@ -52,9 +52,44 @@ export async function DELETE(
 
     try {
         const { id } = await params;
+        
+        // Vérifier que le store existe
+        const store = await prisma.store.findUnique({
+            where: { id },
+            select: { id: true, name: true }
+        });
+        
+        if (!store) {
+            return NextResponse.json(
+                { error: "Store not found" }, 
+                { status: 404 }
+            );
+        }
+        
+        // Supprimer le store (cascade delete automatique)
         await prisma.store.delete({ where: { id } });
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        return NextResponse.json({ error: "Failed to delete store" }, { status: 500 });
+        
+        // Logger l'action
+        console.log(`Store deleted: ${store.name} (${id})`);
+        
+        return NextResponse.json({ 
+            success: true,
+            message: `Store "${store.name}" deleted successfully`
+        });
+    } catch (error: any) {
+        console.error("Delete store error:", error);
+        
+        // Identifier les erreurs de contrainte
+        if (error.code === 'P2003') {
+            return NextResponse.json({ 
+                error: "Cannot delete store due to foreign key constraint",
+                details: error.meta?.field_name
+            }, { status: 400 });
+        }
+        
+        return NextResponse.json({ 
+            error: "Failed to delete store",
+            details: error.message
+        }, { status: 500 });
     }
 }
