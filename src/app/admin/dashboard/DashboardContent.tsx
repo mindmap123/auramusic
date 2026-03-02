@@ -45,7 +45,11 @@ interface ActiveStore {
 interface FeaturedLive {
     style: StyleInfo;
     storeCount: number;
-    listeners: number;
+    stores: Array<{
+        id: string;
+        name: string;
+        city: string | null;
+    }>;
 }
 
 interface DashboardData {
@@ -226,8 +230,17 @@ export default function DashboardContent() {
                                 <span className={styles.liveBadge}>EN DIRECT</span>
                                 <h2 className={styles.featuredTitle}>{featuredLive.style.name}</h2>
                                 <p className={styles.featuredMeta}>
-                                    Diffusé sur {featuredLive.storeCount} magasin{featuredLive.storeCount > 1 ? "s" : ""} • {featuredLive.listeners} auditeurs
+                                    Diffusé sur {featuredLive.storeCount} magasin{featuredLive.storeCount > 1 ? "s" : ""}
                                 </p>
+                                {featuredLive.stores.length > 0 && (
+                                    <div className={styles.storesList}>
+                                        {featuredLive.stores.map(store => (
+                                            <span key={store.id} className={styles.storeTag}>
+                                                {store.name}{store.city ? ` (${store.city})` : ''}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                                 <div className={styles.featuredActions}>
                                     <button className={styles.listenBtn}>
                                         <Headphones size={18} />

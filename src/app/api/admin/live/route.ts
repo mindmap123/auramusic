@@ -148,6 +148,17 @@ export async function GET() {
         const featuredLive = Object.values(styleCount)
             .sort((a, b) => b.count - a.count)[0] || null;
 
+        // Get stores playing the featured style
+        const featuredStores = featuredLive 
+            ? playingStores
+                .filter(s => s.style?.id === featuredLive.style.id)
+                .map(s => ({
+                    id: s.id,
+                    name: s.name,
+                    city: s.city,
+                }))
+            : [];
+
         // Active stores list (top 3)
         const activeStoresList = stores
             .filter(s => s.isActive)
@@ -176,7 +187,7 @@ export async function GET() {
             featuredLive: featuredLive ? {
                 style: featuredLive.style,
                 storeCount: featuredLive.count,
-                listeners: featuredLive.count * 50 + Math.floor(Math.random() * 100),
+                stores: featuredStores,
             } : null,
             popularStyles,
             activeStores: activeStoresList,

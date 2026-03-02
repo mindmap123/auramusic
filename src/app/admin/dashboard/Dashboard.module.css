@@ -278,6 +278,25 @@
     margin: 0;
 }
 
+.storesList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.storeTag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    color: var(--text-base);
+    font-weight: 500;
+}
+
 .featuredActions {
     display: flex;
     gap: 12px;

@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "logo:generate": "node scripts/generate-colored-logos.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.1",
