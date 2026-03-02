@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { AlertTriangle } from "lucide-react";
 import styles from "./LoginForm.module.css";
 
 export default function LoginForm() {
@@ -11,6 +12,10 @@ export default function LoginForm() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    
+    // Vérifier si déconnecté pour conflit de session
+    const sessionConflict = searchParams.get('reason') === 'session_conflict';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,6 +59,16 @@ export default function LoginForm() {
                 <p className={styles.subtitle}>
                     Connectez-vous pour commencer à diffuser.
                 </p>
+
+                {sessionConflict && (
+                    <div className={styles.warning}>
+                        <AlertTriangle size={20} />
+                        <div>
+                            <strong>Compte utilisé ailleurs</strong>
+                            <p>Votre compte a été utilisé sur un autre appareil. Reconnectez-vous pour continuer.</p>
+                        </div>
+                    </div>
+                )}
 
                 {error && <div className={styles.error}>{error}</div>}
 

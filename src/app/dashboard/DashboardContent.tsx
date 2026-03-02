@@ -11,6 +11,8 @@ import { initAudioContext, getAudioInstance } from "@/lib/audioManager";
 import { AppLayout, Sidebar, PlayerBar, MobilePlayer, MobileNav } from "@/components/Layout";
 import StyleGrid from "@/components/Player/StyleGrid";
 import { useGreeting } from "@/hooks/useGreeting";
+import { useSessionCheck } from "@/hooks/useSessionCheck";
+import SessionConflictModal from "@/components/SessionConflictModal";
 import Image from "next/image";
 import styles from "./Dashboard.module.css";
 
@@ -34,6 +36,9 @@ export default function DashboardContent() {
     const [favorites, setFavorites] = useState<string[]>([]);
     const contentRef = useRef<HTMLDivElement>(null);
     const { greeting, currentTime } = useGreeting();
+    
+    // Vérifier la session toutes les 30 secondes
+    const { sessionConflict } = useSessionCheck(30000);
 
     const {
         isPlaying,
@@ -530,6 +535,9 @@ export default function DashboardContent() {
                     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
                 }}
             />
+            
+            {/* Session Conflict Modal */}
+            <SessionConflictModal show={sessionConflict} />
         </AppLayout>
     );
 }

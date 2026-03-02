@@ -60,6 +60,36 @@
     text-align: center;
 }
 
+.warning {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    color: rgb(251, 191, 36);
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 24px;
+    font-size: 0.875rem;
+}
+
+.warning svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.warning strong {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.warning p {
+    margin: 0;
+    color: rgba(251, 191, 36, 0.9);
+    line-height: 1.5;
+}
+
 .inputGroup {
     margin-bottom: 20px;
 }

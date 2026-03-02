@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { createStoreSession } from "@/lib/sessionManager";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -20,12 +21,16 @@ export const authOptions: NextAuthOptions = {
                 });
 
                 if (store && await bcrypt.compare(credentials.password, store.password)) {
+                    // Créer une nouvelle session (invalide les sessions précédentes)
+                    const sessionToken = await createStoreSession(store.id);
+                    
                     return {
                         id: store.id,
                         email: store.email,
                         name: store.name,
                         role: "STORE",
                         userRole: null,
+                        sessionToken, // Ajouter le token à la session
                     };
                 }
 
@@ -88,6 +93,7 @@ export const authOptions: NextAuthOptions = {
                 token.id = user.id;
                 token.userRole = (user as any).userRole;
                 token.storeAccess = (user as any).storeAccess;
+                token.sessionToken = (user as any).sessionToken; // Ajouter le sessionToken
             }
             return token;
         },
@@ -97,6 +103,7 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).id = token.id;
                 (session.user as any).userRole = token.userRole;
                 (session.user as any).storeAccess = token.storeAccess;
+                (session.user as any).sessionToken = token.sessionToken; // Ajouter le sessionToken
             }
             return session;
         },

@@ -8,32 +8,34 @@ datasource db {
 }
 
 model Store {
-  id             String               @id @default(uuid())
-  name           String
-  email          String               @unique
-  password       String
-  currentStyleId String?
-  volume         Int                  @default(70)
-  isPlaying      Boolean              @default(false)
-  isAutoMode     Boolean              @default(false)
-  isActive       Boolean              @default(true)
-  lastPlayedAt   DateTime?
-  role           String               @default("STORE")
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  accentColor    String               @default("green")
-  city           String?
-  country        String?
-  groupId        String?
-  storeType      String?
-  activityLogs   ActivityLog[]
-  playSessions   PlaySession[]
-  style          MusicStyle?          @relation("CurrentStyle", fields: [currentStyleId], references: [id])
-  group          StoreGroup?          @relation(fields: [groupId], references: [id])
-  favorites      StoreFavorite[]
-  schedules      StoreSchedule[]
-  styleProgress  StoreStyleProgress[]
-  userAccess     UserStoreAccess[]
+  id                  String               @id @default(uuid())
+  name                String
+  email               String               @unique
+  password            String
+  currentStyleId      String?
+  volume              Int                  @default(70)
+  isPlaying           Boolean              @default(false)
+  isAutoMode          Boolean              @default(false)
+  isActive            Boolean              @default(true)
+  lastPlayedAt        DateTime?
+  role                String               @default("STORE")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  accentColor         String               @default("green")
+  activeSessionToken  String?              // Token de la session active
+  sessionStartedAt    DateTime?            // Quand la session a démarré
+  city                String?
+  country             String?
+  groupId             String?
+  storeType           String?
+  activityLogs        ActivityLog[]
+  playSessions        PlaySession[]
+  style               MusicStyle?          @relation("CurrentStyle", fields: [currentStyleId], references: [id])
+  group               StoreGroup?          @relation(fields: [groupId], references: [id])
+  favorites           StoreFavorite[]
+  schedules           StoreSchedule[]
+  styleProgress       StoreStyleProgress[]
+  userAccess          UserStoreAccess[]
 
   @@index([groupId])
   @@index([city])

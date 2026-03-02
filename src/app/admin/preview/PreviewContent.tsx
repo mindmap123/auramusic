@@ -22,12 +22,20 @@ export default function PreviewContent() {
     const {
         isPlaying,
         currentStyleId,
+        volume,
         setStyle,
+        togglePlay,
+        setVolume,
+        initPlayer,
         stop,
     } = usePlayerStore(useShallow((state) => ({
         isPlaying: state.isPlaying,
         currentStyleId: state.currentStyleId,
+        volume: state.volume,
         setStyle: state.setStyle,
+        togglePlay: state.togglePlay,
+        setVolume: state.setVolume,
+        initPlayer: state.initPlayer,
         stop: state.stop,
     })));
 
@@ -65,6 +73,7 @@ export default function PreviewContent() {
             // Init player state if needed
             if (data.style?.mixUrl) {
                 setStyle(data.currentStyleId || data.style.id, data.style.mixUrl);
+                initPlayer(data.style.mixUrl, data.currentPosition || 0, volume);
             }
         } catch (err) { console.error(err); }
         finally { setRefreshing(false); setLoading(false); }
@@ -109,12 +118,13 @@ export default function PreviewContent() {
                                     storeName={previewStore.name}
                                     currentView={currentView}
                                     onViewChange={setCurrentView}
+                                    accentColor={previewStore.accentColor || "green"}
                                 />
                             }
                             playerBar={
                                 <PlayerBar
                                     currentStyle={previewStore.style}
-                                    onVolumeChange={() => { }}
+                                    onVolumeChange={(vol) => setVolume(vol)}
                                 />
                             }
                         >
@@ -148,7 +158,13 @@ export default function PreviewContent() {
                                     </div>
                                     <StyleGrid
                                         activeStyleId={currentStyleId}
-                                        onSelect={() => { }} // Read only in preview
+                                        onSelect={(style) => {
+                                            if (style.mixUrl) {
+                                                setStyle(style.id, style.mixUrl);
+                                                initPlayer(style.mixUrl, 0, volume);
+                                                togglePlay();
+                                            }
+                                        }}
                                         isPlaying={isPlaying}
                                     />
                                 </section>

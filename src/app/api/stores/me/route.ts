@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { validateStoreSessionMiddleware } from "@/lib/sessionMiddleware";
 
 export async function PATCH(req: NextRequest) {
-    const session = await getServerSession(authOptions);
-
-    if (!session || (session.user as any).role !== "STORE") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Vérifier la session
+    const validation = await validateStoreSessionMiddleware();
+    if (!validation.valid) {
+        return validation.response;
     }
 
     try {
         const { currentStyleId, volume, isPlaying, isAutoMode, accentColor } = await req.json();
-        const storeId = (session.user as any).id;
+        const storeId = validation.user.id;
 
         const updatedStore = await prisma.store.update({
             where: { id: storeId },

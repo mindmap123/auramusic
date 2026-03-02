@@ -137,6 +137,18 @@ export default function TracksContent() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Vérifier le type de fichier
+        if (!file.type.startsWith('image/')) {
+            alert('Veuillez sélectionner une image (JPG, PNG, etc.)');
+            return;
+        }
+
+        // Vérifier la taille (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('L\'image est trop grande (max 5MB)');
+            return;
+        }
+
         setUploadingCover(true);
         const formData = new FormData();
         formData.append("file", file);
@@ -151,9 +163,13 @@ export default function TracksContent() {
                 setStyleFormData(prev => ({ ...prev, coverUrl: data.url }));
                 if (selectedStyleId) fetchStyles();
             } else {
-                alert(data.error || "Erreur upload");
+                console.error('Cover upload error:', data);
+                alert(`Erreur upload: ${data.error || 'Erreur inconnue'}`);
             }
-        } catch (err) { alert("Erreur upload"); }
+        } catch (err: any) { 
+            console.error('Cover upload exception:', err);
+            alert(`Erreur upload: ${err.message || 'Erreur réseau'}`); 
+        }
         finally { setUploadingCover(false); }
     };
 
